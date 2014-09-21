@@ -13,6 +13,7 @@
                  [enlive "1.1.5"]
                  [markdown-clj "0.9.47"]
                  [clj-time "0.8.0"]
+                 [peridot "0.3.0"]
                  [prismatic/plumbing "0.3.3"]
                  [me.raynes/conch "0.8.0"]
                  [me.raynes/fs "1.4.4"]
