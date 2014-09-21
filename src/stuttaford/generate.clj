@@ -1,34 +1,68 @@
 (ns stuttaford.generate
-  (:require [kerodon.core :as kerodon]
-            [peridot.core :as peridot]
+  (:require [clojure.java.shell :as shell]
+            [clojure.string :as string]
+            [clojure.tools.logging :as log]
+            [kerodon.core :as kerodon]
             [me.raynes.fs :as fs]
-            [stuttaford.web.routes :refer [app]]
+            [peridot.core :as peridot]
+            [stuttaford.web.posts :as posts]
             [stuttaford.web.service :as service]))
 
 (def SITE "site")
 
 (defn clean []
+  (log/info " * Cleaning previous build")
   (fs/delete-dir SITE))
 
 (defn ensure-site []
   (fs/mkdir SITE))
 
 (defn copy-public-to-site []
-  (fs/copy+ "resources/public" SITE))
+  (log/info " * Copying public files")
+  (shell/with-sh-dir "."
+    (shell/sh "bash" "-c" (format "cp -r resources/public/* %s/." SITE))))
+
+(defn content-for-url [session url]
+  (-> session
+      (peridot/request url)
+      :response
+      :body))
+
+(defn ensure-dirs [path]
+  (if (re-find #"/" path)
+    (-> path
+        (string/replace #"/[^/]*$" "")
+        fs/mkdirs)))
+
+(defn write-site-file [path content]
+  (let [path (str SITE path)]
+    (ensure-dirs path)
+    (spit path content)))
+
+(defn generate-path [session path filename]
+  (log/info " * Generating" path "->" filename)
+  (->> path
+       (content-for-url session)
+       (write-site-file filename)))
+
+(defn generate-html-path [session path]
+  (generate-path session path (str path "index.html")))
 
 (defn build []
+  (log/info "=======================================")
+  (log/info "Building site")
   (clean)
   (ensure-site)
-  (copy-public-to-site))
+  (copy-public-to-site)
+  (let [session (kerodon/session (service/handler))]
+    (generate-path session "/atom.xml" "/atom.xml")
+    (generate-html-path session "/")
+    (generate-html-path session "/about/")
+    (doseq [permalink (map :permalink (posts/list-posts))]
+      (generate-html-path session permalink)))
+  (log/info "Done."))
 
 (defn -main
   [& args]
-  (build))
-
-(comment
   (build)
-  (-> (service/handler)
-      kerodon/session
-      (peridot/request "/atom.xml" :request-method :get)
-      :response)
-  )
+  (System/exit 0))

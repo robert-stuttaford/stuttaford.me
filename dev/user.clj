@@ -1,5 +1,6 @@
 (ns user
   (:require [stuttaford.db :refer [start-database!]]
+            [stuttaford.generate :as generate]
             [stuttaford.web.service :refer [start-web-server! stop-web-server!]]))
 
 (defn start! []
@@ -9,3 +10,6 @@
 (defn reset []
   (stop-web-server!)
   (start!))
+
+(defn generate []
+  (generate/build))
