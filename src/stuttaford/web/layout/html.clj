@@ -45,9 +45,9 @@
     "I'm on " [:a {:href twitter} "Twitter"]
     " and " [:a {:href github} "GitHub"] "."]])
 
-(defnk foot [google-analytics-id domain year]
+(defnk foot [google-analytics-id domain year [:author name]]
   [:div.footer
-   [:p "&copy; " year ". All rights reserved."]
+   [:p "&copy; " name " " year ". All rights reserved. Some lefts, too."]
    [:script {:type "text/javascript"}
     "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
