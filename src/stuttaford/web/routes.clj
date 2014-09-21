@@ -62,14 +62,14 @@
 
     (POST "/new" {params :params}
           (link/save-link! params)
-          (response/redirect "/links/new"))
+          (response/redirect "/codex/new"))
 
     (GET "/edit/:slug" [slug]
          (render html-layout link/edit-form slug))
 
     (POST "/edit/:slug" {params :params}
           (link/update-link! params)
-          (response/redirect "/links")))
+          (response/redirect "/codex")))
 
   (route/resources "")
   (route/not-found #(render-memoized html-layout (partial error-404 %))))
