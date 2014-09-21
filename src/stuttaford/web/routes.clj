@@ -7,7 +7,7 @@
             [stuttaford.web.content :refer [parse-markdown-page parse-markdown-post]]
             [stuttaford.web.layout.atom :refer [atom-layout]]
             [stuttaford.web.layout.html :refer [html-layout]]
-            [stuttaford.web.link :as link]))
+            [stuttaford.web.codex :as codex]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Site config
@@ -55,20 +55,23 @@
   (context "/codex" []
 
     (GET "/" {:as req}
-         (render html-layout link/links (some-> req :query-params (get "admin") boolean)))
+         (let [query-params (some-> req :query-params)]
+           (render html-layout codex/codex
+             :admin? (some-> query-params (get "admin") boolean)
+             :debug? (some-> query-params (get "debug") boolean))))
 
     (GET "/new" []
-         (render html-layout link/new-form))
+         (render html-layout codex/new-form))
 
     (POST "/new" {params :params}
-          (link/save-link! params)
+          (codex/save-link! params)
           (response/redirect "/codex/new"))
 
     (GET "/edit/:slug" [slug]
-         (render html-layout link/edit-form slug))
+         (render html-layout codex/edit-form slug))
 
     (POST "/edit/:slug" {params :params}
-          (link/update-link! params)
+          (codex/update-link! params)
           (response/redirect "/codex")))
 
   (route/resources "")

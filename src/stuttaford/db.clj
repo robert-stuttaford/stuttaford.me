@@ -298,3 +298,32 @@
 (comment
   (d/transact (as-conn uri) (add-slugs-to-links))
   )
+
+(defn prepare-tag [tag]
+  {:name (:tag/name tag)})
+
+(defn prepare-link [link]
+  (let [tags (->> link :link/tags (map prepare-tag) vec)]
+    (cond-> {:name     (:link/title link)
+             :uri      (:link/uri link)
+             :category (:link/category link)}
+            (:link/description link) (assoc :description (:link/description link))
+            (:link/image link) (assoc :image (:link/image link))
+            (seq tags) (assoc :tags tags
+                              :tags-string (->> tags
+                                                (map :name)
+                                                (string/join " "))))))
+
+(defn prepare-category [category]
+  {:name (:category/name category)
+   :links (->> category
+               :link/_category
+               (map prepare-link)
+               vec)})
+
+(defn all-categories-with-links []
+  (->> (all (as-db uri) :link/slug)
+       (map :link/category)
+       distinct
+       (map prepare-category)
+       vec))

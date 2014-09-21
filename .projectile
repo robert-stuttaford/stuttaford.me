@@ -1,4 +1,5 @@
 -/target
 -/site
--/public/bootstrap
--/public/images
+-/resources/public/bootstrap
+-/resources/public/images
+-/resources/public/js/codex*

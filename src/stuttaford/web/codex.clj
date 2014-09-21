@@ -1,7 +1,9 @@
-(ns stuttaford.web.link
+(ns stuttaford.web.codex
   (:use [plumbing.core])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
+            [hiccup.element :as element]
+            [hiccup.page :as page]
             [stuttaford.db :as db]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,23 +43,33 @@
    (when description
      [:p description])))
 
-(defn links [admin?]
+(def default-state
+  {:config {}})
+
+(defn om-app [debug? app-state]
+  (let [path (str "/js/codex" (when debug? "-debug"))]
+    (list
+     [:div#codex-om-root]
+     (page/include-js (str path "/codex.js"))
+     [:script {:id "codex-om-state" :type "application/edn"}
+      (pr-str (merge default-state app-state))]
+     (element/javascript-tag
+      (format "stuttaford.codex.init('codex-om-root','codex-om-state', %s);" debug?)))))
+
+(defn codex [& {:keys [admin? debug?] :or {debug? false}}]
   {:title   "Clojure Codex"
    :layout  "page"
    :content
-   (let [categories (->> (db/all db/uri :category/name)
-                         (sort-by :category/sort))]
-     [:divq
-      (when admin?
-        [:a {:href "/links/new"} "Add link"])
-      (all-categories true)
-      (all-tags)
-      (for [category categories]
-        (list
-         [:h3 {:id (:category/name category)} (:category/name category)]
-         [:ul
-          (for [link (:link/_category category)]
-            [:li (link-item link admin?)])]))])})
+   (list
+    [:p.add-link-message
+     "Have a link you'd like to add? Tweet the link to me @RobStuttaford on Twitter with "
+     [:span.hashtag "#codex"] " or simply click here: " [:br]
+     [:a.twitter-hashtag-button
+      {:href "https://twitter.com/intent/tweet?button_hashtag=codex&text=%40RobStuttaford%20Link%3A%20your-link-here"
+       :data-related "RobStuttaford" :data-dnt "true"}]
+     [:script "!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');"]]
+    (om-app debug? (cond-> {:categories (db/all-categories-with-links)}
+                           admin? (assoc :admin? admin?))))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Create links
