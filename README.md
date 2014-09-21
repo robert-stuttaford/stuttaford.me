@@ -1,36 +1,40 @@
-# stuttaford.me
+# stuttaford.me blog
 
-FIXME: description
+Source code for my blog at <http://www.stuttaford.me>
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Download from <https://github.com/robert-stuttaford/stuttaford.me>
 
 ## Usage
 
-FIXME: explanation
+To run as a Ring web app:
 
-    $ java -jar stuttaford.me-0.1.0-standalone.jar [args]
+```
+lein repl
+(user/reset)
+```
 
-## Options
+Then visit <http://localhost:3000>.
 
-FIXME: listing of options this app accepts.
+To generate a site:
 
-## Examples
+```
+lein generate
+```
 
-...
+To publish the generated site:
 
-### Bugs
+```
+./publish.sh
+```
 
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+This assumes that you have write permissions for the remote `origin`,
+as it'll push to the `gh-pages` branch on that remote.
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2014 Robert Stuttaford
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
