@@ -2,7 +2,6 @@
   (:require [clojure.java.shell :as shell]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
-            [kerodon.core :as kerodon]
             [me.raynes.fs :as fs]
             [peridot.core :as peridot]
             [stuttaford.web.posts :as posts]
@@ -54,7 +53,7 @@
   (clean)
   (ensure-site)
   (copy-public-to-site)
-  (let [session (kerodon/session (service/handler))]
+  (let [session (session/session (service/handler))]
     (generate-path session "/atom.xml" "/atom.xml")
     (generate-html-path session "/")
     (generate-html-path session "/about/")

@@ -11,8 +11,6 @@
                  [compojure "1.1.8"]
                  [hiccup "1.0.5"]
                  [enlive "1.1.5"]
-                 [kerodon "0.4.0"]
-                 [prone "0.4.0"]
                  [markdown-clj "0.9.47"]
                  [clj-time "0.8.0"]
                  [prismatic/plumbing "0.3.3"]

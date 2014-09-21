@@ -1,6 +1,5 @@
 (ns stuttaford.web.service
   (:require [compojure.handler :as handler]
-            [prone.middleware :as prone]
             [ring.adapter.jetty :as jetty]
             [stuttaford.web.routes :refer [app]]))
 
