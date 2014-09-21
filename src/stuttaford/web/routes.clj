@@ -63,5 +63,5 @@
           (link/save-link! params)
           (response/redirect "/links/new")))
 
-  (route/resources "/public")
+  (route/resources "")
   (route/not-found #(render-memoized html-layout (partial error-404 %))))

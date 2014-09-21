@@ -16,16 +16,16 @@
    (when-let [description (:description page)]
      [:meta {:name "description" :content description}])
    (page/include-css
-    (str base-url "public/css/poole.css")
-    (str base-url "public/css/syntax.css")
-    (str base-url "public/css/stuttaford.css"))
+    (str base-url "css/poole.css")
+    (str base-url "css/syntax.css")
+    (str base-url "css/stuttaford.css"))
    (when-let [css (seq (:css page))]
      (->> css
           (map (partial str base-url))
           (apply page/include-css)))
-   [:link {:href (str base-url "public/apple-touch-icon-precomposed.png") :sizes "152x152"
+   [:link {:href (str base-url "apple-touch-icon-precomposed.png") :sizes "152x152"
            :rel "apple-touch-icon-precomposed"}]
-   [:link {:href (str base-url "public/favicon.ico") :rel "shortcut icon"}]
+   [:link {:href (str base-url "favicon.ico") :rel "shortcut icon"}]
    [:link {:href (str base-url "atom.xml") :rel "alternate"
            :type "application/rss+xml" :title "RSS"}]])
 

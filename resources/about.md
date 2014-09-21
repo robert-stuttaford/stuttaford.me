@@ -3,7 +3,7 @@ layout: page
 title: About Me
 ---
 
-<img src="/public/images/robert-square.jpeg" width="180" height="173" alt="Robert Stuttaford">
+<img src="/images/robert-square.jpeg" width="180" height="173" alt="Robert Stuttaford">
 
 Hi, internet person! Thanks for popping by!
 
