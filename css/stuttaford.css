@@ -3,7 +3,27 @@
   font-size: 0.9em;
 }
 
-span.tag {
+.add-link-message {
+    font-size: 0.7em;
+}
+
+span.hashtag {
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    background: #eee;
+    font-family: Menlo, Monaco, "Courier New", monospace;
+}
+
+iframe {
+    margin-top: 0.5em;
+}
+
+li.link a {
+    margin-right: 0.3em;
+}
+
+a.tag {
     display: inline;
     padding: .2em .6em .3em;
     font-size: 55%;
@@ -14,8 +34,28 @@ span.tag {
     vertical-align: baseline;
     border-radius: .25em;
     background: #ddd;
+    margin: 0 0.2em;
+}
+
+a.tag.active {
+    background: #268bd2;
+    color: white;
 }
 
 .edit-link {
     font-size: 0.7em;
+}
+
+input#search {
+    margin: 0;
+    display: block;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background: #ebebeb;
+    padding: 5px;
+    font-size: 1.5em;
+    font-weight: bold;
+    outline: none;
+    box-sizing: border-box;
+    width: 100%;
 }
