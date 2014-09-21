@@ -53,7 +53,7 @@
   (clean)
   (ensure-site)
   (copy-public-to-site)
-  (let [session (session/session (service/handler))]
+  (let [session (peridot/session (service/handler))]
     (generate-path session "/atom.xml" "/atom.xml")
     (generate-html-path session "/")
     (generate-html-path session "/about/")
