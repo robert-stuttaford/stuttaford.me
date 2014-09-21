@@ -1,5 +1,6 @@
 (ns stuttaford.web.routes
   (:require [clojure.edn :as edn]
+            [clojure.tools.logging :as log]
             [compojure.core :refer [defroutes context GET POST]]
             [compojure.route :as route]
             [ring.util.response :as response]
@@ -51,17 +52,24 @@
        (render-memoized html-layout parse-markdown-post
                         (format "posts/%s-%s-%s-%s.md" year month date slug)))
 
-  (context "/links" []
+  (context "/codex" []
 
-    (GET "/" []
-         (render html-layout link/links))
+    (GET "/" {:as req}
+         (render html-layout link/links (some-> req :query-params (get "admin") boolean)))
 
     (GET "/new" []
          (render html-layout link/new-form))
 
     (POST "/new" {params :params}
           (link/save-link! params)
-          (response/redirect "/links/new")))
+          (response/redirect "/links/new"))
+
+    (GET "/edit/:slug" [slug]
+         (render html-layout link/edit-form slug))
+
+    (POST "/edit/:slug" {params :params}
+          (link/update-link! params)
+          (response/redirect "/links")))
 
   (route/resources "")
   (route/not-found #(render-memoized html-layout (partial error-404 %))))

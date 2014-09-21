@@ -1,6 +1,7 @@
 (ns stuttaford.web.link
   (:use [plumbing.core])
   (:require [clojure.string :as string]
+            [clojure.tools.logging :as log]
             [stuttaford.db :as db]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -12,35 +13,51 @@
                  sort)]
     (list [:span.tag tag] " ")))
 
+(defn all-categories [link?]
+  (when-let [categories (->> (db/all db/uri :category/name)
+                             (sort-by :category/sort)
+                             (map :category/name))]
+    (list
+     [:h3 "All Categories"]
+     [:p (for [category categories]
+           (list [:span.tag
+                  (if link?
+                    [:a {:href (str "#" category)} category]
+                    category)] " "))])))
+
 (defn all-tags []
   (when-let [tags (seq (db/all db/uri :tag/name))]
     (list
-     [:h3 "All tags"]
+     [:h3 "All Tags"]
      [:p (tag-list tags)])))
 
-(defn link-item [{:keys [link/title link/uri link/description link/image link/tags] :as link}]
+(defn link-item [{:keys [link/title link/uri link/description link/image link/tags link/slug] :as link} admin?]
   (list
    [:p [:a {:href uri :title title} title] " "
     (when (seq tags)
-      (tag-list tags))]
+      (tag-list tags)) " "
+    (when admin?
+      [:a.edit-link {:href (str "/links/edit/" slug)} "edit"])]
    (when description
      [:p description])))
 
-(defn links []
-  {:title   "Clojure Links"
+(defn links [admin?]
+  {:title   "Clojure Codex"
    :layout  "page"
    :content
    (let [categories (->> (db/all db/uri :category/name)
                          (sort-by :category/sort))]
-     [:div
-      [:a {:href "/links/new"} "Add link"]
+     [:divq
+      (when admin?
+        [:a {:href "/links/new"} "Add link"])
+      (all-categories true)
       (all-tags)
       (for [category categories]
         (list
-         [:h3 (:category/name category)]
+         [:h3 {:id (:category/name category)} (:category/name category)]
          [:ul
           (for [link (:link/_category category)]
-            [:li (link-item link)])]))])})
+            [:li (link-item link admin?)])]))])})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Create links
@@ -48,13 +65,16 @@
 (defn new-form []
   {:title   "New link"
    :layout  "page"
-   :css     ["public/bootstrap/css/bootstrap.min.css"]
+   :css     ["bootstrap/css/bootstrap.min.css"]
    :content
    [:div
     [:form {:role "form" :method "POST"}
      [:div.form-group
       [:label {:for "title"} "Title"]
       [:input.form-control {:type "text" :name "title" :required "required"}]]
+     [:div.form-group
+      [:label {:for "slug"} "Slug"]
+      [:input.form-control {:type "text" :name "slug" :placeholder "leave blank to generate one"}]]
      [:div.form-group
       [:label {:for "title"} "Description"]
       [:textarea.form-control {:rows "3" :name "description" :placeholder "optional"}]]
@@ -66,29 +86,83 @@
       [:input.form-control {:type "text" :name "category" :required "required"}]]
      [:div.form-group
       [:label {:for "tags"} "Tags"]
-      [:input.form-control {:type "text" :name "tags" :required "required"
-                            :placeholder "tag 1, tag 2, tag 3"}]]
+      [:input.form-control {:type "text" :name "tags" :placeholder "tag 1, tag 2, tag 3"}]]
      [:button.btn.btn-default {:type "submit"} "Save link"]]
-    [:h3 "All categories"]
-    [:p (for [category (->> (db/all db/uri :category/name)
-                            (sort-by :category/sort)
-                            (map :category/name))]
-          (list [:span.tag category] " "))]
+    (all-categories false)
     (all-tags)]})
 
-(defn split-and-clean-tags [tags]
+(defn split-and-clean-tags [link-title category-name tags]
   (->> (string/split tags #",")
        (map string/trim)
-       (map string/lower-case)))
+       (map string/lower-case)
+       (filter (partial db/not-a-category db/uri))
+       (filter (partial db/not-a-link-title db/uri))
+       (remove (partial = (string/lower-case category-name)))
+       (remove (partial = (string/lower-case link-title)))))
 
 (defn save-link! [params]
   (let [params (-> params
                    (update-in [:title]    string/trim)
                    (update-in [:uri]      string/trim)
-                   (update-in [:category] string/trim)
-                   (update-in [:tags]     split-and-clean-tags))
+                   (update-in [:category] string/trim))
+        params (if (-> params :tags seq)
+                 (update-in params [:tags] (partial split-and-clean-tags
+                                                    (:title params) (:category params)))
+                 (dissoc params :tags))
+        params (if (-> params :slug seq)
+                 params
+                 (assoc params :slug (-> params :title db/to-slug)))
         params (if (-> params :description seq)
                  (update-in params [:description] string/trim)
                  (dissoc params :description))]
     (db/create-link! db/uri params))
+  :ok)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Edit links
+
+(defn edit-form [slug]
+  (when-let [{:keys [link/title link/uri link/description] :as link}
+             (db/one (db/as-db db/uri) :link/slug slug)]
+    {:title   (str "Edit link: " title)
+     :layout  "page"
+     :css     ["bootstrap/css/bootstrap.min.css"]
+     :content
+     [:div
+      [:form {:role "form" :method "POST"}
+       [:input {:type "hidden" :name "original-slug" :value slug}]
+       [:div.form-group
+        [:label {:for "title"} "Title"]
+        [:input.form-control {:type "text" :name "title" :required "required" :value title}]]
+       [:div.form-group
+        [:label {:for "slug"} "Slug"]
+        [:input.form-control {:type "text" :name "slug" :required "required" :value slug}]]
+       [:div.form-group
+        [:label {:for "title"} "Description"]
+        [:textarea.form-control {:rows "3" :name "description" :placeholder "optional" :value description}]]
+       [:div.form-group
+        [:label {:for "uri"} "Address"]
+        [:input.form-control {:type "url" :name "uri" :required "required" :placeholder "http://www.example.com" :value uri}]]
+       [:div.form-group
+        [:label "Category"]
+        [:br]
+        (-> link :link/category :category/name)]
+       [:div.form-group
+        [:label "Tags"]
+        [:br]
+        (->> link :link/tags tag-list)]
+       [:button.btn.btn-default {:type "submit"} "Save link"]]]}))
+
+(defn update-link! [params]
+  (let [params (-> params
+                   (update-in [:title]    string/trim)
+                   (update-in [:uri]      string/trim))
+        parmas (if-not (seq (:slug params))
+                 (assoc params :slug (-> params :title db/to-slug))
+                 params)
+        params (if (-> params :description seq)
+                 (update-in params [:description] string/trim)
+                 (dissoc params :description))]
+    (log/info params)
+    (db/update-link! db/uri (:original-slug params) params))
   :ok)

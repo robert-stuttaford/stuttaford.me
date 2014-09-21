@@ -1,6 +1,7 @@
 (ns stuttaford.db
   (:use [plumbing.core])
-  (:require [datomic.api :as d]))
+  (:require [clojure.string :as string]
+            [datomic.api :as d]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Database
@@ -107,6 +108,14 @@
     :db/id #db/id[:db.part/db]
     :db.install/_attribute :db.part/db}
 
+   {:db/doc "Link slug. Required."
+    :db/ident :link/slug
+    :db/valueType :db.type/string
+    :db/cardinality :db.cardinality/one
+    :db/unique :db.unique/value
+    :db/id #db/id[:db.part/db]
+    :db.install/_attribute :db.part/db}
+
    {:db/doc "Link uri. Required."
     :db/ident :link/uri
     :db/valueType :db.type/string
@@ -203,9 +212,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Links
 
-(defnk new-link-tx [title uri category {tags []} {description nil} {image nil}]
+(defn to-slug [s]
+  (-> (string/lower-case s)
+      (string/replace #"'" "")
+      (string/replace #"[^a-z0-9]+" "-")
+      (string/replace #"(^-|-$)" "")))
+
+(defnk new-link-tx [title slug uri category {tags []} {description nil} {image nil}]
   [(cond-> {:db/id         (tempid)
             :link/title    title
+            :link/slug     slug
             :link/uri      uri
             :link/category (id category)}
            description (assoc :link/description description)
@@ -222,3 +238,63 @@
         link-id (id (first link-tx))
         {:keys [db-after tempids]} @(d/transact (as-conn uri) link-tx)]
     (entity (d/resolve-tempid db-after tempids link-id) db-after)))
+
+(defnk update-link-tx [id title slug uri {description nil} {image nil}]
+  [(cond-> {:db/id      id
+            :link/title title
+            :link/slug  slug
+            :link/uri   uri}
+           description (assoc :link/description description)
+           image       (assoc :link/image image))])
+
+(defn update-link! [uri original-slug link]
+  (when-let [link-entity (one (as-db uri) :link/slug original-slug)]
+    (let [link-id (id link-entity)
+          link-tx (update-link-tx (assoc link :id link-id))
+          db-after (:db-after @(d/transact (as-conn uri) link-tx))]
+      (entity link-id db-after))))
+
+(defn matches-tag [val tag]
+  (= (string/lower-case val) (string/lower-case tag)))
+
+(defn remove-tags-that-are-categories []
+  (let [db   (as-db uri)
+        tags (->> (d/q '[:find ?t :in $ :where
+                         [?t :tag/name ?tn]
+                         [?c :category/name ?cn]
+                         [(stuttaford.db/matches-tag ?cn ?tn)]]
+                       db)
+                  (map first))]
+    (for [tag tags]
+      [:db.fn/retractEntity tag])))
+
+(defn remove-tags-that-are-link-titles []
+  (let [db   (as-db uri)
+        tags (->> (d/q '[:find ?t :in $ :where
+                         [?t :tag/name ?tn]
+                         [?l :link/title ?ln]
+                         [(stuttaford.db/matches-tag ?ln ?tn)]]
+                       db)
+                  (map first))]
+    (for [tag tags]
+      [:db.fn/retractEntity tag])))
+
+(defn not-a-category [uri tag]
+  (empty? (d/q '[:find ?tn :in $ ?tn :where
+                 [?c :category/name ?cn]
+                 [(stuttaford.db/matches-tag ?cn ?tn)]]
+               (as-db uri) tag)))
+
+(defn not-a-link-title [uri tag]
+  (empty? (d/q '[:find ?tn :in $ ?tn :where
+                 [?l :link/name ?ln]
+                 [(stuttaford.db/matches-tag ?ln ?tn)]]
+               (as-db uri) tag)))
+
+(defn add-slugs-to-links []
+  (for [link (all (as-db uri) :link/uri)]
+    [:db/add (id link) :link/slug (-> link :link/title to-slug)]))
+
+(comment
+  (d/transact (as-conn uri) (add-slugs-to-links))
+  )

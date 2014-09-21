@@ -57,6 +57,7 @@
     (generate-path session "/atom.xml" "/atom.xml")
     (generate-html-path session "/")
     (generate-html-path session "/about/")
+    (generate-html-path session "/codex/")
     (doseq [permalink (map :permalink (posts/list-posts))]
       (generate-html-path session permalink)))
   (log/info "Done."))
