@@ -44,7 +44,7 @@
            (response/content-type "text/xml")
            (response/charset "utf-8")))
 
-  (GET "/about" []
+  (GET "/about/" []
        (render-memoized html-layout parse-markdown-page "about.md"))
 
   (GET "/:year/:month/:date/:slug/" [year month date slug]

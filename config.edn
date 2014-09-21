@@ -12,4 +12,4 @@
                        :github      "https://github.com/robert-stuttaford"}
  :meta                {:title       "Robert Stuttaford"
                        :description "Clojure Enthusiast"}
- :nav                 [{:title "About" :path "/about"}]}
+ :nav                 [{:title "About" :path "/about/"}]}
