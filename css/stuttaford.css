@@ -1,0 +1,17 @@
+.post-suffix {
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+span.tag {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 55%;
+    line-height: 1;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+    background: #ddd;
+}
