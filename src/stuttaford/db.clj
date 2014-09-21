@@ -287,7 +287,7 @@
 
 (defn not-a-link-title [uri tag]
   (empty? (d/q '[:find ?tn :in $ ?tn :where
-                 [?l :link/name ?ln]
+                 [?l :link/title ?ln]
                  [(stuttaford.db/matches-tag ?ln ?tn)]]
                (as-db uri) tag)))
 
