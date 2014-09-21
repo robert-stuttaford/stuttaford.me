@@ -37,7 +37,9 @@
    [:h3.masthead-title
     [:a {:title "Home" :href base-url} title] " "
     [:small description]]
-   (map nav-item nav)
+   (->> nav
+        (map nav-item)
+        (interpose " &middot; "))
    " &middot; "
    [:small
     "I'm on " [:a {:href twitter} "Twitter"]
