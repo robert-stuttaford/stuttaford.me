@@ -15,3 +15,7 @@ span.tag {
     border-radius: .25em;
     background: #ddd;
 }
+
+.edit-link {
+    font-size: 0.7em;
+}
