@@ -6,7 +6,7 @@
             [shadow.cljs.build :as cljs]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; React and React-Bootstrap
+;;; React
 
 (defn compose-externs [externs]
   (conj externs "react/externs/react.js"))
@@ -125,6 +125,10 @@
 
 (defn clean-project [project-cfg]
   (delete-folder (:target-path project-cfg)))
+
+(defn clean-all-output []
+  (doseq [mode #{:debug :production}]
+    (clean-project (prepare-project "." mode))))
 
 (defn build-and-wait [opts state]
   (try

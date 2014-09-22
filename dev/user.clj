@@ -14,8 +14,13 @@
   (stop-shadow!)
   (start-shadow!))
 
-(comment (restart-shadow!)
-         )
+(defn clean-shadow-output! []
+  (shadow/clean-all-output))
+
+(comment
+  (restart-shadow!)
+  (clean-shadow-output!)
+  )
 
 (defn start! []
   (start-database!)
