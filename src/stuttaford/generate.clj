@@ -16,6 +16,12 @@
 (defn ensure-site []
   (fs/mkdir SITE))
 
+(defn clean-non-prod-codex-js []
+  (log/info " * Cleaning non-production codex js")
+  (fs/delete-dir "resources/public/js/codex-debug")
+  (fs/delete-dir "resources/public/js/codex/src")
+  (fs/delete "resources/public/js/codex/manifest.json"))
+
 (defn copy-public-to-site []
   (log/info " * Copying public files")
   (shell/with-sh-dir "."
@@ -52,6 +58,7 @@
   (log/info "Building site")
   (clean)
   (ensure-site)
+  (clean-non-prod-codex-js)
   (copy-public-to-site)
   (let [session (peridot/session (service/handler))]
     (generate-path session "/atom.xml" "/atom.xml")

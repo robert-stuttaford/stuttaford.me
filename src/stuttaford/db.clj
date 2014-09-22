@@ -306,7 +306,7 @@
   (let [tags (->> link :link/tags (map prepare-tag) vec)]
     (cond-> {:name     (:link/title link)
              :uri      (:link/uri link)
-             :category (:link/category link)}
+             :category (-> link :link/category :category/name)}
             (:link/description link) (assoc :description (:link/description link))
             (:link/image link) (assoc :image (:link/image link))
             (seq tags) (assoc :tags tags
