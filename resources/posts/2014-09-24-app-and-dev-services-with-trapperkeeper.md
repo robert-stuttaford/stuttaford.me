@@ -183,7 +183,7 @@ already present in `:core-libs`. It is up to us to ensure that both
 the core and the app Javascript is loaded on the page, as can be seen
 in the only web view we have set up here:
 
-[src/tkad/web/routes.clj](https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/web/routes.clj#L22-L23)
+[src/tkad/web/routes.clj](https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/web/routes.clj#L20-L21)
 
 It's important to recognise that even with advanced optimisations,
 these two Javascript files can interoperate!
