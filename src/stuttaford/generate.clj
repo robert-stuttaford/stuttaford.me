@@ -16,11 +16,11 @@
 (defn ensure-site []
   (fs/mkdir SITE))
 
-(defn clean-non-prod-codex-js []
-  (log/info " * Cleaning non-production codex js")
-  (fs/delete-dir "resources/public/js/codex-debug")
-  (fs/delete-dir "resources/public/js/codex/src")
-  (fs/delete "resources/public/js/codex/manifest.json"))
+(defn clean-non-prod-js []
+  (log/info " * Cleaning non-production js")
+  (fs/delete-dir "resources/public/js-debug")
+  (fs/delete-dir "resources/public/js/src")
+  (fs/delete "resources/public/js/manifest.json"))
 
 (defn copy-public-to-site []
   (log/info " * Copying public files")
@@ -58,13 +58,12 @@
   (log/info "Building site")
   (clean)
   (ensure-site)
-  (clean-non-prod-codex-js)
+  (clean-non-prod-js)
   (copy-public-to-site)
   (let [session (peridot/session (service/handler))]
     (generate-path session "/atom.xml" "/atom.xml")
-    (generate-html-path session "/")
-    (generate-html-path session "/about/")
-    (generate-html-path session "/codex/")
+    (doseq [path ["/" "/about/" "/codex/" "/radiant/"]]
+      (generate-html-path session path))
     (doseq [permalink (map :permalink (posts/list-posts))]
       (generate-html-path session permalink)))
   (log/info "Done."))

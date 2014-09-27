@@ -5,7 +5,7 @@
             [shadow]))
 
 (defn start-shadow! []
-  (shadow/start-builders #{:production})) ;; :debug :production
+  (shadow/start-builders #{:debug :production})) ;; :debug :production
 
 (defn stop-shadow! []
   (shadow/stop-builders))
@@ -13,6 +13,8 @@
 (defn restart-shadow! []
   (stop-shadow!)
   (start-shadow!))
+
+(def dev-reset restart-shadow!)
 
 (defn clean-shadow-output! []
   (shadow/clean-all-output))

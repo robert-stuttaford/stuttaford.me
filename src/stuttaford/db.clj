@@ -327,3 +327,16 @@
        distinct
        (map prepare-category)
        vec))
+
+(defn radiant-datom [db [e a v t a?]]
+  [e (->> a (d/entity db) :db/ident) v])
+
+(defn all-datoms-for-radiant []
+  (let [db (as-db uri)]
+    (->> (d/datoms db :eavt)
+         (remove #(->> % :a (d/entity db) :db/ident namespace (re-find #"^(db|fressian)")))
+         (map (partial radiant-datom db))
+         vec)))
+
+(comment (all-datoms-for-radiant)
+         )

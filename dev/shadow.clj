@@ -54,11 +54,16 @@
           state
           source-paths))
 
+(defn configure-core-module [state core-libs mode]
+  (cljs/step-configure-module
+   state :core core-libs #{} {:prepend (react-js-source mode)}))
+
 (defn configure-modules [state {:keys [mode core-libs modules] :as opts}]
-  (reduce (fn [state {:keys [id main]}]
-            (cljs/step-configure-module state id [main] #{}  {:prepend (react-js-source mode)}))
-          state
-          modules))
+  (let [state (configure-core-module state core-libs mode)]
+    (reduce (fn [state {:keys [id main]}]
+              (cljs/step-configure-module state id [main] #{:core}))
+            state
+            modules)))
 
 (defnk build-state [source-paths :as opts]
   (-> (cljs/init-state)

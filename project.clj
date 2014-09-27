@@ -29,9 +29,26 @@
                     [org.clojure/clojurescript "0.0-2342"]
                     [om "0.7.3"]
                     [prismatic/om-tools "0.3.3" :exclusions [org.clojure/clojure]]
-                    [sablono "0.2.22" :exclusions [com.facebook/react]]]
-                   :main         user}}
-  :shadow {:public-path "/js/codex"
-           :target-path "resources/public/js/codex"
-           :externs     []
-           :modules     [{:id :codex :main stuttaford.codex}]})
+                    [racehub/om-bootstrap "0.2.9" :exclusions [org.clojure/clojure]]
+                    [sablono "0.2.22" :exclusions [com.facebook/react]]
+                    [datascript "0.4.0"]
+                    [com.cemerick/url "0.1.1"]
+                    [cljs-http "0.1.16"]
+                    [secretary "1.2.1"]]
+                   :main user}}
+  :shadow {:public-path "/js"
+           :target-path "resources/public/js"
+           :core-libs    [cemerick.url
+                          cljs-http.client
+                          cljs.core
+                          cljs.core.async
+                          cljs.reader
+                          stuttaford.om.common
+                          goog.History
+                          om-tools.core
+                          sablono.core
+                          secretary.core
+                          datascript]
+           :externs     ["datascript/externs.js"]
+           :modules     [{:id :codex   :main stuttaford.codex}
+                         {:id :radiant :main stuttaford.radiant}]})

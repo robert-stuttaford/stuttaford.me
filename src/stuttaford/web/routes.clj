@@ -1,13 +1,14 @@
 (ns stuttaford.web.routes
   (:require [clojure.edn :as edn]
-            [clojure.tools.logging :as log]
             [compojure.core :refer [defroutes context GET POST]]
             [compojure.route :as route]
             [ring.util.response :as response]
+            [stuttaford.db :as db]
+            [stuttaford.web.codex :as codex]
             [stuttaford.web.content :refer [parse-markdown-page parse-markdown-post]]
             [stuttaford.web.layout.atom :refer [atom-layout]]
             [stuttaford.web.layout.html :refer [html-layout]]
-            [stuttaford.web.codex :as codex]))
+            [stuttaford.web.om :refer [om-app]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Site config
@@ -35,6 +36,22 @@
 ;(def render-memoized (memoize render))
 (def render-memoized render)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Radiant
+
+(defn radiant [& {:keys [admin? debug?] :or {debug? false}}]
+  {:title   "Radiant"
+   :layout  "page"
+   :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
+   :content (list (om-app "radiant" debug?
+                          {:data-sources
+                           {:links {:id     :links
+                                    :label  "Links"
+                                    :datoms (db/all-datoms-for-radiant)}}}))})
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Routes
+
 (defroutes app
   (GET "/" []
        (render-memoized html-layout (constantly {:title nil :content "" :layout "home"})))
@@ -52,13 +69,17 @@
        (render-memoized html-layout parse-markdown-post
                         (format "posts/%s-%s-%s-%s.md" year month date slug)))
 
+  (GET "/radiant/" {query-params :query-params}
+       (render html-layout radiant
+         :admin? (some-> query-params (get "admin") boolean)
+         :debug? (some-> query-params (get "debug") boolean)))
+
   (context "/codex" []
 
-    (GET "/" {:as req}
-         (let [query-params (some-> req :query-params)]
-           (render html-layout codex/codex
-             :admin? (some-> query-params (get "admin") boolean)
-             :debug? (some-> query-params (get "debug") boolean))))
+    (GET "/" {query-params :query-params}
+         (render html-layout codex/codex
+           :admin? (some-> query-params (get "admin") boolean)
+           :debug? (some-> query-params (get "debug") boolean)))
 
     (GET "/new" []
          (render html-layout codex/new-form))
