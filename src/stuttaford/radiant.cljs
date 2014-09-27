@@ -125,7 +125,7 @@
                      (case current-datoms-index
                        :eavt [:tr [:th "E"] [:th "A"] [:th "V"]]
                        :aevt [:tr [:th "A"] [:th "E"] [:th "V"]]
-                       :avet [:tr [:th "A"] [:th "V"] [:th "T"]])]
+                       :avet [:tr [:th "A"] [:th "V"] [:th "E"]])]
                     [:tbody
                      (for [{:keys [e a v]} datoms]
                        (case current-datoms-index
