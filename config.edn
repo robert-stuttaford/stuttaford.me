@@ -13,5 +13,6 @@
  :meta                {:title       "Robert Stuttaford"
                        :description "Clojure Enthusiast"}
  :nav                 [{:title "About" :path "/about/"}
+                       {:title "Blog" :path "/"}
                        {:title "Clojure Codex" :path "/codex/"}
                        {:title "Radiant" :path "/radiant/"}]}
