@@ -31,17 +31,10 @@
        (p/panel {:header (components/->top-nav data {:opts {:nav-items nav-items}})}
                 (when schema-visible?
                   (components/->schema data))
-                (when view-component
-                  (om/build view-component data)))))))
+                (if view-component
+                  (om/build view-component data)
+                  (html [:div])))))))
 
 (defn ^:export init
   [app-id state-id debug?]
-  (common/start
-    app-id state-id app-view
-    {:view                      :datalog
-     :query                     "[:find ?tag ?title :in $ :where [?link-id :link/title ?title] [?link-id :link/tags ?tag-id] [?tag-id :tag/name ?tag]]"
-     :current-datoms-index      :avet
-     :current-datoms-components {:a ":link/title"}
-     :schema-visible?           false
-     :shared                    {:control-chan (chan)}}
-    debug?))
+  (common/start app-id state-id app-view {:shared {:control-chan (chan)}} debug?))
