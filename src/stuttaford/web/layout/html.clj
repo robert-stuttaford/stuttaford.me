@@ -45,11 +45,11 @@
     "I'm on " [:a {:href twitter} "Twitter"]
     " and " [:a {:href github} "GitHub"] "."]])
 
-(defnk foot [domain year [:author name]]
+(defnk foot [year [:author name]]
   [:div.footer
    [:p "&copy; " name " " year ". All rights reserved. Some lefts, too."]])
 
-(defnk google-analytics [google-analytics-id]
+(defnk google-analytics [google-analytics-id domain]
   [:script {:type "text/javascript"}
    "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
