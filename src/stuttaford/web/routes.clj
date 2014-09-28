@@ -39,15 +39,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Radiant
 
+(defn radiant-data []
+  {:data-sources              {:links {:id     :codex
+                                       :label  "Codex"
+                                       :datoms (db/all-datoms-for-radiant)}}
+   :view                      :datalog
+   :query
+   "[:find ?tag ?title :in $ :where [?link-id :link/title ?title] [?link-id :link/tags ?tag-id] [?tag-id :tag/name ?tag]]"
+   :current-datoms-index      :avet
+   :current-datoms-components {:a ":link/title"}
+   :schema-visible?           false})
+
 (defn radiant [& {:keys [admin? debug?] :or {debug? false}}]
   {:title   "Radiant"
    :layout  "bare"
    :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
-   :content (list (om-app "radiant" debug?
-                          {:data-sources
-                           {:links {:id     :codex
-                                    :label  "Codex"
-                                    :datoms (db/all-datoms-for-radiant)}}}))})
+   :content (list (om-app "radiant" debug? (radiant-data)))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
