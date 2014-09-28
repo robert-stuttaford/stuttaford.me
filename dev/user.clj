@@ -5,7 +5,7 @@
             [shadow]))
 
 (defn start-shadow! []
-  (shadow/start-builders #{:debug :production})) ;; :debug :production
+  (shadow/start-builders #{:production})) ;; :debug :production
 
 (defn stop-shadow! []
   (shadow/stop-builders))

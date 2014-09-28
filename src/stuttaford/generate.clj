@@ -18,7 +18,7 @@
 
 (defn clean-non-prod-js []
   (log/info " * Cleaning non-production js")
-  (fs/delete-dir "resources/public/js-debug")
+  ;;(fs/delete-dir "resources/public/js-debug")
   (fs/delete-dir "resources/public/js/src")
   (fs/delete "resources/public/js/manifest.json"))
 

@@ -50,11 +50,11 @@
    :current-datoms-components {:a ":link/title"}
    :schema-visible?           false})
 
-(defn radiant [& {:keys [admin? debug?] :or {debug? false}}]
+(defn radiant [& {:keys [debug?] :or {debug? false}}]
   {:title   "Radiant"
    :layout  "bare"
    :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
-   :content (list (om-app "radiant" debug? (radiant-data)))})
+   :content (list (om-app "radiant" true (radiant-data)))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
