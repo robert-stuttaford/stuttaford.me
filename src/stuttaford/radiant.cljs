@@ -15,7 +15,8 @@
 (def nav-items
   {:datalog      ["Datalog" datalog]
    :datoms       ["Datoms" datoms]
-   :transactions ["Transactions" transactions]})
+   ;;:transactions ["Transactions" transactions]
+   })
 
 (defcomponentk app-view [[:data view schema-visible? :as data] owner]
   (will-mount [_]
@@ -37,9 +38,10 @@
   [app-id state-id debug?]
   (common/start
     app-id state-id app-view
-    {:view                 :datalog
-     :query                "[:find ?tag ?title :in $ :where [?link-id :link/title ?title] [?link-id :link/tags ?tag-id] [?tag-id :tag/name ?tag]]"
-     :current-datoms-index :eavt
-     :schema-visible?      true
-     :shared               {:control-chan (chan)}}
+    {:view                      :datalog
+     :query                     "[:find ?tag ?title :in $ :where [?link-id :link/title ?title] [?link-id :link/tags ?tag-id] [?tag-id :tag/name ?tag]]"
+     :current-datoms-index      :avet
+     :current-datoms-components {:a ":link/title"}
+     :schema-visible?           false
+     :shared                    {:control-chan (chan)}}
     debug?))
