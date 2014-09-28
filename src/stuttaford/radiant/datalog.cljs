@@ -13,12 +13,6 @@
   (try (some-> s edn/read-string dq/parse-query)
        (catch :default e nil)))
 
-(defn query-parse-status [s]
-  (when (seq s)
-    (if (maybe-parse-query s)
-      "success"
-      "error")))
-
 (defn handle-query-input-change [data owner]
   (let [input (om/get-node owner "input")
         text  (.-value input)]
@@ -36,7 +30,10 @@
               :rows        8
               :placeholder "[:find ?e ?v :in $ :where [?e :attr ?v]]"
               :value       query
-              :bs-style    (query-parse-status query)
+              :bs-style    (when (seq query)
+                             (if (maybe-parse-query query)
+                               "success"
+                               "error"))
               :on-change   #(handle-query-input-change data owner)}))
      (g/col {:xs 6}
             (html
