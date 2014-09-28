@@ -8,6 +8,9 @@
    [:h1.page-title title]
    content])
 
+(defnk bare-template [[:page content]]
+  content)
+
 (def format-date (partial time-format/unparse (time-format/formatter "dd MMM yyyy")))
 
 (defnk post-template [recent-posts [:author twitter]
@@ -40,4 +43,5 @@
 (def templates
   {:home home-template
    :page page-template
+   :bare bare-template
    :post post-template})

@@ -41,7 +41,7 @@
 
 (defn radiant [& {:keys [admin? debug?] :or {debug? false}}]
   {:title   "Radiant"
-   :layout  "page"
+   :layout  "bare"
    :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
    :content (list (om-app "radiant" debug?
                           {:data-sources

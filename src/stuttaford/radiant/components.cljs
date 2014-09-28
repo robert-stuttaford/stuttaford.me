@@ -2,6 +2,8 @@
   (:require [cljs.core.async :refer [put!]]
             [om-bootstrap.button :as b]
             [om-bootstrap.grid :as g]
+            [om-bootstrap.panel :as p]
+            [om-bootstrap.random :refer [label]]
             [om-bootstrap.table :refer [table]]
             [om.core :as om :include-macros true]
             [om-tools.core :refer-macros [defcomponentk]]
@@ -27,9 +29,27 @@
                   (data-source-item c :add "Add your own...")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Schema
+
+(defcomponentk schema [[:data {current-db nil}] owner]
+  (render-state [_ state]
+    (p/panel {:header "Schema"}
+             (if current-db
+               (html
+                (for [schema (model/schema-for-db current-db)]
+                  [:span.schema
+                   [:span.ident
+                    (pr-str (:db/ident schema))]
+                   (when (= :db.type/ref (:db/valueType schema))
+                     (label {:bs-style "primary"} "REF"))
+                   (when (= :db.cardinality/many (:db/cardinality schema))
+                     (label {:bs-style "primary"} "MANY"))]))
+               "No database."))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Top nav
 
-(defcomponentk top-nav [[:data view data-sources {current-data-source nil}] owner
+(defcomponentk top-nav [[:data view data-sources {current-data-source nil} schema-visible?] owner
                         [:opts nav-items]]
   (render-state [_ state]
     (let [c (control-chan owner)]
@@ -39,7 +59,10 @@
                                    (b/button (cond-> {:on-click #(put! c [:set-view id])}
                                                      (= view id) (assoc :class "active"))
                                              label)))
-                 (data-source-dropdown c data-sources current-data-source)))))
+                 (data-source-dropdown c data-sources current-data-source)
+                 (b/button (cond-> {:on-click #(put! c [:set-schema-visible (not schema-visible?)])}
+                                   schema-visible? (assoc :class "active"))
+                           "Show schema")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Result table

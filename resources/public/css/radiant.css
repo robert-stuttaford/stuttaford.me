@@ -15,3 +15,28 @@
 .datoms-components-inputs .form-group {
     margin-bottom: 0;
 }
+
+.query-input textarea {
+    font-family: Menlo, Monaco, "Courier New", monospace
+}
+
+.query-input .form-control-feedback {
+    top: 0;
+}
+
+span.schema {
+    margin-right: 0.3em;
+    border-radius: 4px;
+    background: #eee;
+    border: 1px solid #ddd;
+    padding: 0.2em 0.5em;
+}
+
+span.schema span.ident {
+    font-family: Menlo, Monaco, "Courier New", monospace;
+    font-size: 0.9em;
+}
+
+span.schema span.label {
+    margin-left: 0.2em;
+}

@@ -23,4 +23,14 @@
                                           :db/valueType   :db.type/ref}})
              (map (fn [[e a v]] [:db/add e a v]) datoms)))
 
+(defn schema-for-attr [schema attr]
+  (into (or (attr schema) {}) {:db/ident attr}))
+
+(defn schema-for-db [db]
+  (->> (d/datoms db :aevt)
+       (map :a)
+       distinct
+       sort
+       (map (partial schema-for-attr (:schema db)))))
+
 (def indexes [:eavt :aevt :avet])

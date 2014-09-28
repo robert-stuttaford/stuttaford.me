@@ -57,11 +57,14 @@
     google_analytics('send', 'pageview');"]])
 
 (defnk html-layout [base-url [:page layout content] :as config]
-  (page/html5
-   (header config)
-   [:body
-    [:div.container.content
-     (masthead config)
-     (when-let [page-layout (-> layout keyword templates)]
-       (page-layout config))
-     (foot config)]]))
+  (let [layout (keyword layout)]
+    (page/html5
+     (header config)
+     [:body
+      [:div.container.content
+       (when-not (= :bare layout)
+         (masthead config))
+       (when-let [page-layout (layout templates)]
+         (page-layout config))
+       (when-not (= :bare layout)
+         (foot config))]])))

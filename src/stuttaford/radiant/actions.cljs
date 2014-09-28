@@ -19,6 +19,9 @@
     (when-let [datoms (model/data-source data-sources current-data-source)]
       (om/update! cursor :current-db (model/make-db-from-datoms datoms)))))
 
+(defmethod perform-action :set-schema-visible [cursor op value]
+  (om/update! cursor :schema-visible? value))
+
 (defmethod perform-action :set-datoms-index [cursor op value]
   (om/update! cursor :current-datoms-index value))
 

@@ -9,6 +9,7 @@
             [stuttaford.radiant.components :as components]
             [stuttaford.radiant.datalog :refer [datalog]]
             [stuttaford.radiant.datoms :refer [datoms]]
+            [stuttaford.radiant.schema :refer [schema]]
             [stuttaford.radiant.transactions :refer [transactions]])
   (:require-macros [cljs.core.async.macros :as csp :refer [go]]))
 
@@ -17,7 +18,7 @@
    :datoms       ["Datoms" datoms]
    :transactions ["Transactions" transactions]})
 
-(defcomponentk app-view [[:data view :as data] owner]
+(defcomponentk app-view [[:data view schema-visible? :as data] owner]
   (will-mount [_]
     (let [c (control-chan owner)]
       (go (while true
@@ -28,6 +29,8 @@
     (html
      (let [[label view-component] (view nav-items)]
        (p/panel {:header (components/->top-nav data {:opts {:nav-items nav-items}})}
+                (when schema-visible?
+                  (components/->schema data))
                 (when view-component
                   (om/build view-component data)))))))
 
@@ -36,6 +39,8 @@
   (common/start
     app-id state-id app-view
     {:view                 :datalog
+     :query                "[:find ?tag ?title :in $ :where [?link-id :link/title ?title] [?link-id :link/tags ?tag-id] [?tag-id :tag/name ?tag]]"
      :current-datoms-index :eavt
+     :schema-visible?      true
      :shared               {:control-chan (chan)}}
     debug?))
