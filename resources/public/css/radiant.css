@@ -11,3 +11,7 @@
 .result-pagination span.item-count {
     margin-right: 1em;
 }
+
+.datoms-components-inputs .form-group {
+    margin-bottom: 0;
+}
