@@ -54,6 +54,7 @@
   (render-state [_ state]
     (let [c (control-chan owner)]
       (b/toolbar {}
+                 (html [:div.radiant "RADIANT"])
                  (b/button-group {}
                                  (for [[id [label]] nav-items]
                                    (b/button (cond-> {:on-click #(put! c [:set-view id])}
@@ -74,18 +75,26 @@
        (drop (* PAGE-SIZE current-page))
        (take PAGE-SIZE)))
 
+(defn paginate-label [current-page rows]
+  (let [start (* PAGE-SIZE current-page)]
+    (str (inc start) " - " (min (+ start PAGE-SIZE) (count rows)))))
+
 (defn sort-rows [sort-col rows]
   (sort-by #(nth % sort-col) rows))
 
 (defcomponentk result-table [[:data cols rows] owner [:opts {allow-sorting? false}]]
   (render-state [_ {:keys [sort-col current-page]
                     :or   {sort-col 0 current-page 0}}]
-    (let [page-count (count (partition-all PAGE-SIZE rows))]
+    (let [page-count (count (partition-all PAGE-SIZE rows))
+          paginate?  (> page-count 1)]
       (html
        [:div
         [:div {:class "result-pagination"}
-         [:span.item-count (count rows) " items"]
-         (when (> page-count 1)
+         [:span.item-count
+          (count rows) " items"
+          (when paginate?
+            (str " · " (paginate-label current-page rows)))]
+         (when paginate?
            (b/button-group
             {}
             (for [page (range page-count)]
@@ -99,7 +108,9 @@
                   (map-indexed (fn [i v]
                                  [:th (when allow-sorting?
                                         {:on-click #(om/set-state! owner :sort-col i)})
-                                  v])
+                                  v
+                                  (when (and allow-sorting? (= i sort-col))
+                                    (list " " [:span.glyphicon.glyphicon-chevron-down]))])
                                cols)]]
                 [:tbody
                  (for [row (->> rows (paginate current-page) (sort-rows sort-col))]
