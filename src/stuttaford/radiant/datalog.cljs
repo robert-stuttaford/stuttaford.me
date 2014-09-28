@@ -31,8 +31,8 @@
      {:class "query-input"}
      (g/col {:xs 6}
             (i/input
-             {:feedback?   true
-              :type        "textarea"
+             {:type        "textarea"
+              :feedback?   true
               :rows        8
               :placeholder "[:find ?e ?v :in $ :where [?e :attr ?v]]"
               :value       query

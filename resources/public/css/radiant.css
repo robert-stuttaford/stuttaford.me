@@ -20,7 +20,7 @@
     font-family: Menlo, Monaco, "Courier New", monospace
 }
 
-.query-input .form-control-feedback {
+.query-input .form-control-feedback, .datoms-components-inputs .form-control-feedback {
     top: 0;
 }
 
