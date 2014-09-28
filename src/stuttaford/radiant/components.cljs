@@ -116,4 +116,6 @@
                  (for [row (->> rows (paginate current-page) (sort-rows sort-col))]
                    [:tr
                     (for [value row]
-                      [:td value])])]))]))))
+                      [:td (if (keyword? value)
+                             (pr-str value)
+                             value)])])]))]))))
