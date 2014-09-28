@@ -9,7 +9,6 @@
             [stuttaford.radiant.components :as components]
             [stuttaford.radiant.datalog :refer [datalog]]
             [stuttaford.radiant.datoms :refer [datoms]]
-            [stuttaford.radiant.schema :refer [schema]]
             [stuttaford.radiant.transactions :refer [transactions]])
   (:require-macros [cljs.core.async.macros :as csp :refer [go]]))
 

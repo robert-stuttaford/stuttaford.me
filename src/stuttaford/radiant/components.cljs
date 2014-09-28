@@ -80,27 +80,29 @@
 (defcomponentk result-table [[:data cols rows] owner [:opts {allow-sorting? false}]]
   (render-state [_ {:keys [sort-col current-page]
                     :or   {sort-col 0 current-page 0}}]
-    (html
-     [:div
-      [:div {:class "result-pagination"}
-       [:span.item-count (count rows) " items"]
-       (b/button-group
-        {}
-        (for [page (range (count (partition-all PAGE-SIZE rows)))]
-          (b/button (cond-> {:on-click #(om/set-state! owner :current-page page)}
-                            (= page current-page) (assoc :class "active"))
-                    (inc page))))]
-      (table {:striped? true :bordered? true :condensed? true :hover? true}
-             (html
-              [:thead
-               [:tr
-                (map-indexed (fn [i v]
-                               [:th (when allow-sorting?
-                                      {:on-click #(om/set-state! owner :sort-col i)})
-                                v])
-                             cols)]]
-              [:tbody
-               (for [row (->> rows (paginate current-page) (sort-rows sort-col))]
+    (let [page-count (count (partition-all PAGE-SIZE rows))]
+      (html
+       [:div
+        [:div {:class "result-pagination"}
+         [:span.item-count (count rows) " items"]
+         (when (> page-count 1)
+           (b/button-group
+            {}
+            (for [page (range page-count)]
+              (b/button (cond-> {:on-click #(om/set-state! owner :current-page page)}
+                                (= page current-page) (assoc :class "active"))
+                        (inc page)))))]
+        (table {:striped? true :bordered? true :condensed? true :hover? true}
+               (html
+                [:thead
                  [:tr
-                  (for [value row]
-                    [:td value])])]))])))
+                  (map-indexed (fn [i v]
+                                 [:th (when allow-sorting?
+                                        {:on-click #(om/set-state! owner :sort-col i)})
+                                  v])
+                               cols)]]
+                [:tbody
+                 (for [row (->> rows (paginate current-page) (sort-rows sort-col))]
+                   [:tr
+                    (for [value row]
+                      [:td value])])]))]))))
