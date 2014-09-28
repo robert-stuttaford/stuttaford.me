@@ -45,8 +45,8 @@
    :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
    :content (list (om-app "radiant" debug?
                           {:data-sources
-                           {:links {:id     :links
-                                    :label  "Links"
+                           {:links {:id     :codex
+                                    :label  "Codex"
                                     :datoms (db/all-datoms-for-radiant)}}}))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
