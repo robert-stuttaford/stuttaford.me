@@ -56,6 +56,12 @@
    :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
    :content (list (om-app "radiant" true (radiant-data)))})
 
+(defn radiant-advanced [& {:keys [debug?] :or {debug? false}}]
+  {:title   "Radiant"
+   :layout  "bare"
+   :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
+   :content (list (om-app "radiant" debug? (radiant-data)))})
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
 
@@ -78,7 +84,10 @@
 
   (GET "/radiant/" {query-params :query-params}
        (render html-layout radiant
-         :admin? (some-> query-params (get "admin") boolean)
+         :debug? (some-> query-params (get "debug") boolean)))
+
+  (GET "/radiant-advanced/" {query-params :query-params}
+       (render html-layout radiant-advanced
          :debug? (some-> query-params (get "debug") boolean)))
 
   (context "/codex" []
