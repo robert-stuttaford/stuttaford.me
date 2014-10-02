@@ -52,9 +52,11 @@
       (->query-input data)
       (when-let [query (maybe-parse-query query)]
         (list
-         ;; [:pre (pr-str query)]
-         ;; [:pre (pr-str current-db)]
-         ;; [:pre (pr-str (d/q query current-db))]
+         (when (not debug?)
+           (list
+            [:pre (pr-str query)]
+            [:pre (pr-str current-db)]
+            [:pre (pr-str (d/q query current-db))]))
          [:hr]
          (components/->result-table {:cols (map pr-str (:find query))
                                      :rows (d/q query current-db)}

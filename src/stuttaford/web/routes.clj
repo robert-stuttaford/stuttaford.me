@@ -45,7 +45,7 @@
                                        :datoms (db/all-datoms-for-radiant)}}
    :view                      :datalog
    :query
-   "[:find ?tag ?title :in $ :where [?link-id :link/title ?title] [?link-id :link/tags ?tag-id] [?tag-id :tag/name ?tag]]"
+   "[:find ?e ?a ?v :in $ :where [?e ?a ?v]]"
    :current-datoms-index      :avet
    :current-datoms-components {:a ":link/title"}
    :schema-visible?           false})
