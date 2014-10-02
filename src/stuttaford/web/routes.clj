@@ -43,9 +43,8 @@
   {:data-sources              {:links {:id     :codex
                                        :label  "Codex"
                                        :datoms (db/all-datoms-for-radiant)}}
-   :view                      :datalog
-   :query
-   "[:find ?e ?a ?v :in $ :where [?e ?a ?v]]"
+   :view                      :datoms
+   :query                     "[:find ?e ?a ?v :in $ :where [?e ?a ?v]]"
    :current-datoms-index      :avet
    :current-datoms-components {:a ":link/title"}
    :schema-visible?           false})

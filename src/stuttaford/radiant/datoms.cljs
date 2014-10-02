@@ -13,12 +13,9 @@
             [stuttaford.radiant.model :as model]))
 
 (defn component-status [[c-one c-two] component-values component value]
-  (if (seq value)
+  (if value
     "success"
-    (let [[one two three] component-values
-          one             (-> one seq boolean)
-          two             (-> two seq boolean)
-          three           (-> three seq boolean)]
+    (let [[one two three] (map boolean component-values)]
       (cond
        (and (not one)
             (and (or two three))
@@ -26,76 +23,98 @@
        (and (not two)
             three
             (and (= component c-two))) "error"
-       :else nil)))
-  )
+       :else nil))))
 
-(defcomponentk datoms [[:data data-sources {current-data-source nil} {current-db nil}
-                        current-datoms-index
-                        {current-datoms-components {:e nil :a nil :v nil}}] owner]
-  (render-state [_ state]
+(defn index-input [c current-datoms-index]
+  (g/col {:xs 3}
+         (b/button-group
+          {}
+          (for [index model/indexes]
+            (b/button (cond-> {:on-click #(put! c [:set-datoms-index index])}
+                              (= index current-datoms-index) (assoc :class "active"))
+                      (-> index
+                          name
+                          string/upper-case))))))
+
+(defn component-input [c components current-datoms-components component]
+  (g/col {:xs 3 :class "datoms-components-inputs"}
+         (i/input {:type        "text"
+                   :feedback?   true
+                   :class       "form-control"
+                   :placeholder (-> component name string/upper-case)
+                   :bs-style    (component-status
+                                 components
+                                 (map current-datoms-components components)
+                                 component
+                                 (component current-datoms-components))
+                   :value       (component current-datoms-components)
+                   :on-change   #(put! c [:set-datoms-component
+                                          [component (.. % -target -value)]])})))
+
+(defcomponentk inputs [[:data current-datoms-index
+                        {current-datoms-components nil}] owner]
+  (render [_]
+    (let [c (control-chan owner)]
+      (g/row
+       {}
+       (index-input c current-datoms-index)
+       (let [components (case current-datoms-index
+                          :eavt [:e :a :v]
+                          :aevt [:a :e :v]
+                          :avet [:a :v :e])]
+         (map (partial component-input c components current-datoms-components)
+              components))))))
+
+(defcomponentk value [[:data value] owner [:opts component]]
+  (render [_]
     (let [c (control-chan owner)]
       (html
-       [:div
-        (g/row
-         {}
-         (g/col {:xs 3}
-                (b/button-group {}
-                                (for [index model/indexes]
-                                  (b/button (cond-> {:on-click #(put! c [:set-datoms-index index])}
-                                                    (= index current-datoms-index) (assoc :class "active"))
-                                            (-> index
-                                                name
-                                                string/upper-case)))))
-         (let [components (case current-datoms-index
-                            :eavt [:e :a :v]
-                            :aevt [:a :e :v]
-                            :avet [:a :v :e])]
-           (for [component components]
-             (g/col {:xs 3 :class "datoms-components-inputs"}
-                    (i/input {:type        "text"
-                              :feedback?   true
-                              :class       "form-control"
-                              :placeholder (-> component name string/upper-case)
-                              :bs-style    (component-status components
-                                                             (map current-datoms-components components)
-                                                             component
-                                                             (component current-datoms-components))
-                              :value       (component current-datoms-components)
-                              :on-change   #(put! c [:set-datoms-component [component (.. % -target -value)]])})))))
-        [:hr]
-        (when current-db
-          (let [e-fn                   #(let [e (:e %)]
-                                          (when (seq e)
-                                            (long e)))
-                a-fn                   #(let [a (:a %)]
-                                          (when (seq a)
-                                            (try (edn/read-string a)
-                                                 (catch :default e
-                                                   nil))))
-                v-fn                   #(let [v (:v %)]
-                                          (when (seq v)
-                                            (try (let [v-as-long (long v)]
-                                                   (if (.isNaN v-as-long)
-                                                     v
-                                                     v-as-long))
-                                                 (catch :default e
-                                                   v))))
-                components-in-order-fn (case current-datoms-index
-                                         :eavt (juxt e-fn a-fn v-fn)
-                                         :aevt (juxt a-fn e-fn v-fn)
-                                         :avet (juxt a-fn v-fn e-fn))
-                components             (->> current-datoms-components
-                                            components-in-order-fn
-                                            (take-while (complement nil?)))
-                datoms                 (apply d/datoms current-db current-datoms-index components)]
-            (list
-             (components/->result-table {:cols (case current-datoms-index
-                                                 :eavt ["E" "A" "V"]
-                                                 :aevt ["A" "E" "V"]
-                                                 :avet ["A" "V" "E"])
-                                         :rows (map (fn [{:keys [e a v]}]
-                                                      (case current-datoms-index
-                                                        :eavt [e (str a) v]
-                                                        :aevt [(str a) e v]
-                                                        :avet [(str a) v e]))
-                                                    datoms)}))))]))))
+       [:a {:href "javascript:"
+            :onClick #(do
+                        (prn c (control-chan owner) component value)
+                        (put! c [:set-datoms-component [component value]]))}
+        value]))))
+
+(defcomponentk datoms [[:data current-datoms-index {current-db nil}
+                        {current-datoms-components nil} :as data] owner]
+  (render [_]
+    (html
+     [:div
+      (->inputs data)
+      [:hr]
+      (when current-db
+        (let [order-fn   (case current-datoms-index
+                           :eavt (juxt model/e-fn model/a-fn model/v-fn)
+                           :aevt (juxt model/a-fn model/e-fn model/v-fn)
+                           :avet (juxt model/a-fn model/v-fn model/e-fn))
+              components (->> current-datoms-components
+                              model/ensure-components
+                              order-fn
+                              (take-while (complement nil?)))
+              datoms     (apply d/datoms current-db current-datoms-index components)]
+          (components/->result-table
+           {:cols (case current-datoms-index
+                    :eavt ["E" "A" "V"]
+                    :aevt ["A" "E" "V"]
+                    :avet ["A" "V" "E"])
+            :rows (map (fn [{:keys [e a v]}]
+                         (case current-datoms-index
+                           :eavt [(->value {:value e}
+                                           {:opts {:component :e}})
+                                  (->value {:value (str a)}
+                                           {:opts {:component :a}})
+                                  (->value {:value v}
+                                           {:opts {:component :v}})]
+                           :aevt [(->value {:value (str a)}
+                                           {:opts {:component :a}})
+                                  (->value {:value e}
+                                           {:opts {:component :e}})
+                                  (->value {:value v}
+                                           {:opts {:component :v}})]
+                           :avet [(->value {:value (str a)}
+                                           {:opts {:component :a}})
+                                  (->value {:value v}
+                                           {:opts {:component :v}})
+                                  (->value {:value e}
+                                           {:opts {:component :e}})]))
+                       datoms)})))])))
