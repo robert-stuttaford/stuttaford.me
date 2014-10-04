@@ -14,23 +14,23 @@ goog.require('om.core');
 goog.require('om_bootstrap.types');
 goog.require('om_tools.dom');
 om_bootstrap.panel.Panel = om_bootstrap.types.bootstrap(new cljs.core.PersistentArrayMap.fromArray([schema.core.optional_key(new cljs.core.Keyword(null,"on-select","on-select",-192407950)),schema.core.make_fn_schema(schema.core.Any,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [schema.core.one(schema.core.Any,new cljs.core.Symbol(null,"arg0","arg0",-1024593414,null))], null)], null)),schema.core.optional_key(new cljs.core.Keyword(null,"header","header",119441134)),om_bootstrap.types.Renderable,schema.core.optional_key(new cljs.core.Keyword(null,"footer","footer",1606445390)),om_bootstrap.types.Renderable,schema.core.optional_key(new cljs.core.Keyword(null,"list-group","list-group",-304522729)),om_bootstrap.types.Renderable], true, false));
-var ufv___38619 = schema.utils.use_fn_validation;var output_schema38607_38620 = om_bootstrap.types.Component;var input_schema38608_38621 = new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [schema.core.one(om_bootstrap.panel.Panel,new cljs.core.Symbol(null,"opts","opts",1795607228,null)),schema.core.Any], null);var input_checker38609_38622 = schema.core.checker(input_schema38608_38621);var output_checker38610_38623 = schema.core.checker(output_schema38607_38620);/**
+var ufv___38689 = schema.utils.use_fn_validation;var output_schema38677_38690 = om_bootstrap.types.Component;var input_schema38678_38691 = new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [schema.core.one(om_bootstrap.panel.Panel,new cljs.core.Symbol(null,"opts","opts",1795607228,null)),schema.core.Any], null);var input_checker38679_38692 = schema.core.checker(input_schema38678_38691);var output_checker38680_38693 = schema.core.checker(output_schema38677_38690);/**
 * Inputs: [opts :- Panel & children]
 * Returns: t/Component
 * @param {...*} var_args
 */
-om_bootstrap.panel.panel = ((function (ufv___38619,output_schema38607_38620,input_schema38608_38621,input_checker38609_38622,output_checker38610_38623){
+om_bootstrap.panel.panel = ((function (ufv___38689,output_schema38677_38690,input_schema38678_38691,input_checker38679_38692,output_checker38680_38693){
 return (function() { 
-var panel__delegate = function (G__38611,rest38612){var validate__837__auto__ = ufv___38619.get_cell();if(cljs.core.truth_(validate__837__auto__))
-{var args__838__auto___38624 = cljs.core.list_STAR_.cljs$core$IFn$_invoke$arity$2(G__38611,rest38612);var temp__4126__auto___38625 = (function (){var G__38616 = args__838__auto___38624;return (input_checker38609_38622.cljs$core$IFn$_invoke$arity$1 ? input_checker38609_38622.cljs$core$IFn$_invoke$arity$1(G__38616) : input_checker38609_38622.call(null,G__38616));
-})();if(cljs.core.truth_(temp__4126__auto___38625))
-{var error__839__auto___38626 = temp__4126__auto___38625;throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2(schema.utils.format_STAR_.cljs$core$IFn$_invoke$arity$variadic("Input to %s does not match schema: %s",cljs.core.array_seq([new cljs.core.Symbol(null,"panel","panel",1081894071,null),cljs.core.pr_str.cljs$core$IFn$_invoke$arity$variadic(cljs.core.array_seq([error__839__auto___38626], 0))], 0)),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"schema","schema",-1582001791),input_schema38608_38621,new cljs.core.Keyword(null,"value","value",305978217),args__838__auto___38624,new cljs.core.Keyword(null,"error","error",-978969032),error__839__auto___38626], null));
+var panel__delegate = function (G__38681,rest38682){var validate__837__auto__ = ufv___38689.get_cell();if(cljs.core.truth_(validate__837__auto__))
+{var args__838__auto___38694 = cljs.core.list_STAR_.cljs$core$IFn$_invoke$arity$2(G__38681,rest38682);var temp__4126__auto___38695 = (function (){var G__38686 = args__838__auto___38694;return (input_checker38679_38692.cljs$core$IFn$_invoke$arity$1 ? input_checker38679_38692.cljs$core$IFn$_invoke$arity$1(G__38686) : input_checker38679_38692.call(null,G__38686));
+})();if(cljs.core.truth_(temp__4126__auto___38695))
+{var error__839__auto___38696 = temp__4126__auto___38695;throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2(schema.utils.format_STAR_.cljs$core$IFn$_invoke$arity$variadic("Input to %s does not match schema: %s",cljs.core.array_seq([new cljs.core.Symbol(null,"panel","panel",1081894071,null),cljs.core.pr_str.cljs$core$IFn$_invoke$arity$variadic(cljs.core.array_seq([error__839__auto___38696], 0))], 0)),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"schema","schema",-1582001791),input_schema38678_38691,new cljs.core.Keyword(null,"value","value",305978217),args__838__auto___38694,new cljs.core.Keyword(null,"error","error",-978969032),error__839__auto___38696], null));
 } else
 {}
 } else
 {}
-var o__840__auto__ = (function (){var opts = G__38611;var children = rest38612;while(true){
-var vec__38617 = om_bootstrap.types.separate.cljs$core$IFn$_invoke$arity$3(om_bootstrap.panel.Panel,opts,new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"bs-class","bs-class",1438130590),"panel",new cljs.core.Keyword(null,"bs-style","bs-style",1424423998),"default"], null));var bs = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__38617,(0),null);var props = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__38617,(1),null);var classes = cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(om_bootstrap.types.bs_class_set(bs),new cljs.core.Keyword(null,"panel","panel",-558637456),true);return om_tools.dom.element(React.DOM.div,om_bootstrap.util.merge_props.cljs$core$IFn$_invoke$arity$variadic(cljs.core.array_seq([props,new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"class","class",-2030961996),om_tools.dom.class_set(classes)], null)], 0)),(new cljs.core.PersistentVector(null,4,(5),cljs.core.PersistentVector.EMPTY_NODE,[(function (){var temp__4126__auto__ = new cljs.core.Keyword(null,"header","header",119441134).cljs$core$IFn$_invoke$arity$1(bs);if(cljs.core.truth_(temp__4126__auto__))
+var o__840__auto__ = (function (){var opts = G__38681;var children = rest38682;while(true){
+var vec__38687 = om_bootstrap.types.separate.cljs$core$IFn$_invoke$arity$3(om_bootstrap.panel.Panel,opts,new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"bs-class","bs-class",1438130590),"panel",new cljs.core.Keyword(null,"bs-style","bs-style",1424423998),"default"], null));var bs = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__38687,(0),null);var props = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__38687,(1),null);var classes = cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(om_bootstrap.types.bs_class_set(bs),new cljs.core.Keyword(null,"panel","panel",-558637456),true);return om_tools.dom.element(React.DOM.div,om_bootstrap.util.merge_props.cljs$core$IFn$_invoke$arity$variadic(cljs.core.array_seq([props,new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"class","class",-2030961996),om_tools.dom.class_set(classes)], null)], 0)),(new cljs.core.PersistentVector(null,4,(5),cljs.core.PersistentVector.EMPTY_NODE,[(function (){var temp__4126__auto__ = new cljs.core.Keyword(null,"header","header",119441134).cljs$core$IFn$_invoke$arity$1(bs);if(cljs.core.truth_(temp__4126__auto__))
 {var header = temp__4126__auto__;return cljs.core.apply.cljs$core$IFn$_invoke$arity$3(React.DOM.div,{"className": "panel-heading"},cljs.core.flatten((new cljs.core.PersistentVector(null,1,(5),cljs.core.PersistentVector.EMPTY_NODE,[om_bootstrap.util.clone_with_props.cljs$core$IFn$_invoke$arity$2(header,new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"class","class",-2030961996),"panel-title"], null))],null))));
 } else
 {return null;
@@ -49,29 +49,29 @@ var vec__38617 = om_bootstrap.types.separate.cljs$core$IFn$_invoke$arity$3(om_bo
 break;
 }
 })();if(cljs.core.truth_(validate__837__auto__))
-{var temp__4126__auto___38627 = (function (){var G__38618 = o__840__auto__;return (output_checker38610_38623.cljs$core$IFn$_invoke$arity$1 ? output_checker38610_38623.cljs$core$IFn$_invoke$arity$1(G__38618) : output_checker38610_38623.call(null,G__38618));
-})();if(cljs.core.truth_(temp__4126__auto___38627))
-{var error__839__auto___38628 = temp__4126__auto___38627;throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2(schema.utils.format_STAR_.cljs$core$IFn$_invoke$arity$variadic("Output of %s does not match schema: %s",cljs.core.array_seq([new cljs.core.Symbol(null,"panel","panel",1081894071,null),cljs.core.pr_str.cljs$core$IFn$_invoke$arity$variadic(cljs.core.array_seq([error__839__auto___38628], 0))], 0)),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"schema","schema",-1582001791),output_schema38607_38620,new cljs.core.Keyword(null,"value","value",305978217),o__840__auto__,new cljs.core.Keyword(null,"error","error",-978969032),error__839__auto___38628], null));
+{var temp__4126__auto___38697 = (function (){var G__38688 = o__840__auto__;return (output_checker38680_38693.cljs$core$IFn$_invoke$arity$1 ? output_checker38680_38693.cljs$core$IFn$_invoke$arity$1(G__38688) : output_checker38680_38693.call(null,G__38688));
+})();if(cljs.core.truth_(temp__4126__auto___38697))
+{var error__839__auto___38698 = temp__4126__auto___38697;throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2(schema.utils.format_STAR_.cljs$core$IFn$_invoke$arity$variadic("Output of %s does not match schema: %s",cljs.core.array_seq([new cljs.core.Symbol(null,"panel","panel",1081894071,null),cljs.core.pr_str.cljs$core$IFn$_invoke$arity$variadic(cljs.core.array_seq([error__839__auto___38698], 0))], 0)),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"schema","schema",-1582001791),output_schema38677_38690,new cljs.core.Keyword(null,"value","value",305978217),o__840__auto__,new cljs.core.Keyword(null,"error","error",-978969032),error__839__auto___38698], null));
 } else
 {}
 } else
 {}
 return o__840__auto__;
 };
-var panel = function (G__38611,var_args){
-var rest38612 = null;if (arguments.length > 1) {
-  rest38612 = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1),0);} 
-return panel__delegate.call(this,G__38611,rest38612);};
+var panel = function (G__38681,var_args){
+var rest38682 = null;if (arguments.length > 1) {
+  rest38682 = cljs.core.array_seq(Array.prototype.slice.call(arguments, 1),0);} 
+return panel__delegate.call(this,G__38681,rest38682);};
 panel.cljs$lang$maxFixedArity = 1;
-panel.cljs$lang$applyTo = (function (arglist__38629){
-var G__38611 = cljs.core.first(arglist__38629);
-var rest38612 = cljs.core.rest(arglist__38629);
-return panel__delegate(G__38611,rest38612);
+panel.cljs$lang$applyTo = (function (arglist__38699){
+var G__38681 = cljs.core.first(arglist__38699);
+var rest38682 = cljs.core.rest(arglist__38699);
+return panel__delegate(G__38681,rest38682);
 });
 panel.cljs$core$IFn$_invoke$arity$variadic = panel__delegate;
 return panel;
 })()
-;})(ufv___38619,output_schema38607_38620,input_schema38608_38621,input_checker38609_38622,output_checker38610_38623))
+;})(ufv___38689,output_schema38677_38690,input_schema38678_38691,input_checker38679_38692,output_checker38680_38693))
 ;
-schema.utils.declare_class_schema_BANG_(schema.utils.fn_schema_bearer(om_bootstrap.panel.panel),schema.core.make_fn_schema(output_schema38607_38620,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [input_schema38608_38621], null)));
+schema.utils.declare_class_schema_BANG_(schema.utils.fn_schema_bearer(om_bootstrap.panel.panel),schema.core.make_fn_schema(output_schema38677_38690,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [input_schema38678_38691], null)));
 //# sourceMappingURL=panel.js.map
