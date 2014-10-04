@@ -36,14 +36,17 @@
        sort
        (map (partial schema-for-attr (:schema db)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Datoms
+
 (def indexes [:eavt :aevt :avet])
 
 (defn ensure-components [components]
   (merge {:e nil :a nil :v nil} components))
 
 (defnk e-fn [e]
-  (when (seq e)
-    (long e)))
+  (cond (number? e) e
+        (and (string? e) (seq e)) (long e)))
 
 (defnk a-fn [a]
   (when (seq a)
@@ -53,8 +56,27 @@
 
 (defnk v-fn [v]
   (cond (number? v) v
-        (seq v)     (try (let [v-as-long (long v)]
-                           (if (.isNaN v-as-long)
-                             v
-                             v-as-long))
-                         (catch :default e v))))
+        (and (string? v) (seq v))
+        (try (let [v-as-long (long v)]
+               (if (.isNaN v-as-long)
+                 v
+                 v-as-long))
+             (catch :default e v))))
+
+(defn order-fn [index]
+  (case index
+    :eavt (juxt e-fn a-fn v-fn)
+    :aevt (juxt a-fn e-fn v-fn)
+    :avet (juxt a-fn v-fn e-fn)))
+
+(defn components [index]
+  (case index
+    :eavt [:e :a :v]
+    :aevt [:a :e :v]
+    :avet [:a :v :e]))
+
+(defn cols [index]
+  (case index
+    :eavt ["E" "A" "V"]
+    :aevt ["A" "E" "V"]
+    :avet ["A" "V" "E"]))

@@ -46,7 +46,6 @@
    :view                      :datoms
    :query                     "[:find ?e ?a ?v :in $ :where [?e ?a ?v]]"
    :current-datoms-index      :avet
-   :current-datoms-components {:a ":link/title"}
    :schema-visible?           false})
 
 (defn radiant [& {:keys [debug?] :or {debug? false}}]
