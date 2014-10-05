@@ -1,6 +1,7 @@
 (ns stuttaford.web.service
   (:require [compojure.handler :as handler]
             [ring.adapter.jetty :as jetty]
+            [ring.middleware.resource :refer [wrap-resource]]
             [stuttaford.web.routes :refer [app]]))
 
 (defonce service (atom nil))

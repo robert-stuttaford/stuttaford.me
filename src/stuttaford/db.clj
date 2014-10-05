@@ -329,7 +329,7 @@
        vec))
 
 (defn radiant-datom [db [e a v t a?]]
-  [e (->> a (d/entity db) :db/ident) v])
+  [e (->> a (d/entity db) :db/ident) v t])
 
 (defn all-datoms-for-radiant []
   (let [db (as-db uri)]
@@ -338,5 +338,5 @@
          (map (partial radiant-datom db))
          vec)))
 
-(comment (all-datoms-for-radiant)
+(comment (first (all-datoms-for-radiant))
          )

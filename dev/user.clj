@@ -21,8 +21,7 @@
 
 (comment
   (restart-shadow!)
-  (clean-shadow-output!)
-  )
+  (clean-shadow-output!))
 
 (defn start! []
   (start-database!)

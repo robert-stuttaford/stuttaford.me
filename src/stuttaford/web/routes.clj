@@ -40,13 +40,13 @@
 ;; Radiant
 
 (defn radiant-data []
-  {:data-sources              {:links {:id     :codex
-                                       :label  "Codex"
-                                       :datoms (db/all-datoms-for-radiant)}}
-   :view                      :datoms
-   :query                     "[:find ?e ?a ?v :in $ :where [?e ?a ?v]]"
-   :current-datoms-index      :avet
-   :schema-visible?           false})
+  {:data-sources         {:links {:id     :codex
+                                  :label  "Codex"
+                                  :datoms (db/all-datoms-for-radiant)}}
+   :view                 :datoms
+   :query                "[:find ?e ?a ?v :in $ :where [?e ?a ?v]]"
+   :current-datoms-index :avet
+   :schema-visible?      false})
 
 (defn radiant [& {:keys [debug?] :or {debug? false}}]
   {:title   "Radiant"
@@ -59,6 +59,15 @@
    :layout  "bare"
    :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
    :content (list (om-app "radiant" debug? (radiant-data)))})
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dive into Datomic
+
+(defn dive-into-datomic [& {:keys [debug?] :or {debug? false}}]
+  {:title   "Dive into Datomic"
+   :layout  "bare"
+   :css     ["bootstrap/css/bootstrap.min.css" "css/dive-into-datomic.css"]
+   :content (list (om-app "dive-into-datomic" true {:view :datom}))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
@@ -88,6 +97,10 @@
        (render html-layout radiant-advanced
          :debug? (some-> query-params (get "debug") boolean)))
 
+  (GET "/dive-into-datomic/" {query-params :query-params}
+       (render html-layout dive-into-datomic
+         :debug? (some-> query-params (get "debug") boolean)))
+
   (context "/codex" []
 
     (GET "/" {query-params :query-params}
@@ -110,4 +123,5 @@
           (response/redirect "/codex")))
 
   (route/resources "")
+
   (route/not-found #(render-memoized html-layout (partial error-404 %))))

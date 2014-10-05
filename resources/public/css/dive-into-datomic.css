@@ -1,0 +1,134 @@
+@font-face {
+    font-family: 'Bitter';
+    src: url('/fonts/bitter-bold-webfont.eot');
+    src: url('/fonts/bitter-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/bitter-bold-webfont.woff2') format('woff2'),
+         url('/fonts/bitter-bold-webfont.woff') format('woff'),
+         url('/fonts/bitter-bold-webfont.ttf') format('truetype'),
+         url('/fonts/bitter-bold-webfont.svg#bitterbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Bitter';
+    src: url('/fonts/bitter-italic-webfont.eot');
+    src: url('/fonts/bitter-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/bitter-italic-webfont.woff2') format('woff2'),
+         url('/fonts/bitter-italic-webfont.woff') format('woff'),
+         url('/fonts/bitter-italic-webfont.ttf') format('truetype'),
+         url('/fonts/bitter-italic-webfont.svg#bitteritalic') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Bitter';
+    src: url('/fonts/bitter-regular-webfont.eot');
+    src: url('/fonts/bitter-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/bitter-regular-webfont.woff2') format('woff2'),
+         url('/fonts/bitter-regular-webfont.woff') format('woff'),
+         url('/fonts/bitter-regular-webfont.ttf') format('truetype'),
+         url('/fonts/bitter-regular-webfont.svg#bitterregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+body {
+    margin: 1em;
+}
+
+.container {
+    max-width: none;
+}
+
+span.code {
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    background: #eee;
+    font-family: Menlo, Monaco, "Courier New", monospace;
+    font-size: 0.9em;
+}
+
+.navigation {
+    opacity: 0;
+    margin-bottom: 2em;
+    transition: opacity 0.5s ease;
+}
+
+.navigation:hover {
+    opacity: 1;
+}
+
+.datom-tuple {
+    font-family: Menlo, Monaco, "Courier New", monospace;
+    font-size: 2em;
+    text-align: center;
+}
+
+.datom-tuple a {
+    padding: 0.2em 0.6em;
+    border-radius: 8px;
+    margin: 0 0.1em;
+    box-sizing: border-box;
+    border: 1px solid #fff;
+}
+
+.datom-tuple a.entity {
+    color: #37d;
+}
+
+.datom-tuple a.attribute {
+    color: #a0e;
+}
+
+.datom-tuple a.value {
+    color: #6c6;
+}
+
+.datom-tuple a.transaction {
+    color: #f78;
+}
+
+
+.datom-tuple a:hover {
+    text-decoration: none;
+    background: #eee;
+    border: 1px solid #eee;
+}
+
+.datom-tuple a.active {
+    background: #eee;
+    border: 1px solid #ddd;
+}
+
+.datom-content {
+    margin: 2em;
+    font-size : 1.6em;
+    font-family: 'Bitter', serif;
+}
+
+.datom ul {
+    padding: 0 1em;
+    list-style: none;
+}
+
+.datom li:before {
+    content: "";
+    border-color: transparent #111;
+    border-style: solid;
+    border-width: 0.25em 0 0.25em 0.35em;
+    display: block;
+    height: 0;
+    width: 0;
+    left: -1em;
+    top: 0.9em;
+    position: relative;
+}
+
+.datom li {
+    margin-bottom: 0.3em;
+}

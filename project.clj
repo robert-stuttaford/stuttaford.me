@@ -51,4 +51,5 @@
                           datascript]
            :externs     ["datascript/externs.js"]
            :modules     [{:id :codex   :main stuttaford.codex}
-                         {:id :radiant :main stuttaford.radiant}]})
+                         {:id :radiant :main stuttaford.radiant}
+                         {:id :dive-into-datomic :main stuttaford.dive-into-datomic}]})

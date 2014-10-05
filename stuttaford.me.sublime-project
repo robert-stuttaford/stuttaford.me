@@ -1,0 +1,24 @@
+{
+  "folders":
+  [
+    {
+      "file_exclude_patterns":
+      [
+        ".lein*",
+        ".#*",
+        "*.sublime-workspace",
+        ".emacs*"
+      ],
+      "folder_exclude_patterns":
+      [
+        "checkouts",
+        "target",
+        "logs",
+        "site",
+        "js*"
+      ],
+      "follow_symlinks": true,
+      "path": "."
+    }
+  ]
+}
