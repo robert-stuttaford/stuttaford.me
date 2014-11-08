@@ -4,6 +4,8 @@
   (:require-macros
     [datascript :refer [combine-cmp case-tree]]))
 
+(def ^:const tx0 0x20000000)
+
 (defrecord Datom [e a v tx added]
   Object
   (toString [this]
@@ -20,7 +22,7 @@
   (-equiv [d o] (and (= (.-e d) (.-e o))
                      (= (.-a d) (.-a o))
                      (= (.-v d) (.-v o))))
-  
+
   ISeqable
   (-seq [d] (list (.-e d) (.-a d) (.-v d) (.-tx d) (.-added d))))
 
@@ -29,17 +31,6 @@
 
 (defprotocol ISearch
   (-search [data pattern]))
-
-(defn- compare-key [k o1 o2]
-  (let [k1 (get o1 k)
-        k2 (get o2 k)]
-    (if (and (some? k1) (some? k2))
-      (let [t1 (type k1)
-            t2 (type k2)]
-        (if (= t1 t2)
-          (compare k1 k2)
-          (compare t1 t2)))
-      0)))
 
 (defn cmp-val [o1 o2]
   (if (and (some? o1) (some? o2))
@@ -76,11 +67,11 @@
     (cmp     (.-e d1) (.-e d2))
     (cmp     (.-tx d1) (.-tx d2))))
 
-(defrecord DB [schema eavt aevt avet max-eid max-tx]
+(defrecord DB [schema eavt aevt avet max-eid max-tx refs]
   Object
   (toString [this]
     (pr-str* this))
-    
+
   ISearch
   (-search [_ [e a v tx]]
     (case-tree [e a (some? v) tx] [
@@ -128,7 +119,7 @@
          (equiv-index (.-eavt this) (.-eavt other)))))
 
 
-(defrecord TxReport [db-before db-after tx-data tempids])
+(defrecord TxReport [db-before db-after tx-data tempids tx-meta])
 
 (defn multival? [db attr]
   (= (get-in db [:schema attr :db/cardinality]) :db.cardinality/many))
@@ -146,7 +137,8 @@
 
 (defn- advance-max-eid [db eid]
   (cond-> db
-    (> eid (:max-eid db))
+    (and (> eid (:max-eid db))
+         (< eid tx0)) ;; do not trigger advance if transaction id was referenced
       (assoc :max-eid eid)))
 
 (defn- allocate-eid
@@ -175,14 +167,22 @@
       (update-in [:db-after] with-datom datom)
       (update-in [:tx-data] conj datom)))
 
+(defn reverse-ref [attr]
+  (let [name (name attr)]
+    (when (= "_" (nth name 0))
+      (keyword (namespace attr) (subs name 1)))))
+
 (defn- explode [db entity]
   (let [eid (:db/id entity)]
     (for [[a vs] (dissoc entity :db/id)
+          :let   [reverse-a (reverse-ref a)]
           v      (if (and (or (array? vs) (coll? vs))
                           (not (map? vs))
                           (multival? db a))
                    vs [vs])]
-      [:db/add eid a v])))
+      (if reverse-a
+        [:db/add v   reverse-a eid]
+        [:db/add eid a         v]))))
 
 (defn- transact-add [report [_ e a v]]
   (let [tx      (current-tx report)
@@ -204,21 +204,31 @@
   (let [tx (current-tx report)]
     (transact-report report (Datom. (.-e d) (.-a d) (.-v d) tx false))))
 
+(defn- tx-id? [e]
+  (or (= e :db/current-tx)
+      (= e ":db/current-tx"))) ;; for datascript.js interop
+
 (defn- transact-tx-data [report [entity & entities :as es]]
   (let [db (:db-after report)]
     (cond
       (nil? entity)
         (-> report
+            (assoc-in  [:tempids :db/current-tx] (current-tx report))
             (update-in [:db-after :max-tx] inc))
-     
+
       (map? entity)
-        (if (:db/id entity)
-          (recur report (concat (explode db entity) entities))
-          (let [eid    (next-eid db)
-                entity (assoc entity :db/id eid)]
-            (recur (allocate-eid report eid)
-                   (concat [entity] entities))))
-     
+        (cond
+          (tx-id? (:db/id entity))
+            (let [entity (assoc entity :db/id (current-tx report))]
+              (recur report (concat (explode db entity) entities)))
+          (nil? (:db/id entity))
+            (let [eid    (next-eid db)
+                  entity (assoc entity :db/id eid)]
+              (recur (allocate-eid report eid)
+                     (concat [entity] entities)))
+          :else
+            (recur report (concat (explode db entity) entities)))
+
       :else
         (let [[op e a v] entity]
           (cond
@@ -226,16 +236,34 @@
               (let [[_ f & args] entity]
                 (recur report (concat (apply f db args) entities)))
 
+            (= op :db.fn/cas)
+              (let [[_ e a ov nv] entity
+                    datoms (-search db [e a])]
+                (if (multival? db a)
+                  (if (some #(= (.-v %) ov) datoms)
+                    (recur (transact-add report [:db/add e a nv]) entities)
+                    (throw (js/Error. (str ":db.fn/cas failed on datom [" e " " a " " (map :v datoms) "], expected " ov))))
+                  (let [v (.-v (first datoms))] 
+                    (if (= v ov)
+                      (recur (transact-add report [:db/add e a nv]) entities)
+                      (throw (js/Error. (str ":db.fn/cas failed on datom [" e " " a " " v "], expected " ov)))))))
+           
+            (tx-id? e)
+              (recur report (concat [[op (current-tx report) a v]] entities))
+           
+            (and (ref? db a) (tx-id? v))
+              (recur report (concat [[op e a (current-tx report)]] entities))
+
             (neg? e)
               (if-let [eid (get-in report [:tempids e])]
                 (recur report (concat [[op eid a v]] entities))
                 (recur (allocate-eid report e (next-eid db)) es))
-           
+
             (and (ref? db a) (neg? v))
               (if-let [vid (get-in report [:tempids v])]
                 (recur report (concat [[op e a vid]] entities))
                 (recur (allocate-eid report v (next-eid db)) es))
-           
+
             (= op :db/add)
               (recur (transact-add report entity) entities)
 
@@ -249,6 +277,6 @@
                 (recur (reduce transact-retract-datom report datoms) entities))
 
             (= op :db.fn/retractEntity)
-              (let [datoms (-search db [e])]
-                (recur (reduce transact-retract-datom report datoms) entities)))))))
-
+              (let [e-datoms (-search db [e])
+                    v-datoms (mapcat (fn [a] (-search db [nil a e])) (.-refs db))]
+                (recur (reduce transact-retract-datom report (concat e-datoms v-datoms)) entities)))))))

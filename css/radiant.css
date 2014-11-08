@@ -35,6 +35,14 @@ body {
 
 .datoms-components-inputs .form-group {
     margin-bottom: 0;
+    width: 90%;
+    float: left;
+}
+
+.datoms-components-inputs a {
+    margin: 0.6em 0.3em;
+    display: block;
+    float: left;
 }
 
 .query-input textarea {
