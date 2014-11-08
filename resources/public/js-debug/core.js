@@ -1961,14 +1961,14 @@ goog.addDependency("plumbing/core.js",['plumbing.core'],['cljs.core','plumbing.f
 goog.addDependency("datascript/btset.js",['datascript.btset'],['cljs.core']);
 goog.addDependency("datascript/core.js",['datascript.core'],['cljs.core','datascript.btset']);
 goog.addDependency("clojure/set.js",['clojure.set'],['cljs.core']);
+goog.addDependency("cljs/reader.js",['cljs.reader'],['goog.string','cljs.core','goog.string.StringBuffer']);
 goog.addDependency("clojure/walk.js",['clojure.walk'],['cljs.core']);
-goog.addDependency("datascript/query.js",['datascript.query'],['cljs.core','datascript.core','clojure.set','clojure.walk']);
 goog.addDependency("datascript/impl/entity.js",['datascript.impl.entity'],['cljs.core','datascript.core']);
+goog.addDependency("datascript/query.js",['datascript.query'],['cljs.core','datascript.core','clojure.set','cljs.reader','clojure.walk','datascript.impl.entity']);
 goog.addDependency("datascript.js",['datascript'],['datascript.query','cljs.core','datascript.core','datascript.btset','datascript.impl.entity']);
 goog.addDependency("om/dom.js",['om.dom'],['cljs.core']);
 goog.addDependency("goog/ui/idgenerator.js",['goog.ui.IdGenerator'],[]);
 goog.addDependency("om/core.js",['om.core'],['cljs.core','om.dom','goog.ui.IdGenerator']);
-goog.addDependency("cljs/reader.js",['cljs.reader'],['goog.string','cljs.core','goog.string.StringBuffer']);
 goog.addDependency("stuttaford/radiant/model.js",['stuttaford.radiant.model'],['plumbing.core','cljs.core','datascript','datascript.core','om.core','cljs.reader']);
 goog.addDependency("om_tools/dom.js",['om_tools.dom'],['cljs.core','om.dom','clojure.string']);
 goog.addDependency("om_bootstrap/util.js",['om_bootstrap.util'],['schema.core','cljs.core','om.core']);
@@ -2172,8 +2172,8 @@ goog.addDependency("sablono/core.js",['sablono.core'],['goog.dom','sablono.util'
 goog.addDependency("secretary/core.js",['secretary.core'],['cljs.core','clojure.string','clojure.walk']);
 goog.addDependency("datascript/btset.js",['datascript.btset'],['cljs.core']);
 goog.addDependency("datascript/core.js",['datascript.core'],['cljs.core','datascript.btset']);
-goog.addDependency("datascript/query.js",['datascript.query'],['cljs.core','datascript.core','clojure.set','clojure.walk']);
 goog.addDependency("datascript/impl/entity.js",['datascript.impl.entity'],['cljs.core','datascript.core']);
+goog.addDependency("datascript/query.js",['datascript.query'],['cljs.core','datascript.core','clojure.set','cljs.reader','clojure.walk','datascript.impl.entity']);
 goog.addDependency("datascript.js",['datascript'],['datascript.query','cljs.core','datascript.core','datascript.btset','datascript.impl.entity']);
 
 /**
@@ -20780,8 +20780,8 @@ goog.require('sablono.core');
 goog.require('secretary.core');
 goog.require('datascript.btset');
 goog.require('datascript.core');
-goog.require('datascript.query');
 goog.require('datascript.impl.entity');
+goog.require('datascript.query');
 goog.require('datascript');
 goog.require('om_tools.dom');
 goog.require('om_bootstrap.util');

@@ -1,8 +1,10 @@
 (ns datascript.query
   (:require
+    [cljs.reader]
     [clojure.set :as set]
     [clojure.walk :as walk]
-    [datascript.core :as dc]))
+    [datascript.core :as dc]
+    [datascript.impl.entity :as de]))
 
 
 ;; Records
@@ -19,8 +21,9 @@
 ;; Utilities
 
 (defn intersect-keys [attrs1 attrs2]
-  (set/intersection (set (keys attrs1)) 
+  (set/intersection (set (keys attrs1))
                     (set (keys attrs2))))
+
 (defn concatv [& xs]
   (vec (apply concat xs)))
 
@@ -64,16 +67,18 @@
 (defn sum-rel [a b]
   (Relation. (:attrs a) (concat (:tuples a) (:tuples b))))
 
-(defn prod-rel [rel1 rel2]
-  (let [attrs1 (keys (:attrs rel1))
-        attrs2 (keys (:attrs rel2))
-        idxs1  (to-array (map (:attrs rel1) attrs1))
-        idxs2  (to-array (map (:attrs rel2) attrs2))]
-    (Relation.
-      (zipmap (concat attrs1 attrs2) (range))
-      (for [t1 (:tuples rel1)
-            t2 (:tuples rel2)]
-        (join-tuples t1 idxs1 t2 idxs2)))))
+(defn prod-rel
+  ([] (Relation. {} [#js[]]))
+  ([rel1 rel2]
+    (let [attrs1 (keys (:attrs rel1))
+          attrs2 (keys (:attrs rel2))
+          idxs1  (to-array (map (:attrs rel1) attrs1))
+          idxs2  (to-array (map (:attrs rel2) attrs2))]
+      (Relation.
+        (zipmap (concat attrs1 attrs2) (range))
+        (for [t1 (:tuples rel1)
+              t2 (:tuples rel2)]
+          (join-tuples t1 idxs1 t2 idxs2))))))
 
 ;; built-ins
 
@@ -81,12 +86,31 @@
   (let [l (count xs)]
     (not= (take (/ l 2) xs) (drop (/ l 2) xs))))
 
+(defn- -get-else
+  [db e a else-val]
+  (if-let [datom (first (dc/-search db [e a]))]
+    (.-v datom)
+    else-val))
+
+(defn- -get-some
+  [db e & as]
+  (reduce
+   (fn [_ a]
+     (when-let [datom (first (dc/-search db [e a]))]
+       (reduced (.-v datom))))
+   nil
+   as))
+
+(defn- -missing?
+  [db e a]
+  (nil? (get (de/entity db e) a)))
+
 (def built-ins {
-  '= =, '== ==, 'not= not=, '!= not=, '< <, '> >, '<= <=, '>= >=, '+ +, '- -, 
+  '= =, '== ==, 'not= not=, '!= not=, '< <, '> >, '<= <=, '>= >=, '+ +, '- -,
   '* *, '/ /, 'quot quot, 'rem rem, 'mod mod, 'inc inc, 'dec dec, 'max max, 'min min,
   'zero? zero?, 'pos? pos?, 'neg? neg?, 'even? even?, 'odd? odd?, 'true? true?,
   'false? false?, 'nil? nil?, 'str str, 'identity identity, 'vector vector,
-  '-differ? -differ?})
+  '-differ? -differ?, 'get-else -get-else, 'get-some -get-some, 'missing? -missing?, 'ground identity})
 
 (def built-in-aggregates {
   'distinct (comp vec distinct)
@@ -124,10 +148,10 @@
 (defn in->rel [form value]
   (condp looks-like? form
     '[_ ...] ;; collection binding [?x ...]
-      (reduce sum-rel 
+      (reduce sum-rel
         (map #(in->rel (first form) %) value))
     '[[*]]   ;; relation binding [[?a ?b]]
-      (reduce sum-rel 
+      (reduce sum-rel
         (map #(in->rel (first form) %) value))
     '[*]     ;; tuple binding [?a ?b]
       (reduce prod-rel
@@ -151,7 +175,7 @@
 (defn parse-ins [context ins values]
   (reduce parse-in context (map vector ins values)))
 
-;; 
+;;
 
 (defn tuple-key-fn [idxs]
   (if (== (count idxs) 1)
@@ -252,7 +276,7 @@
   ;; TODO raise if more than one tuple bound
   (when-let [rel (first (filter #(contains? (:attrs %) sym) (:rels context)))]
     (aget (first (:tuples rel)) ((:attrs rel) sym))))
-  
+
 (defn- rel-contains-attrs? [rel attrs]
   (not (empty? (set/intersection (set attrs) (set (keys (:attrs rel)))))))
 
@@ -261,11 +285,13 @@
         production (reduce prod-rel rels)]
     [(update-in context [:rels] #(remove (set rels) %)) production]))
 
-(defn -call-fn [rel f args]
+(defn -call-fn [context rel f args]
   (fn [tuple]
     ;; TODO raise if not all args are bound
     (let [resolved-args (map #(if (symbol? %)
-                                (aget tuple (get (:attrs rel) %))
+                                (or
+                                 (get (:sources context) %)
+                                 (aget tuple (get (:attrs rel) %)))
                                 %)
                              args)]
       (apply f resolved-args))))
@@ -275,7 +301,7 @@
         pred         (or (get built-ins f)
                          (context-resolve-val context f))
         [context production] (rel-prod-by-attrs context (filter symbol? args))
-        tuple-pred   (-call-fn production pred args)
+        tuple-pred   (-call-fn context production pred args)
         new-rel      (update-in production [:tuples] #(filter tuple-pred %))]
     (update-in context [:rels] conj new-rel)))
 
@@ -284,7 +310,7 @@
         fun      (or (get built-ins f)
                      (context-resolve-val context f))
         [context production] (rel-prod-by-attrs context (filter symbol? args))
-        tuple-fn (-call-fn production fun args)
+        tuple-fn (-call-fn context production fun args)
         new-rel  (->> (:tuples production)
                    (map #(let [val (tuple-fn %)
                                rel (in->rel out val)]
@@ -355,7 +381,7 @@
         empty-rels?     (fn [context]
                           (some #(empty? (:tuples %)) (:rels context)))]
     (loop [stack (list {:prefix-clauses []
-                        :prefix-context (assoc context :rels [])
+                        :prefix-context context
                         :clauses        [clause]
                         :used-args      {}
                         :pending-guards {}})
@@ -363,13 +389,13 @@
       (if-let [frame (first stack)]
         (let [[clauses [rule-clause & next-clauses]] (split-with #(not (rule? context %)) (:clauses frame))]
           (if (nil? rule-clause)
-            
+
             ;; no rules --> expand, collect, sum
             (let [context (solve (:prefix-context frame) clauses)
                   tuples  (-collect context final-attrs)
                   new-rel (Relation. final-attrs-map tuples)]
               (recur (next stack) (sum-rel rel new-rel)))
-              
+
             ;; has rule --> add guards --> check if dead --> expand rule --> push to stack, recur
             (let [[rule & call-args]     rule-clause
                   guards                 (rule-gen-guards rule-clause (:used-args frame))
@@ -379,11 +405,11 @@
 
                 ;; this branch has no data, just drop it from stack
                 (recur (next stack) rel)
-                
+
                 (let [prefix-clauses (concat clauses active-gs)
                       prefix-context (solve (:prefix-context frame) prefix-clauses)]
                   (if (empty-rels? prefix-context)
-                    
+
                     ;; this branch has no data, just drop it from stack
                     (recur (next stack) rel)
 

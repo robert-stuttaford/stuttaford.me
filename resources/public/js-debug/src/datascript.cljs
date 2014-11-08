@@ -12,36 +12,48 @@
 (defn entity-db [entity] (.-db entity))
 (def  touch de/touch)
 
-(def ^:const tx0 0x20000000)
+(def ^:const tx0 dc/tx0)
+
+(defn- refs [schema]
+  (->> schema
+    (filter (fn [[_ v]] (= (:db/valueType v) :db.type/ref)))
+    (mapv first)))
 
 (defn empty-db [& [schema]]
-  (dc/DB. schema
-       (btset/btset-by dc/cmp-datoms-eavt) 
-       (btset/btset-by dc/cmp-datoms-aevt)
-       (btset/btset-by dc/cmp-datoms-avet)
-       0
-       tx0))
+  (dc/map->DB {
+    :schema  schema
+    :eavt    (btset/btset-by dc/cmp-datoms-eavt) 
+    :aevt    (btset/btset-by dc/cmp-datoms-aevt)
+    :avet    (btset/btset-by dc/cmp-datoms-avet)
+    :max-eid 0
+    :max-tx  tx0
+    :refs    (refs schema)}))
 
 (defn create-conn [& [schema]]
   (atom (empty-db schema)
         :meta { :listeners  (atom {}) }))
 
-(defn with [db tx-data]
-  (dc/transact-tx-data (dc/TxReport. db db [] {}) tx-data))
+(defn with [db tx-data & [tx-meta]]
+  (dc/transact-tx-data (dc/map->TxReport
+                         { :db-before db
+                           :db-after  db
+                           :tx-data   []
+                           :tempids   {}
+                           :tx-meta   tx-meta}) tx-data))
 
 (defn db-with [db tx-data]
   (:db-after (with db tx-data)))
 
-(defn -transact! [conn tx-data]
+(defn -transact! [conn tx-data tx-meta]
   (let [report (atom nil)]
     (swap! conn (fn [db]
-                  (let [r (with db tx-data)]
+                  (let [r (with db tx-data tx-meta)]
                     (reset! report r)
                     (:db-after r))))
     @report))
 
-(defn transact! [conn tx-data]
-  (let [report (-transact! conn tx-data)]
+(defn transact! [conn tx-data & [tx-meta]]
+  (let [report (-transact! conn tx-data tx-meta)]
     (doseq [[_ callback] @(:listeners (meta conn))]
       (callback report))
     report))
@@ -97,27 +109,35 @@
 
 (defn db-from-reader [{:keys [schema datoms]}]
   (let [datoms (map (fn [[e a v tx]] (dc/Datom. e a v tx true)) datoms)]
-    (dc/DB. schema
-         (apply btset/btset-by dc/cmp-datoms-eavt datoms)
-         (apply btset/btset-by dc/cmp-datoms-aevt datoms)
-         (apply btset/btset-by dc/cmp-datoms-avet datoms)
-         (reduce max 0 (map :e datoms))
-         (reduce max tx0 (map :tx datoms)))))
+    (dc/map->DB {
+      :schema  schema
+      :eavt    (apply btset/btset-by dc/cmp-datoms-eavt datoms)
+      :aevt    (apply btset/btset-by dc/cmp-datoms-aevt datoms)
+      :avet    (apply btset/btset-by dc/cmp-datoms-avet datoms)
+      :max-eid (reduce max 0 (map :e datoms))
+      :max-tx  (reduce max tx0 (map :tx datoms))
+      :refs    (refs schema)})))
 
 
 ;; Datomic compatibility layer
 
 (def last-tempid (atom -1000000))
 (defn tempid
-  ([_part]  (swap! last-tempid dec))
-  ([_part x] x))
+  ([part]
+    (if (= part :db.part/tx)
+      :db/current-tx
+      (swap! last-tempid dec)))
+  ([part x]
+    (if (= part :db.part/tx)
+      :db/current-tx
+      x)))
 (defn resolve-tempid [_db tempids tempid]
   (get tempids tempid))
 
 (def db deref)
 
-(defn transact [conn tx-data]
-  (let [res (transact! conn tx-data)]
+(defn transact [conn tx-data & [tx-meta]]
+  (let [res (transact! conn tx-data tx-meta)]
     (reify
       IDeref
       (-deref [_] res)
@@ -139,8 +159,8 @@
       IPending
       (-realized? [_] @realized))))
 
-(defn transact-async [conn tx-data]
-  (future-call #(transact! conn tx-data)))
+(defn transact-async [conn tx-data & [tx-meta]]
+  (future-call #(transact! conn tx-data tx-meta)))
 
 (defn- rand-bits [pow]
   (rand-int (bit-shift-left 1 pow)))

@@ -62,7 +62,7 @@
   (copy-public-to-site)
   (let [session (peridot/session (service/handler))]
     (generate-path session "/atom.xml" "/atom.xml")
-    (doseq [path ["/" "/about/" "/codex/" "/radiant/" "/radiant-advanced/"]]
+    (doseq [path ["/" "/about/" "/codex/" "/radiant/"]]
       (generate-html-path session path))
     (doseq [permalink (map :permalink (posts/list-posts))]
       (generate-html-path session permalink)))

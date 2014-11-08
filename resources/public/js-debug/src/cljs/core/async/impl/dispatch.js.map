@@ -13,8 +13,8 @@
   "cljs.core.async.impl.dispatch/TASK_BATCH_SIZE",
   "cljs.core.async.impl.dispatch/process-messages", "count", "m",
   "cljs.core.async.impl.dispatch/queue-dispatcher",
-  "js/MessageChannel", "msg", "and__19277__auto__", "js/setImmediate",
-  "G__41953", "G__41954", "G__41955", "js/setTimeout",
+  "js/MessageChannel", "msg", "and__19564__auto__", "js/setImmediate",
+  "G__48768", "G__48769", "G__48770", "js/setTimeout",
   "cljs.core.async.impl.dispatch/run", "f",
-  "cljs.core.async.impl.dispatch/queue-delay", "delay", "G__41958",
-  "G__41959"]}
+  "cljs.core.async.impl.dispatch/queue-delay", "delay", "G__48773",
+  "G__48774"]}

@@ -178,6 +178,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Categories
 
+
+
 (defn new-category-tx [name]
   (let [id (tempid)]
     [[:db/add id :category/name name]

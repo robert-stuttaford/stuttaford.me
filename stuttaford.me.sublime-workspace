@@ -469,7 +469,10 @@
 	"expanded_folders":
 	[
 		"/Users/robert/Development/stuttaford.me",
+		"/Users/robert/Development/stuttaford.me/resources",
+		"/Users/robert/Development/stuttaford.me/resources/public",
 		"/Users/robert/Development/stuttaford.me/resources/public/bootstrap",
+		"/Users/robert/Development/stuttaford.me/resources/public/bootstrap/css",
 		"/Users/robert/Development/stuttaford.me/src",
 		"/Users/robert/Development/stuttaford.me/src/stuttaford",
 		"/Users/robert/Development/stuttaford.me/src/stuttaford/dive_into_datomic"

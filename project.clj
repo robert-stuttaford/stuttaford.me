@@ -25,13 +25,13 @@
   :profiles {:dev {:source-paths ["dev"]
                    :dependencies
                    [[org.clojure/tools.namespace "0.2.7"]
-                    [thheller/shadow-build "0.9.3" :exclusions [org.clojure/clojurescript]]
-                    [org.clojure/clojurescript "0.0-2342"]
+                    [thheller/shadow-build "0.9.5" :exclusions [org.clojure/clojurescript]]
+                    [org.clojure/clojurescript "0.0-2371"]
                     [om "0.7.3"]
                     [prismatic/om-tools "0.3.3" :exclusions [org.clojure/clojure]]
                     [racehub/om-bootstrap "0.2.9" :exclusions [org.clojure/clojure]]
                     [sablono "0.2.22" :exclusions [com.facebook/react]]
-                    [datascript "0.4.0"]
+                    [datascript "0.5.1"  :exclusions [org.clojure/clojurescript]]
                     [com.cemerick/url "0.1.1"]
                     [cljs-http "0.1.16"]
                     [secretary "1.2.1"]]
@@ -49,7 +49,7 @@
                           sablono.core
                           secretary.core
                           datascript]
-           :externs     ["datascript/externs.js"]
+           :ups-externs ["datascript/externs.js"]
            :modules     [{:id :codex   :main stuttaford.codex}
                          {:id :radiant :main stuttaford.radiant}
                          {:id :dive-into-datomic :main stuttaford.dive-into-datomic}]})

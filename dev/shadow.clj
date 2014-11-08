@@ -36,7 +36,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Build Steps
 
-(defn compiler-options [state {:keys [mode externs public-path target-path]}]
+(defn compiler-options [state {:keys [mode externs ups-externs public-path target-path]}]
   (-> state
       (into {:public-path public-path
              :public-dir  (io/file target-path)
@@ -46,7 +46,8 @@
                            :pretty-print  true}
               :production {:optimizations :advanced
                            :pretty-print  false
-                           :externs       (compose-externs externs)}))))
+                           :externs       (compose-externs externs)
+                           :ups-externs   ups-externs}))))
 
 (defn configure-source-paths [state source-paths]
   (reduce (fn [state source-path]
@@ -161,7 +162,7 @@
               state (build-state opts)]
           (loop [state state]
             (when (= :active @shadow)
-              (recur (shadow/build-and-wait opts state))))
+              (recur (build-and-wait opts state))))
           (log/info "Stopping Shadow builds for" mode)))))))
 
 (defn stop-builders []

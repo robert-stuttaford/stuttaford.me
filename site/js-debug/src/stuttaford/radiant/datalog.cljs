@@ -7,6 +7,7 @@
             [om-bootstrap.input :as i]
             [om-tools.core :refer-macros [defcomponentk]]
             [sablono.core :as html :refer-macros [html]]
+            [stuttaford.om.common :as common :refer [config]]
             [stuttaford.radiant.components :as components]))
 
 (defn maybe-parse-query [s]
@@ -51,11 +52,6 @@
      [:div
       (->query-input data)
       (when-let [query (maybe-parse-query query)]
-        (list
-         ;; [:pre (pr-str query)]
-         ;; [:pre (pr-str current-db)]
-         ;; [:pre (pr-str (d/q query current-db))]
-         [:hr]
-         (components/->result-table {:cols (map pr-str (:find query))
-                                     :rows (d/q query current-db)}
-                                    {:opts {:allow-sorting? true}})))])))
+        (components/->result-table {:cols (map pr-str (:find query))
+                                    :rows (d/q query current-db)}
+                                   {:opts {:allow-sorting? true}}))])))
