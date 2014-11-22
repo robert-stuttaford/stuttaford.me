@@ -11,8 +11,8 @@ om_tools.dom.camel_case = (function camel_case(s){return clojure.string.replace(
 /**
 * Converts attributes that are kebab-case and should be camelCase
 */
-om_tools.dom.opt_key_case = (function opt_key_case(attr){if(cljs.core.truth_((function (){var or__19586__auto__ = (cljs.core.count(attr) < (5));if(or__19586__auto__)
-{return or__19586__auto__;
+om_tools.dom.opt_key_case = (function opt_key_case(attr){if(cljs.core.truth_((function (){var or__19687__auto__ = (cljs.core.count(attr) < (5));if(or__19687__auto__)
+{return or__19687__auto__;
 } else
 {return new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 2, ["aria-",null,"data-",null], null), null).call(null,cljs.core.subs.cljs$core$IFn$_invoke$arity$3(attr,(0),(5)));
 }
@@ -25,7 +25,7 @@ om_tools.dom.opt_key_case = (function opt_key_case(attr){if(cljs.core.truth_((fu
 /**
 * Converts aliased attributes
 */
-om_tools.dom.opt_key_alias = (function opt_key_alias(opt){var G__55249 = (((opt instanceof cljs.core.Keyword))?opt.fqn:null);switch (G__55249) {
+om_tools.dom.opt_key_alias = (function opt_key_alias(opt){var G__46571 = (((opt instanceof cljs.core.Keyword))?opt.fqn:null);switch (G__46571) {
 case "for":
 return new cljs.core.Keyword(null,"htmlFor","htmlFor",-1050291720);
 
@@ -50,7 +50,7 @@ om_tools.dom.format_opt_key = (function format_opt_key(opt_key){return cljs.core
 * Recursively formats map values (ie :style attribute)
 */
 om_tools.dom.format_opt_val = (function format_opt_val(opt_val){if(cljs.core.map_QMARK_(opt_val))
-{var G__55252 = opt_val;return (om_tools.dom.format_opts.cljs$core$IFn$_invoke$arity$1 ? om_tools.dom.format_opts.cljs$core$IFn$_invoke$arity$1(G__55252) : om_tools.dom.format_opts.call(null,G__55252));
+{var G__46574 = opt_val;return (om_tools.dom.format_opts.cljs$core$IFn$_invoke$arity$1 ? om_tools.dom.format_opts.cljs$core$IFn$_invoke$arity$1(G__46574) : om_tools.dom.format_opts.call(null,G__46574));
 } else
 {return opt_val;
 
@@ -60,7 +60,7 @@ om_tools.dom.format_opt_val = (function format_opt_val(opt_val){if(cljs.core.map
 * Returns JavaScript object for React DOM attributes from opts map
 */
 om_tools.dom.format_opts = (function format_opts(opts){if(cljs.core.map_QMARK_(opts))
-{return cljs.core.clj__GT_js(cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$2((function (p__55255){var vec__55256 = p__55255;var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55256,(0),null);var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55256,(1),null);return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [om_tools.dom.format_opt_key(k),om_tools.dom.format_opt_val(v)], null);
+{return cljs.core.clj__GT_js(cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$2((function (p__46577){var vec__46578 = p__46577;var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__46578,(0),null);var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__46578,(1),null);return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [om_tools.dom.format_opt_key(k),om_tools.dom.format_opt_val(v)], null);
 }),opts)));
 } else
 {return opts;
@@ -94,7 +94,7 @@ om_tools.dom.element_args = (function element_args(opts,children){if((opts == nu
 }
 }
 });
-om_tools.dom.element = (function element(ctor,opts,children){var vec__55258 = om_tools.dom.element_args(opts,children);var opts__$1 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55258,(0),null);var children__$1 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55258,(1),null);return cljs.core.apply.cljs$core$IFn$_invoke$arity$2(ctor,cljs.core.flatten(cljs.core.cons(opts__$1,children__$1)));
+om_tools.dom.element = (function element(ctor,opts,children){var vec__46580 = om_tools.dom.element_args(opts,children);var opts__$1 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__46580,(0),null);var children__$1 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__46580,(1),null);return cljs.core.apply.cljs$core$IFn$_invoke$arity$2(ctor,cljs.core.flatten(cljs.core.cons(opts__$1,children__$1)));
 });
 om_tools.dom.class_set = (function class_set(m){var temp__4126__auto__ = cljs.core.seq(cljs.core.distinct(cljs.core.map.cljs$core$IFn$_invoke$arity$2(cljs.core.name,cljs.core.keys(cljs.core.filter.cljs$core$IFn$_invoke$arity$2(cljs.core.val,m)))));if(temp__4126__auto__)
 {var ks = temp__4126__auto__;return clojure.string.join.cljs$core$IFn$_invoke$arity$2(" ",ks);
