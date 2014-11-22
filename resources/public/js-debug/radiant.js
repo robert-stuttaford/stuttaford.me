@@ -1,11 +1,8 @@
 goog.require('stuttaford.radiant.model');
 goog.require('om_bootstrap.grid');
-goog.require('om_bootstrap.panel');
 goog.require('om_bootstrap.table');
-goog.require('om_bootstrap.random');
 goog.require('stuttaford.radiant.components');
 goog.require('stuttaford.radiant.actions');
-goog.require('om_bootstrap.input');
 goog.require('stuttaford.radiant.datalog');
 goog.require('stuttaford.radiant.transactions');
 goog.require('stuttaford.radiant.datoms');

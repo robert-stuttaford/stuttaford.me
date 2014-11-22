@@ -64,6 +64,15 @@
    :content (list (om-app "dive-into-datomic" true {:view :datalog}))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Articles
+
+(defn articles [& {:keys [debug?] :or {debug? false}}]
+  {:title   "Articles"
+   :layout  "bare"
+   :css     ["bootstrap/css/bootstrap.min.css" "css/articles.css"]
+   :content (list (om-app "articles" true {:view :source-article}))})
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
 
 (defroutes app
@@ -89,6 +98,10 @@
 
   (GET "/dive-into-datomic/" {query-params :query-params}
        (render html-layout dive-into-datomic
+         :debug? (some-> query-params (get "debug") boolean)))
+
+  (GET "/articles/" {query-params :query-params}
+       (render html-layout articles
          :debug? (some-> query-params (get "debug") boolean)))
 
   (context "/codex" []

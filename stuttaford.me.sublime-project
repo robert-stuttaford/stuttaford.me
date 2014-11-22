@@ -14,8 +14,7 @@
         "checkouts",
         "target",
         "logs",
-        "site",
-        "js*"
+        "site"
       ],
       "follow_symlinks": true,
       "path": "."
