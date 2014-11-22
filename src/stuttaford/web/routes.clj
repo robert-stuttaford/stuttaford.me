@@ -61,7 +61,7 @@
   {:title   "Dive into Datomic"
    :layout  "bare"
    :css     ["bootstrap/css/bootstrap.min.css" "css/dive-into-datomic.css"]
-   :content (list (om-app "dive-into-datomic" true {:view :datom}))})
+   :content (list (om-app "dive-into-datomic" true {:view :datalog}))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
