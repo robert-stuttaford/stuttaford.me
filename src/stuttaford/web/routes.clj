@@ -61,7 +61,7 @@
   {:title   "Dive into Datomic"
    :layout  "bare"
    :css     ["bootstrap/css/bootstrap.min.css" "css/dive-into-datomic.css"]
-   :content (list (om-app "dive-into-datomic" true {:view :datalog}))})
+   :content (list (om-app "dive-into-datomic" debug? {:view :datalog}))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Articles
@@ -70,7 +70,7 @@
   {:title   "Articles"
    :layout  "bare"
    :css     ["bootstrap/css/bootstrap.min.css" "css/articles.css"]
-   :content (list (om-app "articles" true {:view :source-article}))})
+   :content (list (om-app "articles" debug? {:view :source-article}))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
