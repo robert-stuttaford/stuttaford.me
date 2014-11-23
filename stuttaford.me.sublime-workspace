@@ -469,20 +469,17 @@
 	"expanded_folders":
 	[
 		"/Users/robert/Development/stuttaford.me",
-		"/Users/robert/Development/stuttaford.me/resources",
 		"/Users/robert/Development/stuttaford.me/resources/public",
-		"/Users/robert/Development/stuttaford.me/resources/public/bootstrap",
-		"/Users/robert/Development/stuttaford.me/resources/public/bootstrap/css",
-		"/Users/robert/Development/stuttaford.me/src",
-		"/Users/robert/Development/stuttaford.me/src/stuttaford",
-		"/Users/robert/Development/stuttaford.me/src/stuttaford/dive_into_datomic"
+		"/Users/robert/Development/stuttaford.me/resources/public/js-debug",
+		"/Users/robert/Development/stuttaford.me/resources/public/js-debug/src",
+		"/Users/robert/Development/stuttaford.me/resources/public/js-debug/src/stuttaford"
 	],
 	"file_history":
 	[
+		"/Users/robert/Development/stuttaford.me/stuttaford.me.sublime-project",
 		"/Users/robert/Development/stuttaford.me/src/stuttaford/dive_into_datomic.cljs",
 		"/Users/robert/Development/stuttaford.me/src/stuttaford/dive_into_datomic/components.cljs",
 		"/Users/robert/Development/stuttaford.me/src/stuttaford/dive_into_datomic/actions.cljs",
-		"/Users/robert/Development/stuttaford.me/stuttaford.me.sublime-project",
 		"/Users/robert/Development/Resources/templates/static/home-pages/default.html",
 		"/Users/robert/Development/Resources/scss/app/mq/_layout.scss",
 		"/Users/robert/Development/Resources/scss/cognician/components/_elements.scss",

@@ -12,6 +12,8 @@
             [stuttaford.om.common :as common :refer [config control-chan]])
   (:require-macros [cljs.core.async.macros :as csp :refer [go]]))
 
+(enable-console-print!)
+
 (def variant-names [:a :b :c])
 
 (def PARAGRAPH-BREAK "PARAGRAPH-BREAK")
@@ -42,7 +44,12 @@
        not))
 
 (defn variant-is-complete? [source-article-sentences variant]
+  (prn (->> source-article-sentences
+            (filter sentence?)
+            (filter (comp string/blank? variant :variants))
+            ))
   (->> source-article-sentences
+       (filter sentence?)
        (filter (comp string/blank? variant :variants))
        empty?))
 
@@ -53,6 +60,17 @@
                        (apply str)
                        string/trim)
                   #"\n " "\n"))
+
+(defn count-words [text]
+  (-> text
+      (string/replace #"\s+" " ")
+      (string/split #" ")
+      count))
+
+(defn word-count [data source-or-variant]
+  (if (= source-or-variant :source)
+    (-> data :source-article count-words)
+    (-> data :source-article-sentences (compose-variant source-or-variant) count-words)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Actions
@@ -136,10 +154,6 @@ Once you start rewriting, this input will be locked.")
 
 (defcomponentk rewrite-articles [[:data {source-article-sentences []}] owner]
   (render-state [_ state]
-    (prn (->> source-article-sentences
-              (filter sentence?)
-              (map-indexed (fn [i sentence]
-                             (assoc sentence :index i)))))
     (html
      [:div
       (if (seq source-article-sentences)
@@ -180,7 +194,7 @@ Once you start rewriting, this input will be locked.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Top nav
 
-(defcomponentk top-nav [[:data view {source-article-sentences []}] owner
+(defcomponentk top-nav [[:data view {source-article-sentences []} :as data] owner
                         [:opts nav-items]]
   (render-state [_ state]
     (b/toolbar
@@ -200,7 +214,13 @@ Once you start rewriting, this input will be locked.")
                 :let [variant-name (name variant)]]
             (r/label {:bs-style (if (variant-is-complete? source-article-sentences variant)
                                   "success"
-                                  "warning")} variant-name))]))))))
+                                  "warning")} variant-name))]
+         [:div.word-counts
+          "Words counts"
+          (r/label {} (word-count data :source))
+          (for [variant variant-names
+                :let [variant-name (name variant)]]
+            (r/label {} (word-count data variant)))]))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nav Items
@@ -222,7 +242,7 @@ Once you start rewriting, this input will be locked.")
   (will-unmount [_]
     (close! (control-chan owner)))
   (did-mount [_]
-    (aset js/window "onbeforeunload"
+    #_(aset js/window "onbeforeunload"
           (constantly "This is a confirmation, just in case you have unsaved work.")))
   (render-state [_ state]
     (html
