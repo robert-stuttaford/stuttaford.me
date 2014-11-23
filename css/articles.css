@@ -55,13 +55,13 @@ p.warning {
     color: red;
 }
 
-div.variants-status {
+div.variants-status, div.word-counts {
     float: left;
     margin-left: 2em;
     font-size: 1.6em;
 }
 
-div.variants-status .label {
+div.variants-status .label, div.word-counts .label {
     margin-left: 0.3em;
 }
 
