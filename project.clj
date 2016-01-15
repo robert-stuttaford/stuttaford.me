@@ -2,8 +2,10 @@
   :description "Static site for stuttaford.me"
   :url "http://www.stuttaford.me"
   :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.6.0"]
+            :url  "http://www.eclipse.org/legal/epl-v10.html"}
+  :dependencies [[org.clojure/clojure "1.7.0"]
+                 [cider/cider-nrepl "0.11.0-SNAPSHOT"]
+                 [refactor-nrepl "2.0.0-SNAPSHOT"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [ring/ring-core "1.3.1"]
                  [ring/ring-jetty-adapter "1.3.1"]
@@ -35,22 +37,22 @@
                     [com.cemerick/url "0.1.1"]
                     [cljs-http "0.1.16"]
                     [secretary "1.2.1"]]
-                   :main user}}
+                   :main         user}}
   :shadow {:public-path "/js"
            :target-path "resources/public/js"
-           :core-libs    [cemerick.url
-                          cljs-http.client
-                          cljs.core
-                          cljs.core.async
-                          cljs.reader
-                          stuttaford.om.common
-                          goog.History
-                          om-tools.core
-                          sablono.core
-                          secretary.core
-                          datascript]
+           :core-libs   [cemerick.url
+                         cljs-http.client
+                         cljs.core
+                         cljs.core.async
+                         cljs.reader
+                         stuttaford.om.common
+                         goog.History
+                         om-tools.core
+                         sablono.core
+                         secretary.core
+                         datascript]
            :ups-externs ["datascript/externs.js"]
-           :modules     [{:id :codex   :main stuttaford.codex}
+           :modules     [{:id :codex :main stuttaford.codex}
                          {:id :radiant :main stuttaford.radiant}
                          {:id :dive-into-datomic :main stuttaford.dive-into-datomic}
                          {:id :articles :main stuttaford.articles}]})

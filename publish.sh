@@ -1,2 +1,2 @@
 #!/bin/bash
-git subtree push --prefix site origin gh-pages
+git subtree push --force --prefix site origin gh-pages

@@ -13,8 +13,8 @@
       [
         "checkouts",
         "target",
-        "logs",
-        "site"
+        "logs"//,
+        //"site"
       ],
       "follow_symlinks": true,
       "path": "."
