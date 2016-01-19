@@ -474,12 +474,15 @@
 	"expanded_folders":
 	[
 		"/Users/robert/Code/stuttaford.me",
+		"/Users/robert/Code/stuttaford.me/resources",
+		"/Users/robert/Code/stuttaford.me/resources/posts",
 		"/Users/robert/Code/stuttaford.me/src",
 		"/Users/robert/Code/stuttaford.me/src/stuttaford",
 		"/Users/robert/Code/stuttaford.me/src/stuttaford/web"
 	],
 	"file_history":
 	[
+		"/Users/robert/Code/stuttaford.me/resources/posts/2016-01-15-how-cognician-uses-onyx.md",
 		"/Users/robert/Code/stuttaford.me/stuttaford.me.sublime-project",
 		"/Users/robert/Development/stuttaford.me/stuttaford.me.sublime-project",
 		"/Users/robert/Development/stuttaford.me/src/stuttaford/dive_into_datomic.cljs",
@@ -606,12 +609,11 @@
 		"/Users/robert/Development/Resources/public/css/groups/join/cci-pilot-group.css",
 		"/Users/robert/Development/Resources/scss/app/_cog-progress.scss",
 		"/Users/robert/Development/Resources/templates/cog-layout.html",
-		"/Users/robert/Development/Resources/public/js/devcards/la.js",
-		"/Users/robert/Development/Resources/public/js/devcards/la.cljs"
+		"/Users/robert/Development/Resources/public/js/devcards/la.js"
 	],
 	"find":
 	{
-		"height": 24.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{

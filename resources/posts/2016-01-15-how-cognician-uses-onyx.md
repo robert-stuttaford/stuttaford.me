@@ -39,7 +39,7 @@ Before I can describe how we use Onyx, I’m going to go over some of its key co
 
 ## Onyx’s API is mostly data
 
-The Onyx data API is broken into several cleverly designed pieces (see the [documentation site](https://onyx-platform.gitbooks.io/onyx/content/) or the [cheat-sheet](http://www.onyxplatform.org/cheat-sheet.html) for the full picture):
+The Onyx data API is broken into several cleverly designed pieces (see the [documentation site](https://onyx-platform.gitbooks.io/onyx/content/) or the [cheat-sheet](http://www.onyxplatform.org/docs/cheat-sheet/) for the full picture):
 
 - **Peer configuration**, which defines the shape of the overall system; how many peers (individual worker bees) you’re going to run, [ZooKeeper](https://zookeeper.apache.org/) (for coordination) and [Aeron](https://github.com/real-logic/Aeron) (for networking) configuration, and many, *many* dials and knobs for managing overall performance.
 
@@ -218,7 +218,7 @@ I want to thank the two (yes, just two!) guys in the Onyx team – [Michael Drog
 
 I know that although we were able to contribute by sharing bug reports, or feedback on this API or the utility of that feature, we at Cognician by far got the better deal. Thank you, guys. You’re both menschen!
 
-I wouldn’t hesitate for a second to recommend them to anyone who wants to use Onyx in anger - they’ve just recently started a consultancy to offer commercial support, training, development and so on; you can hit them up at <http://www.onyxplatform.org/support.html>. I can’t think of a better way to get started.
+I wouldn’t hesitate for a second to recommend them to anyone who wants to use Onyx in anger - they’ve just recently started a consultancy to offer commercial support, training, development and so on; you can hit them up at <http://www.onyxplatform.org/support>. I can’t think of a better way to get started.
 
 You can also simply pop in for a chat on their their [Gitter room](https://gitter.im/onyx-platform/onyx), or in the `#onyx` room on the [Clojurians Slack](https://clojurians.slack.com/) ([not a member?](http://clojurians.net/)). If you do, I’ll see you there!
 
