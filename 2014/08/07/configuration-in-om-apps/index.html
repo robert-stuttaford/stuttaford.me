@@ -1,85 +1,79 @@
 <!DOCTYPE html>
-<html><head><link href="http://gmpg.org/xfn/11" rel="profile"><meta content="IE=edge" http-equiv="X-UA-Compatible"><meta content="text/html; charset=utf-8" http-equiv="content-type"><meta content="width=device-width initial-scale=1.0 maximum-scale=1" name="viewport"><title>Configuration in Om apps &middot; Robert Stuttaford, Clojure Enthusiast</title><meta content="A simple pattern for providing configuration data to all the components in an Om app." name="description"><link href="/css/poole.css" rel="stylesheet" type="text/css"><link href="/css/syntax.css" rel="stylesheet" type="text/css"><link href="/css/stuttaford.css" rel="stylesheet" type="text/css"><link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="152x152"><link href="/favicon.ico" rel="shortcut icon"><link href="/atom.xml" rel="alternate" title="RSS" type="application/rss+xml"></head><body><div class="container content"><div class="masthead"><h3 class="masthead-title"><a href="/" title="Home">Robert Stuttaford</a> <small>Clojure Enthusiast</small></h3><small><a href="/about/">About</a></small> &middot; <small><a href="/">Blog</a></small> &middot; <small><a href="/codex/">Clojure Codex</a></small> &middot; <small><a href="/radiant/">Radiant</a></small> &middot; <small>I'm on <a href="https://twitter.com/RobStuttaford">Twitter</a> and <a href="https://github.com/robert-stuttaford">GitHub</a>.</small></div><div class="post"><h1 class="post-title"><a href="/2014/08/07/configuration-in-om-apps/">Configuration in Om apps</a></h1><span class="post-date">07 Aug 2014</span><p>I've found a nice and simple way for making configuration available to all components in a ClojureScript <a href="https://github.com/swannodette/om">Om</a> application.</p><p>As long as you have a React component reference, typically named <code>owner</code> in Om, you can use this pattern.</p><p>The code that follows assumes a <code>:config</code> key in the root of your state map, and it assumes that the value for that key is also a map.</p><div class="highlight"><pre>
-<span class="p">(</span><span class="k">def </span><span class="nv">state</span>
-  <span class="p">(</span><span class="nf">atom</span> <span class="p">{</span><span class="ss">:config</span> <span class="p">{</span><span class="ss">:media-path</span> <span class="s">"/images/content/"</span><span class="p">}</span>
-         <span class="ss">:header</span> <span class="p">{</span><span class="ss">:logo</span> <span class="s">"avengers-logo.jpg"</span>
-                  <span class="ss">:title</span> <span class="s">"The Avengers"</span><span class="p">}}))</span>
-</pre></div><p>Given that, we bootstrap the Om application:</p><div class="highlight"><pre>
-<span class="p">(</span><span class="nf">om/root</span> <span class="nv">app</span> <span class="nv">state</span>
-         <span class="p">{</span><span class="ss">:target</span> <span class="p">(</span><span class="k">. </span><span class="nv">js/document</span> <span class="p">(</span><span class="nf">getElementById</span> <span class="s">"app"</span><span class="p">))</span>
-          <span class="ss">:shared</span> <span class="p">{</span><span class="ss">:config</span> <span class="p">(</span><span class="ss">:config</span> <span class="o">@</span><span class="nv">state</span><span class="p">)}})</span>
-</pre></div><p>As you can see on the last line, we put <code>:config</code> into the <code>:shared</code> state facility that Om provides, which is available to all components from this <code>om/root</code>.</p><p>Of course, it's still available directly to the root component, as well, but now we'll have a consistent way to reach config from anywhere.</p><p>To access the config from within any component, however deeply nested, we use <code>om/get-shared</code>:</p><div class="highlight"><pre>
-<span class="p">(</span><span class="kd">defn </span><span class="nv">header</span> <span class="p">[</span><span class="nv">data</span> <span class="nv">owner</span><span class="p">]</span>
-  <span class="p">(</span><span class="nf">reify</span>
-    <span class="nv">IRender</span>
-    <span class="p">(</span><span class="nf">render</span> <span class="p">[</span><span class="nv">_</span><span class="p">]</span>
-      <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">config</span> <span class="p">(</span><span class="nf">om/get-shared</span> <span class="nv">owner</span> <span class="ss">:config</span><span class="p">)]</span>
-        <span class="p">(</span><span class="nf">dom/div</span> <span class="nv">nil</span>
-                 <span class="p">(</span><span class="nf">dom/img</span> <span class="o">#</span><span class="nv">js</span> <span class="p">{</span><span class="ss">:src</span> <span class="p">(</span><span class="nb">str </span><span class="p">(</span><span class="ss">:media-path</span> <span class="nv">config</span><span class="p">)</span>
-                                         <span class="p">(</span><span class="ss">:logo</span> <span class="nv">data</span><span class="p">))})</span>
-                 <span class="p">(</span><span class="nf">dom/h1</span> <span class="nv">nil</span> <span class="p">(</span><span class="ss">:title</span> <span class="nv">data</span><span class="p">)))))))</span>
-</pre></div><p>It's important to point out that the <code>:shared</code> state can only be set once at <code>om/root</code>, so it's not meant as a global mutable state - we have <code>atom</code> for that :-)</p><p>At this point, we're good. We have configuration data anywhere we need it. We can go one step further, though, and provide a simpler abstraction for the rest of our app to use:</p><div class="highlight"><pre>
-<span class="p">(</span><span class="kd">defn </span><span class="nv">config</span>
-  <span class="p">([</span><span class="nv">owner</span><span class="p">]</span>
-     <span class="p">(</span><span class="nb">or </span><span class="p">(</span><span class="nf">om/get-shared</span> <span class="nv">owner</span> <span class="ss">:config</span><span class="p">)</span> <span class="p">{}))</span>
-  <span class="p">([</span><span class="nv">owner</span> <span class="nv">key</span><span class="p">]</span>
-     <span class="p">(</span><span class="nb">get </span><span class="p">(</span><span class="nf">config</span> <span class="nv">owner</span><span class="p">)</span> <span class="nv">key</span><span class="p">)))</span>
-</pre></div><p>When called with just the owner, you'll get the whole config map back. This is great when you need access to several keys and want to destructure them out. When called with the owner and a key, it returns whatever value that key has.</p><p>Using this function also ensures that you have an empty map to work with just in case you don't have <code>:config</code> in your shared state.</p><p>Now that we have that, what does our header component look like?</p><div class="highlight"><pre>
-<span class="p">(</span><span class="kd">defn </span><span class="nv">header</span> <span class="p">[</span><span class="nv">data</span> <span class="nv">owner</span><span class="p">]</span>
-  <span class="p">(</span><span class="nf">reify</span>
-    <span class="nv">IRender</span>
-    <span class="p">(</span><span class="nf">render</span> <span class="p">[</span><span class="nv">_</span><span class="p">]</span>
-      <span class="p">(</span><span class="nf">dom/div</span> <span class="nv">nil</span>
-               <span class="p">(</span><span class="nf">dom/img</span> <span class="o">#</span><span class="nv">js</span> <span class="p">{</span><span class="ss">:src</span> <span class="p">(</span><span class="nb">str </span><span class="p">(</span><span class="nf">config</span> <span class="nv">owner</span> <span class="ss">:media-path</span><span class="p">)</span>
-                                       <span class="p">(</span><span class="ss">:logo</span> <span class="nv">data</span><span class="p">))})</span>
-               <span class="p">(</span><span class="nf">dom/h1</span> <span class="nv">nil</span> <span class="p">(</span><span class="ss">:title</span> <span class="nv">data</span><span class="p">))))))</span>
-</pre></div><p>That's a fair bit simpler to read than before. It's not <em>that</em> much cleaner, but when you have many components, the savings add up!</p><p>Here's the full runnable source:</p><div class="highlight"><pre>
-<span class="p">(</span><span class="kd">ns </span><span class="nv">configuration-pattern</span>
-  <span class="p">(</span><span class="ss">:require</span> <span class="p">[</span><span class="nv">om.core</span> <span class="ss">:as</span> <span class="nv">om</span> <span class="ss">:include-macros</span> <span class="nv">true</span><span class="p">]</span>
-            <span class="p">[</span><span class="nv">om.dom</span> <span class="ss">:as</span> <span class="nv">dom</span> <span class="ss">:include-macros</span> <span class="nv">true</span><span class="p">]))</span>
+<html><head><link href="http://gmpg.org/xfn/11" rel="profile"><meta content="IE=edge" http-equiv="X-UA-Compatible"><meta content="text/html; charset=utf-8" http-equiv="content-type"><meta content="width=device-width initial-scale=1.0 maximum-scale=1" name="viewport"><title>Configuration in Om apps &middot; Robert Stuttaford, Clojure Enthusiast</title><meta content="A simple pattern for providing configuration data to all the components in an Om app." name="description"><link href="/css/poole.css" rel="stylesheet" type="text/css"><link href="/css/syntax.css" rel="stylesheet" type="text/css"><link href="/css/stuttaford.css" rel="stylesheet" type="text/css"><link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="152x152"><link href="/favicon.ico" rel="shortcut icon"><link href="/atom.xml" rel="alternate" title="RSS" type="application/rss+xml"></head><body><div class="container content"><div class="masthead"><h3 class="masthead-title"><a href="/" title="Home">Robert Stuttaford</a> <small>Clojure Enthusiast</small></h3><small><a href="/about/">About</a></small> &middot; <small><a href="/">Blog</a></small> &middot; <small><a href="/codex/">Clojure Codex</a></small> &middot; <small>I'm on <a href="https://twitter.com/RobStuttaford">Twitter</a> and <a href="https://github.com/robert-stuttaford">GitHub</a>.</small></div><div class="post"><h1 class="post-title"><a href="/2014/08/07/configuration-in-om-apps/">Configuration in Om apps</a></h1><span class="post-date">07 Aug 2014</span><p>I've found a nice and simple way for making configuration available to all components in a ClojureScript <a href='https://github.com/swannodette/om'>Om</a> application.</p><p>As long as you have a React component reference, typically named <code>owner</code> in Om, you can use this pattern.</p><p>The code that follows assumes a <code>:config</code> key in the root of your state map, and it assumes that the value for that key is also a map.</p><pre><code class="clojure">&#40;def state
+  &#40;atom {:config {:media-path &quot;/images/content/&quot;}
+         :header {:logo &quot;avengers-logo.jpg&quot;
+                  :title &quot;The Avengers&quot;}}&#41;&#41;
+</code></pre><p>Given that, we bootstrap the Om application:</p><pre><code class="clojure">&#40;om/root app state
+         {:target &#40;. js/document &#40;getElementById &quot;app&quot;&#41;&#41;
+          :shared {:config &#40;:config @state&#41;}}&#41;
+</code></pre><p>As you can see on the last line, we put <code>:config</code> into the <code>:shared</code> state facility that Om provides, which is available to all components from this <code>om/root</code>.</p><p>Of course, it's still available directly to the root component, as well, but now we'll have a consistent way to reach config from anywhere.</p><p>To access the config from within any component, however deeply nested, we use <code>om/get-shared</code>:</p><pre><code class="clojure">&#40;defn header &#91;data owner&#93;
+  &#40;reify
+    IRender
+    &#40;render &#91;&#95;&#93;
+      &#40;let &#91;config &#40;om/get-shared owner :config&#41;&#93;
+        &#40;dom/div nil
+                 &#40;dom/img #js {:src &#40;str &#40;:media-path config&#41;
+                                         &#40;:logo data&#41;&#41;}&#41;
+                 &#40;dom/h1 nil &#40;:title data&#41;&#41;&#41;&#41;&#41;&#41;&#41;
+</code></pre><p>It's important to point out that the <code>:shared</code> state can only be set once at <code>om/root</code>, so it's not meant as a global mutable state - we have <code>atom</code> for that :-)</p><p>At this point, we're good. We have configuration data anywhere we need it. We can go one step further, though, and provide a simpler abstraction for the rest of our app to use:</p><pre><code class="clojure">&#40;defn config
+  &#40;&#91;owner&#93;
+     &#40;or &#40;om/get-shared owner :config&#41; {}&#41;&#41;
+  &#40;&#91;owner key&#93;
+     &#40;get &#40;config owner&#41; key&#41;&#41;&#41;
+</code></pre><p>When called with just the owner, you'll get the whole config map back. This is great when you need access to several keys and want to destructure them out. When called with the owner and a key, it returns whatever value that key has.</p><p>Using this function also ensures that you have an empty map to work with just in case you don't have <code>:config</code> in your shared state.</p><p>Now that we have that, what does our header component look like?</p><pre><code class="clojure">&#40;defn header &#91;data owner&#93;
+  &#40;reify
+    IRender
+    &#40;render &#91;&#95;&#93;
+      &#40;dom/div nil
+               &#40;dom/img #js {:src &#40;str &#40;config owner :media-path&#41;
+                                       &#40;:logo data&#41;&#41;}&#41;
+               &#40;dom/h1 nil &#40;:title data&#41;&#41;&#41;&#41;&#41;&#41;
+</code></pre><p>That's a fair bit simpler to read than before. It's not <em>that</em> much cleaner, but when you have many components, the savings add up!</p><p>Here's the full runnable source:</p><pre><code class="clojure">&#40;ns configuration-pattern
+  &#40;:require &#91;om.core :as om :include-macros true&#93;
+            &#91;om.dom :as dom :include-macros true&#93;&#41;&#41;
 
-<span class="p">(</span><span class="kd">defn </span><span class="nv">config</span>
-  <span class="p">([</span><span class="nv">owner</span><span class="p">]</span>
-     <span class="p">(</span><span class="nb">or </span><span class="p">(</span><span class="nf">om/get-shared</span> <span class="nv">owner</span> <span class="ss">:config</span><span class="p">)</span> <span class="p">{}))</span>
-  <span class="p">([</span><span class="nv">owner</span> <span class="nv">key</span><span class="p">]</span>
-     <span class="p">(</span><span class="nb">get </span><span class="p">(</span><span class="nf">config</span> <span class="nv">owner</span><span class="p">)</span> <span class="nv">key</span><span class="p">)))</span>
+&#40;defn config
+  &#40;&#91;owner&#93;
+     &#40;or &#40;om/get-shared owner :config&#41; {}&#41;&#41;
+  &#40;&#91;owner key&#93;
+     &#40;get &#40;config owner&#41; key&#41;&#41;&#41;
 
-<span class="p">(</span><span class="k">def </span><span class="nv">state</span>
-  <span class="p">(</span><span class="nf">atom</span> <span class="p">{</span><span class="ss">:config</span> <span class="p">{</span><span class="ss">:media-path</span> <span class="s">"/images/content/"</span><span class="p">}</span>
-         <span class="ss">:header</span> <span class="p">{</span><span class="ss">:logo</span> <span class="s">"avengers-logo.jpg"</span>
-                  <span class="ss">:title</span> <span class="s">"The Avengers"</span><span class="p">}}))</span>
+&#40;def state
+  &#40;atom {:config {:media-path &quot;/images/content/&quot;}
+         :header {:logo &quot;avengers-logo.jpg&quot;
+                  :title &quot;The Avengers&quot;}}&#41;&#41;
 
-<span class="c1">;; without config helper</span>
-<span class="p">(</span><span class="kd">defn </span><span class="nv">header</span> <span class="p">[</span><span class="nv">data</span> <span class="nv">owner</span><span class="p">]</span>
-  <span class="p">(</span><span class="nf">reify</span>
-    <span class="nv">IRender</span>
-    <span class="p">(</span><span class="nf">render</span> <span class="p">[</span><span class="nv">_</span><span class="p">]</span>
-      <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">config</span> <span class="p">(</span><span class="nf">om/get-shared</span> <span class="nv">owner</span> <span class="ss">:config</span><span class="p">)]</span>
-        <span class="p">(</span><span class="nf">dom/div</span> <span class="nv">nil</span>
-                 <span class="p">(</span><span class="nf">dom/img</span> <span class="o">#</span><span class="nv">js</span> <span class="p">{</span><span class="ss">:src</span> <span class="p">(</span><span class="nb">str </span><span class="p">(</span><span class="ss">:media-path</span> <span class="nv">config</span><span class="p">)</span>
-                                         <span class="p">(</span><span class="ss">:logo</span> <span class="nv">data</span><span class="p">))})</span>
-                 <span class="p">(</span><span class="nf">dom/h1</span> <span class="nv">nil</span> <span class="p">(</span><span class="ss">:title</span> <span class="nv">data</span><span class="p">)))))))</span>
+;; without config helper
+&#40;defn header &#91;data owner&#93;
+  &#40;reify
+    IRender
+    &#40;render &#91;&#95;&#93;
+      &#40;let &#91;config &#40;om/get-shared owner :config&#41;&#93;
+        &#40;dom/div nil
+                 &#40;dom/img #js {:src &#40;str &#40;:media-path config&#41;
+                                         &#40;:logo data&#41;&#41;}&#41;
+                 &#40;dom/h1 nil &#40;:title data&#41;&#41;&#41;&#41;&#41;&#41;&#41;
 
-<span class="c1">;; with config helper</span>
-<span class="p">(</span><span class="kd">defn </span><span class="nv">header</span> <span class="p">[</span><span class="nv">data</span> <span class="nv">owner</span><span class="p">]</span>
-  <span class="p">(</span><span class="nf">reify</span>
-    <span class="nv">IRender</span>
-    <span class="p">(</span><span class="nf">render</span> <span class="p">[</span><span class="nv">_</span><span class="p">]</span>
-      <span class="p">(</span><span class="nf">dom/div</span> <span class="nv">nil</span>
-               <span class="p">(</span><span class="nf">dom/img</span> <span class="o">#</span><span class="nv">js</span> <span class="p">{</span><span class="ss">:src</span> <span class="p">(</span><span class="nb">str </span><span class="p">(</span><span class="nf">config</span> <span class="nv">owner</span> <span class="ss">:media-path</span><span class="p">)</span>
-                                       <span class="p">(</span><span class="ss">:logo</span> <span class="nv">data</span><span class="p">))})</span>
-               <span class="p">(</span><span class="nf">dom/h1</span> <span class="nv">nil</span> <span class="p">(</span><span class="ss">:title</span> <span class="nv">data</span><span class="p">))))))</span>
+;; with config helper
+&#40;defn header &#91;data owner&#93;
+  &#40;reify
+    IRender
+    &#40;render &#91;&#95;&#93;
+      &#40;dom/div nil
+               &#40;dom/img #js {:src &#40;str &#40;config owner :media-path&#41;
+                                       &#40;:logo data&#41;&#41;}&#41;
+               &#40;dom/h1 nil &#40;:title data&#41;&#41;&#41;&#41;&#41;&#41;
 
-<span class="p">(</span><span class="kd">defn </span><span class="nv">app</span> <span class="p">[</span><span class="nv">data</span> <span class="nv">owner</span><span class="p">]</span>
-  <span class="p">(</span><span class="nf">reify</span>
-    <span class="nv">IRender</span>
-    <span class="p">(</span><span class="nf">render</span> <span class="p">[</span><span class="nv">_</span><span class="p">]</span>
-      <span class="p">(</span><span class="nf">om/build</span> <span class="nv">header</span> <span class="p">(</span><span class="ss">:header</span> <span class="nv">data</span><span class="p">)))))</span>
+&#40;defn app &#91;data owner&#93;
+  &#40;reify
+    IRender
+    &#40;render &#91;&#95;&#93;
+      &#40;om/build header &#40;:header data&#41;&#41;&#41;&#41;&#41;
 
-<span class="p">(</span><span class="nf">om/root</span> <span class="nv">app</span> <span class="nv">state</span>
-         <span class="p">{</span><span class="ss">:target</span> <span class="p">(</span><span class="k">. </span><span class="nv">js/document</span> <span class="p">(</span><span class="nf">getElementById</span> <span class="s">"app"</span><span class="p">))</span>
-          <span class="ss">:shared</span> <span class="p">{</span><span class="ss">:config</span> <span class="p">(</span><span class="ss">:config</span> <span class="o">@</span><span class="nv">state</span><span class="p">)}})</span>
-</pre></div><p>And there you have it. One less thing to worry about!</p><p class="post-suffix">I hope you found this post useful. I don't have comments on here yet, but please feel free to reach out on <a href="https://twitter.com/RobStuttaford">Twitter</a>!</p></div><div class="related"><h2>Related Posts</h2><ul class="related-posts"><li><h3><a href="/2014/08/04/welcome/">Welcome! <small>04 Aug 2014</small></a></h3></li></ul></div><div class="footer"><p>&copy; Robert Stuttaford 2014. All rights reserved. Some lefts, too.</p></div><script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+&#40;om/root app state
+         {:target &#40;. js/document &#40;getElementById &quot;app&quot;&#41;&#41;
+          :shared {:config &#40;:config @state&#41;}}&#41;
+</code></pre><p>And there you have it. One less thing to worry about!</p><p class="post-suffix">I hope you found this post useful. I don't have comments on here yet, but please feel free to reach out on <a href="https://twitter.com/RobStuttaford">Twitter</a>!</p></div><div class="related"><h2>Related Posts</h2><ul class="related-posts"><li><h3><a href="/2014/08/04/welcome/">Welcome! <small>04 Aug 2014</small></a></h3></li></ul></div><div class="footer"><p>&copy; Robert Stuttaford 2016. All rights reserved. Some lefts, too.</p></div><script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','google_analytics');
