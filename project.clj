@@ -1,58 +1,95 @@
 (defproject stuttaford.me "0.1.0-SNAPSHOT"
-  :description "Static site for stuttaford.me"
-  :url "http://www.stuttaford.me"
-  :license {:name "Eclipse Public License"
-            :url  "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [cider/cider-nrepl "0.11.0-SNAPSHOT"]
-                 [refactor-nrepl "2.0.0-SNAPSHOT"]
-                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
-                 [ring/ring-core "1.3.1"]
-                 [ring/ring-jetty-adapter "1.3.1"]
-                 [org.clojure/tools.logging "0.3.1"]
-                 [ch.qos.logback/logback-classic "1.1.2"]
-                 [compojure "1.1.9"]
+  :url          "http://www.stuttaford.me"
+  :license      {:name "Eclipse Public License"
+                 :url  "http://www.eclipse.org/legal/epl-v10.html"}
+  :dependencies [[ch.qos.logback/logback-classic "1.1.7"]
+                 [clj-time "0.12.0"]
+                 [com.datomic/datomic-free "0.9.5372"
+                  :exclusions [org.slf4j/slf4j-nop]]
+                 [compojure "1.5.1"]
+                 [enlive "1.1.6"]
                  [hiccup "1.0.5"]
-                 [enlive "1.1.5"]
-                 [markdown-clj "0.9.48"]
-                 [clj-time "0.8.0"]
-                 [peridot "0.3.0"]
-                 [prismatic/plumbing "0.3.3"]
+                 [markdown-clj "0.9.89"]
                  [me.raynes/conch "0.8.0"]
                  [me.raynes/fs "1.4.6"]
-                 [com.datomic/datomic-free "0.9.4899"
-                  :exclusions [org.slf4j/slf4j-nop]]]
-  :aliases {"generate" ["run" "-m" "stuttaford.generate"]}
-  :jvm-opts ["-Dlogback.configurationFile=logback.xml"]
-  :profiles {:dev {:source-paths ["dev"]
-                   :dependencies
-                   [[org.clojure/tools.namespace "0.2.7"]
-                    [thheller/shadow-build "0.9.5" :exclusions [org.clojure/clojurescript]]
-                    [org.clojure/clojurescript "0.0-2371"]
-                    [om "0.7.3"]
-                    [prismatic/om-tools "0.3.3" :exclusions [org.clojure/clojure]]
-                    [racehub/om-bootstrap "0.2.9" :exclusions [org.clojure/clojure]]
-                    [sablono "0.2.22" :exclusions [com.facebook/react]]
-                    [datascript "0.5.1"  :exclusions [org.clojure/clojurescript]]
-                    [com.cemerick/url "0.1.1"]
-                    [cljs-http "0.1.16"]
-                    [secretary "1.2.1"]]
-                   :main         user}}
-  :shadow {:public-path "/js"
-           :target-path "resources/public/js"
-           :core-libs   [cemerick.url
-                         cljs-http.client
-                         cljs.core
-                         cljs.core.async
-                         cljs.reader
-                         stuttaford.om.common
-                         goog.History
-                         om-tools.core
-                         sablono.core
-                         secretary.core
-                         datascript]
-           :ups-externs ["datascript/externs.js"]
-           :modules     [{:id :codex :main stuttaford.codex}
-                         {:id :radiant :main stuttaford.radiant}
-                         {:id :dive-into-datomic :main stuttaford.dive-into-datomic}
-                         {:id :articles :main stuttaford.articles}]})
+                 [org.clojure/clojure "1.8.0"]
+                 [org.clojure/core.async "0.2.385"]
+                 [org.clojure/tools.logging "0.3.1"]
+                 [peridot "0.4.4"]
+                 [prismatic/plumbing "0.5.3"]
+                 [ring/ring-core "1.5.0"]
+                 [ring/ring-jetty-adapter "1.5.0"]
+                 ;; fix dep conflicts
+                 [com.google.guava/guava "19.0"]
+                 [commons-codec "1.10"]
+                 [org.clojure/tools.reader "1.0.0-beta2"]
+                 [sablono "0.7.2"]]
+  :aliases      {"generate" ["run" "-m" "stuttaford.generate"]}
+  :jvm-opts     ["-Dlogback.configurationFile=logback.xml"]
+  :profiles
+  {:dev
+   {:main         user
+    :source-paths ["dev"]
+    :plugins      [[lein-cljsbuild "1.1.3"]
+                   [lein-figwheel "0.5.3-1" :exclusions [org.clojure/clojure]]]
+    :dependencies [[cljs-http "0.1.41"]
+                   [cljsjs/react "15.2.1-0"]
+                   [cljsjs/react-dom "15.2.1-0"]
+                   [cljsjs/react-dom-server "15.2.1-0"]
+                   [com.cemerick/piggieback "0.2.1"]
+                   [com.cemerick/url "0.1.1"]
+                   [datascript "0.15.2"]
+                   [devcards "0.2.1-7"
+                    :exclusions [cljsjs/react
+                                 cljsjs/react-dom
+                                 cljsjs/react-dom-server]]
+                   [org.clojure/clojurescript "1.9.93"]
+                   [org.clojure/tools.namespace "0.2.10"]
+                   [prismatic/plumbing "0.5.3"]
+                   [rum "0.10.4"
+                    :exclusions [cljsjs/react
+                                 cljsjs/react-dom
+                                 cljsjs/react-dom-server]]]
+
+    :cljsbuild
+    {:builds
+     [{:id           "dev"
+       :source-paths ["src"]
+       :figwheel     {:on-jsload "stuttaford.client/on-js-reload"}
+       :compiler     {:main                 stuttaford.client
+                      :compiler-stats       true
+                      ;;:verbose              true
+                      :asset-path           "/js/out"
+                      :output-to            "resources/public/js/stuttaford.js"
+                      :output-dir           "resources/public/js/out"
+                      :optimizations        :none
+                      ;;:cache-analysis       true
+                      :source-map-timestamp true}}
+
+      {:id           "debug"
+       :source-paths ["src"]
+       :compiler     {:output-to      "resources/public/js/stuttaford.debug.js"
+                      :main           stuttaford.client
+                      :optimizations  :advanced
+                      :pseudo-names   true
+                      :cache-analysis true
+                      :elide-asserts  true
+                      :pretty-print   false}}
+
+      {:id           "prod"
+       :source-paths ["src"]
+       :compiler     {:output-to      "resources/public/js/stuttaford.min.js"
+                      :main           stuttaford.client
+                      :optimizations  :advanced
+                      :cache-analysis true
+                      :elide-asserts  true
+                      :pretty-print   false}}]}
+
+    :figwheel {:http-server-root "figwheel-server"
+               :server-port      3449
+               :server-ip        "127.0.0.1"
+               :css-dirs         ["resources/public/css"]
+               :nrepl-port       7887
+               :nrepl-middleware ["cider.nrepl/cider-middleware"
+                                  "refactor-nrepl.middleware/wrap-refactor"
+                                  "cemerick.piggieback/wrap-cljs-repl"]}}})

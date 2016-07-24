@@ -5,7 +5,8 @@
             [me.raynes.fs :as fs]
             [peridot.core :as peridot]
             [stuttaford.web.posts :as posts]
-            [stuttaford.web.service :as service]))
+            [stuttaford.web.service :as service]
+            [stuttaford.web.routes :as routes]))
 
 (def SITE "site")
 
@@ -18,8 +19,9 @@
 
 (defn clean-non-prod-js []
   (log/info " * Cleaning non-production js")
-  ;;(fs/delete-dir "resources/public/js-debug")
-  (fs/delete-dir "resources/public/js/src")
+  (fs/delete-dir "resources/public/js/out")
+  (fs/delete "resources/public/js/stuttaford.debug.js")
+  (fs/delete "resources/public/js/stuttaford.js")
   (fs/delete "resources/public/js/manifest.json"))
 
 (defn copy-public-to-site []
@@ -62,13 +64,12 @@
   (copy-public-to-site)
   (let [session (peridot/session (service/handler))]
     (generate-path session "/atom.xml" "/atom.xml")
-    (doseq [path ["/" "/about/" "/codex/" "/radiant/" "/articles/"]]
+    (doseq [path (map :path (:nav (routes/site-config)))]
       (generate-html-path session path))
     (doseq [permalink (map :permalink (posts/list-posts))]
       (generate-html-path session permalink)))
   (log/info "Done."))
 
-(defn -main
-  [& args]
+(defn -main [& args]
   (build)
   (System/exit 0))

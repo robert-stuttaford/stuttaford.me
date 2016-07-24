@@ -3,7 +3,7 @@
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [stuttaford.db :as db]
-            [stuttaford.web.om :refer [om-app]]))
+            [stuttaford.web.client :as client]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; View links
@@ -42,29 +42,38 @@
    (when description
      [:p description])))
 
-(defn codex [& {:keys [admin? debug?] :or {debug? false}}]
-  {:title   "Clojure Codex"
-   :layout  "page"
+(defn codex [& {:keys [admin? debug? dev?]}]
+  {:title  "Clojure Codex"
+   :layout "page"
    :content
    (list
     [:p.add-link-message
      "Have a link you'd like to add? Tweet the link to me @RobStuttaford on Twitter with "
      [:span.hashtag "#codex"] " or simply click here: " [:br]
      [:a.twitter-hashtag-button
-      {:href "https://twitter.com/intent/tweet?button_hashtag=codex&text=%40RobStuttaford%20Link%3A%20your-link-here"
+      {:href         "https://twitter.com/intent/tweet?button_hashtag=codex&text=%40RobStuttaford%20Link%3A%20your-link-here"
        :data-related "RobStuttaford" :data-dnt "true"}]
      [:script "!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');"]]
-    (om-app "codex" debug?
-            (cond-> {:categories (db/all-categories-with-links)}
-                    admin? (assoc :admin? admin?))))})
+    (client/client-app "codex" debug? dev?
+                       (cond-> {:db (db/datascript-db (db/as-db db/uri)
+                                                      #{:category/name
+                                                        :link/category
+                                                        :link/description
+                                                        :link/image
+                                                        :link/slug
+                                                        :link/tags
+                                                        :link/title
+                                                        :link/uri
+                                                        :tag/name})}
+                         admin? (assoc :admin? admin?))))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Create links
 
 (defn new-form []
-  {:title   "New link"
-   :layout  "page"
-   :css     ["bootstrap/css/bootstrap.min.css"]
+  {:title  "New link"
+   :layout "page"
+   :css    ["bootstrap/css/bootstrap.min.css"]
    :content
    [:div
     [:form {:role "form" :method "POST"}
@@ -123,9 +132,9 @@
 (defn edit-form [slug]
   (when-let [{:keys [link/title link/uri link/description] :as link}
              (db/one (db/as-db db/uri) :link/slug slug)]
-    {:title   (str "Edit link: " title)
-     :layout  "page"
-     :css     ["bootstrap/css/bootstrap.min.css"]
+    {:title  (str "Edit link: " title)
+     :layout "page"
+     :css    ["bootstrap/css/bootstrap.min.css"]
      :content
      [:div
       [:form {:role "form" :method "POST"}

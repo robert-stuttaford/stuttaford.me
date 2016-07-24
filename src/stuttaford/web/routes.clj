@@ -1,20 +1,22 @@
 (ns stuttaford.web.routes
   (:require [clojure.edn :as edn]
-            [compojure.core :refer [defroutes context GET POST]]
+            [compojure.core :refer [context defroutes GET POST]]
             [compojure.route :as route]
             [ring.util.response :as response]
-            [stuttaford.db :as db]
             [stuttaford.web.codex :as codex]
-            [stuttaford.web.content :refer [parse-markdown-page parse-markdown-post]]
+            [stuttaford.web.content
+             :refer
+             [parse-markdown-page parse-markdown-post]]
             [stuttaford.web.layout.atom :refer [atom-layout]]
-            [stuttaford.web.layout.html :refer [html-layout]]
-            [stuttaford.web.om :refer [om-app]]))
+            [stuttaford.web.layout.html :refer [html-layout]]))
+
+(def ^:dynamic PROD-MODE? true)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Site config
 
 (def site-config
-  (memoize #(-> "config.edn" slurp edn/read-string)))
+  #(-> "config.edn" slurp edn/read-string))
 
 (defn page-config [page]
   (assoc (site-config) :page page))
@@ -33,44 +35,8 @@
 (defn render [layout-fn view & args]
   (-> (apply view args) page-config layout-fn))
 
-;(def render-memoized (memoize render))
+;;(def render-memoized (memoize render))
 (def render-memoized render)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Radiant
-
-(defn radiant-data []
-  {:data-sources         {:links {:id     :codex
-                                  :label  "Codex"
-                                  :datoms (db/all-datoms-for-radiant)}}
-   :view                 :datoms
-   :query                "[:find ?e ?a ?v :in $ :where [?e ?a ?v]]"
-   :current-datoms-index :avet
-   :schema-visible?      false})
-
-(defn radiant [& {:keys [debug?] :or {debug? false}}]
-  {:title   "Radiant"
-   :layout  "bare"
-   :css     ["bootstrap/css/bootstrap.min.css" "css/radiant.css"]
-   :content (list (om-app "radiant" debug? (radiant-data)))})
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Dive into Datomic
-
-(defn dive-into-datomic [& {:keys [debug?] :or {debug? false}}]
-  {:title   "Dive into Datomic"
-   :layout  "bare"
-   :css     ["bootstrap/css/bootstrap.min.css" "css/dive-into-datomic.css"]
-   :content (list (om-app "dive-into-datomic" debug? {:view :datalog}))})
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Articles
-
-(defn articles [& {:keys [debug?] :or {debug? false}}]
-  {:title   "Articles"
-   :layout  "bare"
-   :css     ["bootstrap/css/bootstrap.min.css" "css/articles.css"]
-   :content (list (om-app "articles" debug? {:view :source-article}))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
@@ -92,24 +58,13 @@
        (render-memoized html-layout parse-markdown-post
                         (format "posts/%s-%s-%s-%s.md" year month date slug)))
 
-  (GET "/radiant/" {query-params :query-params}
-       (render html-layout radiant
-         :debug? (some-> query-params (get "debug") boolean)))
-
-  (GET "/dive-into-datomic/" {query-params :query-params}
-       (render html-layout dive-into-datomic
-         :debug? (some-> query-params (get "debug") boolean)))
-
-  (GET "/articles/" {query-params :query-params}
-       (render html-layout articles
-         :debug? (some-> query-params (get "debug") boolean)))
-
   (context "/codex" []
 
     (GET "/" {query-params :query-params}
          (render html-layout codex/codex
            :admin? (some-> query-params (get "admin") boolean)
-           :debug? (some-> query-params (get "debug") boolean)))
+           :debug? (some-> query-params (get "debug") boolean)
+           :dev?   (not PROD-MODE?)))
 
     (GET "/new" []
          (render html-layout codex/new-form))

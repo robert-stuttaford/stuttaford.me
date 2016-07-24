@@ -3,16 +3,15 @@
  :repo                "https://github.com/robert-stuttaford/stuttaford.me"
  :base-url            "/"
  :google-analytics-id "UA-53515800-1"
- :year                "2014"
+ :year                "2016"
  :recent-posts        3
  :latest-posts        1
- :author              {:name        "Robert Stuttaford"
-                       :email       "robert.stuttaford@gmail.com"
-                       :twitter     "https://twitter.com/RobStuttaford"
-                       :github      "https://github.com/robert-stuttaford"}
+ :author              {:name    "Robert Stuttaford"
+                       :email   "robert.stuttaford@gmail.com"
+                       :twitter "https://twitter.com/RobStuttaford"
+                       :github  "https://github.com/robert-stuttaford"}
  :meta                {:title       "Robert Stuttaford"
                        :description "Clojure Enthusiast"}
  :nav                 [{:title "About" :path "/about/"}
                        {:title "Blog" :path "/"}
-                       {:title "Clojure Codex" :path "/codex/"}
-                       {:title "Radiant" :path "/radiant/"}]}
+                       {:title "Clojure Codex" :path "/codex/"}]}
