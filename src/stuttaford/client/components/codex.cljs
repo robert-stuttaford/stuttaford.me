@@ -55,8 +55,13 @@
   (d/q '[:find [?link ...] :in $ :where [?link :link/uri]] db))
 
 (rum/defc codex < rum/reactive [state]
-  (let [{:keys [db query]} (rum/react state)]
+  (let [{:keys [db query admin?]} (rum/react state)]
     [:div
+
+     (when admin?
+       [:a {:href  "/codex/new"
+            :style {:color     "#444"
+                    :font-size "0.8em"}} "[Add link]"])
 
      [:input#search
       {:type        "text"
@@ -74,9 +79,13 @@
        [:div
         [:h3 category]
         [:ul
-         (for [{:keys [link/uri link/title link/tags]} (sort-by :link/title links)]
+         (for [{:keys [link/uri link/title link/tags link/slug]} (sort-by :link/title links)]
            [:li.link
             [:a {:href uri} title]
+            (when admin?
+              [:a {:href  (str "/codex/edit/" slug)
+                   :style {:color     "#444"
+                           :font-size "0.8em"}} "[edit]"])
             (for [{:keys [tag/name]} (sort-by :tag/name tags)]
               [:a.tag
                (cond-> {:on-click #(put! common/action-chan [::search name])}

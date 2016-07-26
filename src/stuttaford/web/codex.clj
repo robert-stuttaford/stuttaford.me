@@ -64,7 +64,8 @@
                                                         :link/tags
                                                         :link/title
                                                         :link/uri
-                                                        :tag/name})}
+                                                        :tag/name})
+                                :admin? admin?}
                          admin? (assoc :admin? admin?))))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
