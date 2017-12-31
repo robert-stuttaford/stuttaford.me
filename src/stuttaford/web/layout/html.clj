@@ -16,6 +16,7 @@
    (when-let [description (:description page)]
      [:meta {:name "description" :content description}])
    (page/include-css
+    "https://fonts.googleapis.com/css?family=Volkhov"
     (str base-url "css/poole.css")
     (str base-url "css/syntax.css")
     (str base-url "css/stuttaford.css"))
@@ -32,18 +33,14 @@
 (defnk nav-item [title path]
   [:small [:a {:href path} title]])
 
-(defnk masthead [base-url [:meta title description] [:author twitter github] nav]
+(defnk masthead [base-url [:meta title description] nav]
   [:div.masthead
    [:h3.masthead-title
     [:a {:title "Home" :href base-url} title] " "
     [:small description]]
    (->> nav
         (map nav-item)
-        (interpose " &middot; "))
-   " &middot; "
-   [:small
-    "I'm on " [:a {:href twitter} "Twitter"]
-    " and " [:a {:href github} "GitHub"] "."]])
+        (interpose " &middot; "))])
 
 (defnk foot [year [:author name]]
   [:div.footer

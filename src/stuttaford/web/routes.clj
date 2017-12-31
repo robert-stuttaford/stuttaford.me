@@ -38,6 +38,9 @@
 ;;(def render-memoized (memoize render))
 (def render-memoized render)
 
+(defn markdown-page [name]
+  (render-memoized html-layout parse-markdown-page (str name ".md")))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
 
@@ -51,8 +54,9 @@
            (response/content-type "text/xml")
            (response/charset "utf-8")))
 
-  (GET "/about/" []
-       (render-memoized html-layout parse-markdown-page "about.md"))
+  (GET "/about/"           [] (markdown-page "about"))
+  (GET "/speaking/"        [] (markdown-page "speaking"))
+  (GET "/open-source/"     [] (markdown-page "open-source"))
 
   (GET "/:year/:month/:date/:slug/" [year month date slug]
        (render-memoized html-layout parse-markdown-post

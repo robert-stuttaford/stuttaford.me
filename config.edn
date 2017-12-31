@@ -3,7 +3,7 @@
  :repo                "https://github.com/robert-stuttaford/stuttaford.me"
  :base-url            "/"
  :google-analytics-id "UA-53515800-1"
- :year                "2016"
+ :year                "2018"
  :recent-posts        3
  :latest-posts        1
  :author              {:name    "Robert Stuttaford"
@@ -14,4 +14,7 @@
                        :description "Clojure Enthusiast"}
  :nav                 [{:title "About" :path "/about/"}
                        {:title "Blog" :path "/"}
-                       {:title "Clojure Codex" :path "/codex/"}]}
+                       {:title "Clojure Codex" :path "/codex/"}
+                       {:title "Speaking" :path "/speaking/"}
+                       {:title "Open Source" :path "/open-source/"}
+                       {:title "Twitter" :path "https://twitter.com/RobStuttaford"}]}
