@@ -63,3 +63,20 @@ input#search {
     box-sizing: border-box;
     width: 100%;
 }
+
+.tldr {
+    border-radius: 7px;
+    border: 1px solid;
+    border-top-color: #d9d9d9;
+    border-left-color: #d9d9d9;
+    border-bottom-color: #999;
+    border-right-color: #999;
+    background: #f6f6f6;
+    padding: 1.5rem;
+    padding-top: 0;
+    padding-bottom: 0.5rem;
+}
+
+.tldr h3 {
+    border-bottom: 1px solid #ccc;
+}

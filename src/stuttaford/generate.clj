@@ -64,9 +64,11 @@
   (clean-non-prod-js)
   (copy-public-to-site)
   (let [session (peridot/session (service/handler))]
+    (generate-path session "/" "/index.html")
     (generate-path session "/atom.xml" "/atom.xml")
     (doseq [path (map :path (:nav (routes/site-config)))]
       (generate-html-path session path))
+    (generate-path session "/blog/archived/" "/blog/archived/index.html")
     (doseq [permalink (map :permalink (posts/list-posts))]
       (generate-html-path session permalink)))
   (log/info "Done."))

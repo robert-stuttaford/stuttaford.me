@@ -37,11 +37,15 @@
 
 (defn blog-template [{:keys [latest-posts] :as config}]
   [:div.posts
-   (for [post (posts/latest latest-posts)]
-     (post-template (update config :page merge post)))
+   (if-some [latest (seq (posts/latest latest-posts))]
+     (for [post latest]
+       (post-template (update config :page merge post)))
+     (list
+      [:h1.post-title "Blog"]
+      [:p "A new year, a new approach - coming soon!"]))
    [:div.related
     [:a {:href "/blog/archived/"}
-     "Older posts"]]])
+     "Archived posts"]]])
 
 (defn archived-blog-template [_]
   [:div.posts

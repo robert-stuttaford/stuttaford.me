@@ -1,33 +1,42 @@
 (ns stuttaford.web.content
   (:require [clj-time.core :as time]
             [clojure.java.io :as io]
-            [clojure.string :as string]
-            [markdown.core :as md]
-            [stuttaford.web.syntax-highlight :refer [highlight-clojure-in-html]]))
+            [clojure.string :as string])
+  (:import com.vladsch.flexmark.ext.toc.TocExtension
+           [com.vladsch.flexmark.ext.yaml.front.matter
+            AbstractYamlFrontMatterVisitor
+            YamlFrontMatterExtension]
+           com.vladsch.flexmark.html.HtmlRenderer
+           com.vladsch.flexmark.parser.Parser
+           com.vladsch.flexmark.util.options.MutableDataSet
+           java.util.ArrayList))
 
-(def header-regex #"^---\n((?:[a-z-]+: [^\n]+\n)*)---\n")
+(def options ^MutableDataSet
+  (doto (MutableDataSet.)
+    (.set Parser/EXTENSIONS
+          (ArrayList. [(TocExtension/create)
+                       (YamlFrontMatterExtension/create)]))))
 
-(defn parse-markdown-page-header [page]
-  (when-let [header (some->> page
-                             (re-find header-regex)
-                             second)]
-    (let [header (->> (string/split header #"\n")
-                      (map #(string/split % #": "))
-                      (map (juxt (comp keyword first) second))
-                      (into {}))]
-      (if-let [tags (:tags header)]
-        (assoc header :tags (string/split tags #" *, *"))
-        header))))
+(def parser ^Parser$Builder
+  (.build (Parser/builder options)))
+
+(def renderer ^HtmlRenderer$Builder
+  (.build (HtmlRenderer/builder options)))
+
+(defn parse-markdown [str]
+  (let [doc (.parse parser str)]
+    (into {:content (.render renderer doc)}
+          (map (fn [[key [value]]]
+                 [(keyword key)
+                  value]))
+          (.getData (doto (AbstractYamlFrontMatterVisitor.)
+                      (.visit doc))))))
 
 (defn parse-markdown-page [filename]
   (when-let [file (some-> filename io/resource)]
     (when-let [raw (slurp file)]
-      (assoc (or (parse-markdown-page-header raw) {})
-        :content (-> raw
-                     (string/replace header-regex "")
-                     md/md-to-html-string
-                     highlight-clojure-in-html)
-        :last-modified (-> file io/file .lastModified)))))
+      (assoc (parse-markdown raw)
+             :last-modified (-> file io/file .lastModified)))))
 
 (defn parse-markdown-post [filename]
   (when-let [page (parse-markdown-page filename)]
