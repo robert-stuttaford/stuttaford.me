@@ -1,7 +1,10 @@
 (ns stuttaford.db
-  (:require [clojure.string :as string]
+  (:require [clojure.edn :as edn]
+            [clojure.set :as set]
+            [clojure.string :as string]
             [datomic.api :as d]
-            [plumbing.core :refer :all]))
+            [net.cgrand.enlive-html :as html])
+  (:import java.net.URL))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Database
@@ -86,77 +89,57 @@
     :db/ident              :category/name
     :db/valueType          :db.type/string
     :db/cardinality        :db.cardinality/one
-    :db/unique             :db.unique/value
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/unique             :db.unique/value}
 
    {:db/doc                "Category sort. Required."
     :db/ident              :category/sort
     :db/valueType          :db.type/long
-    :db/cardinality        :db.cardinality/one
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/cardinality        :db.cardinality/one}
 
    {:db/doc                "Tag. Required."
     :db/ident              :tag/name
     :db/valueType          :db.type/string
     :db/cardinality        :db.cardinality/one
-    :db/unique             :db.unique/value
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/unique             :db.unique/value}
 
    {:db/doc                "Link title. Required."
     :db/ident              :link/title
     :db/valueType          :db.type/string
-    :db/cardinality        :db.cardinality/one
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/cardinality        :db.cardinality/one}
 
    {:db/doc                "Link slug. Required."
     :db/ident              :link/slug
     :db/valueType          :db.type/string
     :db/cardinality        :db.cardinality/one
-    :db/unique             :db.unique/value
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/unique             :db.unique/value}
 
    {:db/doc                "Link uri. Required."
     :db/ident              :link/uri
     :db/valueType          :db.type/string
     :db/cardinality        :db.cardinality/one
-    :db/unique             :db.unique/value
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/unique             :db.unique/value}
 
    {:db/doc                "Link category. Required."
     :db/ident              :link/category
     :db/valueType          :db.type/ref
-    :db/cardinality        :db.cardinality/one
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/cardinality        :db.cardinality/one}
 
    {:db/doc                "Link description."
     :db/ident              :link/description
     :db/valueType          :db.type/string
-    :db/cardinality        :db.cardinality/one
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/cardinality        :db.cardinality/one}
 
    {:db/doc                "Link image."
     :db/ident              :link/image
     :db/valueType          :db.type/string
-    :db/cardinality        :db.cardinality/one
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/cardinality        :db.cardinality/one}
 
    {:db/doc                "Link tags."
     :db/ident              :link/tags
     :db/valueType          :db.type/ref
-    :db/cardinality        :db.cardinality/many
-    :db/id                 #db/id[:db.part/db]
-    :db.install/_attribute :db.part/db}
+    :db/cardinality        :db.cardinality/many}
 
-   {:db/id    #db/id[:db.part/user]
+   {:db/id    "tempid.append-sort-in-scope"
     :db/ident :append-sort-in-scope
     :db/fn    #db/fn {:lang   "clojure"
                       :params [db new-id scope-attr sort-attr]
@@ -168,23 +151,43 @@
                                      (reduce max 0)
                                      (inc))]]}}
 
-   {:db/id    #db/id[:db.part/user]
+   {:db/id    "tempid.set-sort-in-scope"
     :db/ident :set-sort-in-scope
     :db/fn    #db/fn {:lang   "clojure"
                       :params [db scope-attr sort-attr sorted-ids]
                       :code   (let [ids (map :e (datomic.api/datoms db :aevt scope-attr))]
                                 (->> sorted-ids
-                                     (clojure.set/difference ids)
+                                     (set/difference ids)
                                      (concat sorted-ids)
                                      (map-indexed (fn [idx id]
                                                     [:db/add id sort-attr idx]))))}}]
 
   )
 
+(defn codex-datoms []
+  (-> (URL. "http://www.stuttaford.me/codex/")
+      html/html-resource
+      (html/select [(html/attr= :data-component "codex") :script])
+      first
+      html/text
+      edn/read-string
+      :db
+      :datoms))
+
+(defn rebuild-db-from-public-site! []
+  (d/delete-database uri)
+  (d/create-database uri)
+  (let [datoms (codex-datoms)
+        conn   (as-conn uri)]
+    @(d/transact conn schema)
+    @(d/transact conn (map (fn [[e a v]]
+                             [:db/add (str e) a (if (number? v)
+                                                  (str v)
+                                                  v)])
+                           datoms))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Categories
-
-
 
 (defn new-category-tx [name]
   (let [id (tempid)]
@@ -197,9 +200,10 @@
 (defn find-or-create-category! [uri name]
   (if-let [category (one (as-db uri) :category/name name)]
     category
-    (let [category-id                (tempid)
-          category-tx                [[:db/add category-id :category/name name]
-                                      [:append-sort-in-scope category-id :category/name :category/sort]]
+    (let [category-id (tempid)
+          category-tx [[:db/add category-id :category/name name]
+                       [:append-sort-in-scope category-id
+                        :category/name :category/sort]]
           {:keys [db-after tempids]} @(d/transact (as-conn uri) category-tx)]
       (entity (d/resolve-tempid db-after tempids category-id) db-after))))
 
@@ -226,7 +230,8 @@
       (string/replace #"[^a-z0-9]+" "-")
       (string/replace #"(^-|-$)" "")))
 
-(defnk new-link-tx [title slug uri category {tags []} {description nil} {image nil}]
+(defn new-link-tx [{:keys [title slug uri category tags description image]
+                     :or   {tags []}}]
   [(cond-> {:db/id         (tempid)
             :link/title    title
             :link/slug     slug
@@ -242,12 +247,12 @@
       (update-in [:tags] (partial map (partial find-or-create-tag! uri)))))
 
 (defn create-link! [uri link]
-  (let [link-tx                    (->> link (ensure-link-category-and-tags! uri) new-link-tx)
-        link-id                    (id (first link-tx))
+  (let [link-tx (->> link (ensure-link-category-and-tags! uri) new-link-tx)
+        link-id (id (first link-tx))
         {:keys [db-after tempids]} @(d/transact (as-conn uri) link-tx)]
     (entity (d/resolve-tempid db-after tempids link-id) db-after)))
 
-(defnk update-link-tx [id title slug uri {description nil} {image nil}]
+(defn update-link-tx [{:keys [id title slug uri description image]}]
   [(cond-> {:db/id      id
             :link/title title
             :link/slug  slug

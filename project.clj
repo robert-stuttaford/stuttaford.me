@@ -4,7 +4,7 @@
                  :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[ch.qos.logback/logback-classic "1.1.7"]
                  [clj-time "0.12.0"]
-                 [com.datomic/datomic-free "0.9.5372"
+                 [com.datomic/datomic-free "0.9.5656"
                   :exclusions [org.slf4j/slf4j-nop]]
                  [compojure "1.5.1"]
                  [enlive "1.1.6"]
