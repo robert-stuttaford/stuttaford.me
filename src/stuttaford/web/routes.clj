@@ -3,6 +3,7 @@
             [compojure.core :refer [context defroutes GET POST]]
             [compojure.route :as route]
             [ring.util.response :as response]
+            [stuttaford.db :as db]
             [stuttaford.web.codex :as codex]
             [stuttaford.web.content
              :refer
@@ -66,26 +67,27 @@
 
     (GET "/" {query-params :query-params}
       (render html-layout codex/codex
-              :admin? (some-> query-params (get "admin") boolean)
-              :debug? (some-> query-params (get "debug") boolean)
-              :dev?   (not PROD-MODE?)))
+              {:db     (db/db)
+               :admin? (some-> query-params (get "admin") boolean)
+               :debug? (some-> query-params (get "debug") boolean)
+               :dev?   (not PROD-MODE?)}))
 
     (GET "/new" []
-      (render html-layout codex/new-form))
+      (render html-layout codex/new-form (db/db)))
 
     (POST "/new" {params :params}
-      (codex/save-link! params)
+      (codex/save-link! (db/db) params)
       (response/redirect "/codex/new"))
 
     (GET "/edit/:slug" [slug]
-      (render html-layout codex/edit-form slug))
+      (render html-layout codex/edit-form (db/db) slug))
 
     (GET "/delete/:slug" [slug]
-      (codex/delete-link! slug)
+      (codex/delete-link! (db/db) slug)
       (response/redirect "/codex"))
 
     (POST "/edit/:slug" {params :params}
-      (codex/update-link! params)
+      (codex/update-link! (db/db) params)
       (response/redirect "/codex")))
 
   (route/resources "")

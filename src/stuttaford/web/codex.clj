@@ -7,25 +7,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; View links
 
-(defn tag-list [tags]
-  (for [tag (->> tags
-                 (map :tag/name)
-                 sort)]
-    (list [:code tag] " ")))
-
-(defn all-categories [link?]
-  (when-let [categories (->> (db/all db/uri :category/name)
-                             (map :category/name))]
+(defn all-categories [db link?]
+  (when-let [categories (->> (d/datoms db :avet :category/name)
+                             (map :v)
+                             seq)]
     (list
      [:h3 "All Categories"]
-     [:p (for [category categories]
+     [:p (for [category (sort categories)]
            (list [:code
                   (if link?
                     [:a {:href (str "#" category)} category]
                     category)] " "))])))
 
-(defn all-tags []
-  (when-let [tags (seq (db/all db/uri :tag/name))]
+(defn tag-list [tags]
+  (for [tag (sort tags)]
+    (list [:code tag] " ")))
+
+(defn all-tags [db]
+  (when-let [tags (->> (d/datoms db :avet :tag/name)
+                       (map :v)
+                       seq)]
     (list
      [:h3 "All Tags"]
      [:p (tag-list tags)])))
@@ -40,7 +41,7 @@
    (when description
      [:p description])))
 
-(defn codex [& {:keys [admin? debug? dev?]}]
+(defn codex [{:keys [db admin? debug? dev?]}]
   {:title  "Clojure Codex"
    :layout "page"
    :content
@@ -53,7 +54,7 @@
        :data-related "RobStuttaford" :data-dnt "true"}]
      [:script "!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');"]]
     (client/client-app "codex" debug? dev?
-                       (cond-> {:db (db/datascript-db (db/as-db db/uri)
+                       (cond-> {:db (db/datascript-db db
                                                       #{:category/name
                                                         :link/category
                                                         :link/description
@@ -69,7 +70,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Create links
 
-(defn new-form []
+(defn new-form [db]
   {:title  "New link"
    :layout "page"
    :css    ["bootstrap/css/bootstrap.min.css"]
@@ -95,25 +96,25 @@
       [:label {:for "tags"} "Tags"]
       [:input.form-control {:type "text" :name "tags" :placeholder "tag 1, tag 2, tag 3"}]]
      [:button.btn.btn-default {:type "submit"} "Save link"]]
-    (all-categories false)
-    (all-tags)]})
+    (all-categories db false)
+    (all-tags db)]})
 
-(defn split-and-clean-tags [link-title category-name tags]
+(defn split-and-clean-tags [db link-title category-name tags]
   (->> (string/split tags #",")
        (map string/trim)
        (map string/lower-case)
-       (filter (partial db/not-a-category db/uri))
-       (filter (partial db/not-a-link-title db/uri))
+       (filter (partial db/not-a-category db))
+       (filter (partial db/not-a-link-title db))
        (remove (partial = (string/lower-case category-name)))
        (remove (partial = (string/lower-case link-title)))))
 
-(defn save-link! [params]
+(defn save-link! [db params]
   (let [params (-> params
                    (update-in [:title]    string/trim)
                    (update-in [:uri]      string/trim)
                    (update-in [:category] string/trim))
         params (if (-> params :tags seq)
-                 (update-in params [:tags] (partial split-and-clean-tags
+                 (update-in params [:tags] (partial split-and-clean-tags db
                                                     (:title params) (:category params)))
                  (dissoc params :tags))
         params (if (-> params :slug seq)
@@ -128,9 +129,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Edit links
 
-(defn edit-form [slug]
+(defn edit-form [db slug]
   (when-let [{:link/keys [title uri description] :as link}
-             (db/one (db/as-db db/uri) :link/slug slug)]
+             (d/entity db [:link/slug slug])]
     {:title  (str "Edit link: " title)
      :layout "page"
      :css    ["bootstrap/css/bootstrap.min.css"]
@@ -160,7 +161,7 @@
         (->> link :link/tags tag-list)]
        [:button.btn.btn-default {:type "submit"} "Save link"]]]}))
 
-(defn update-link! [params]
+(defn update-link! [db params]
   (let [params (-> params
                    (update :title string/trim)
                    (update :uri string/trim))
@@ -170,9 +171,9 @@
         params (if (-> params :description seq)
                  (update params :description string/trim)
                  (dissoc params :description))]
-    (db/update-link! db/uri (:original-slug params) params))
+    (db/update-link! db (:original-slug params) params))
   :ok)
 
 (defn delete-link! [slug]
-  @(d/transact (db/as-conn db/uri) [[:db.fn/retractEntity [:link/slug slug]]])
+  (db/delete-link! slug)
   :ok)
