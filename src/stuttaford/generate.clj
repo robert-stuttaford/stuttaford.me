@@ -47,10 +47,11 @@
     (spit path content)))
 
 (defn generate-path [session path filename]
-  (log/info " * Generating" path "->" filename)
-  (->> path
-       (content-for-url session)
-       (write-site-file filename)))
+  (when-not (string/starts-with? path "http")
+    (log/info " * Generating" path "->" filename)
+    (->> path
+         (content-for-url session)
+         (write-site-file filename))))
 
 (defn generate-html-path [session path]
   (generate-path session path (str path "index.html")))
