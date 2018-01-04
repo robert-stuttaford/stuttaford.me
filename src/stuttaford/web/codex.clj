@@ -1,6 +1,6 @@
 (ns stuttaford.web.codex
   (:require [clojure.string :as string]
-            [clojure.tools.logging :as log]
+            [datomic.api :as d]
             [stuttaford.db :as db]
             [stuttaford.web.client :as client]))
 
@@ -11,16 +11,15 @@
   (for [tag (->> tags
                  (map :tag/name)
                  sort)]
-    (list [:span.tag tag] " ")))
+    (list [:code tag] " ")))
 
 (defn all-categories [link?]
   (when-let [categories (->> (db/all db/uri :category/name)
-                             (sort-by :category/sort)
                              (map :category/name))]
     (list
      [:h3 "All Categories"]
      [:p (for [category categories]
-           (list [:span.tag
+           (list [:code
                   (if link?
                     [:a {:href (str "#" category)} category]
                     category)] " "))])))
@@ -31,7 +30,7 @@
      [:h3 "All Tags"]
      [:p (tag-list tags)])))
 
-(defn link-item [{:keys [link/title link/uri link/description link/tags link/slug]} admin?]
+(defn link-item [{:link/keys [title uri description tags slug]} admin?]
   (list
    [:p [:a {:href uri :title title} title] " "
     (when (seq tags)
@@ -130,7 +129,7 @@
 ;; Edit links
 
 (defn edit-form [slug]
-  (when-let [{:keys [link/title link/uri link/description] :as link}
+  (when-let [{:link/keys [title uri description] :as link}
              (db/one (db/as-db db/uri) :link/slug slug)]
     {:title  (str "Edit link: " title)
      :layout "page"
@@ -163,14 +162,17 @@
 
 (defn update-link! [params]
   (let [params (-> params
-                   (update-in [:title]    string/trim)
-                   (update-in [:uri]      string/trim))
-        parmas (if-not (seq (:slug params))
+                   (update :title string/trim)
+                   (update :uri string/trim))
+        params (if-not (seq (:slug params))
                  (assoc params :slug (-> params :title db/to-slug))
                  params)
         params (if (-> params :description seq)
-                 (update-in params [:description] string/trim)
+                 (update params :description string/trim)
                  (dissoc params :description))]
-    (log/info params)
     (db/update-link! db/uri (:original-slug params) params))
+  :ok)
+
+(defn delete-link! [slug]
+  @(d/transact (db/as-conn db/uri) [[:db.fn/retractEntity [:link/slug slug]]])
   :ok)

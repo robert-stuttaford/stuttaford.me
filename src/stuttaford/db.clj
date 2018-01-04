@@ -161,8 +161,7 @@
                                            (concat sorted-ids)
                                            (map-indexed (fn [idx id]
                                                           [:db/add id sort-attr idx]))))})}]
-
-  )
+)
 
 (defn codex-datoms []
   (-> (URL. "http://www.stuttaford.me/codex/")

@@ -46,43 +46,47 @@
 
 (defroutes app
   (GET "/" []
-       (render-memoized html-layout (constantly {:title nil :content "" :layout "home"})))
+    (render-memoized html-layout (constantly {:title nil :content "" :layout "home"})))
 
   (GET "/atom.xml" []
-       (-> (render-memoized atom-layout (constantly {}))
-           response/response
-           (response/content-type "text/xml")
-           (response/charset "utf-8")))
+    (-> (render-memoized atom-layout (constantly {}))
+        response/response
+        (response/content-type "text/xml")
+        (response/charset "utf-8")))
 
   (GET "/about/"           [] (markdown-page "about"))
   (GET "/speaking/"        [] (markdown-page "speaking"))
   (GET "/open-source/"     [] (markdown-page "open-source"))
 
   (GET "/:year/:month/:date/:slug/" [year month date slug]
-       (render-memoized html-layout parse-markdown-post
-                        (format "posts/%s-%s-%s-%s.md" year month date slug)))
+    (render-memoized html-layout parse-markdown-post
+                     (format "posts/%s-%s-%s-%s.md" year month date slug)))
 
   (context "/codex" []
 
     (GET "/" {query-params :query-params}
-         (render html-layout codex/codex
-           :admin? (some-> query-params (get "admin") boolean)
-           :debug? (some-> query-params (get "debug") boolean)
-           :dev?   (not PROD-MODE?)))
+      (render html-layout codex/codex
+              :admin? (some-> query-params (get "admin") boolean)
+              :debug? (some-> query-params (get "debug") boolean)
+              :dev?   (not PROD-MODE?)))
 
     (GET "/new" []
-         (render html-layout codex/new-form))
+      (render html-layout codex/new-form))
 
     (POST "/new" {params :params}
-          (codex/save-link! params)
-          (response/redirect "/codex/new"))
+      (codex/save-link! params)
+      (response/redirect "/codex/new"))
 
     (GET "/edit/:slug" [slug]
-         (render html-layout codex/edit-form slug))
+      (render html-layout codex/edit-form slug))
+
+    (GET "/delete/:slug" [slug]
+      (codex/delete-link! slug)
+      (response/redirect "/codex"))
 
     (POST "/edit/:slug" {params :params}
-          (codex/update-link! params)
-          (response/redirect "/codex")))
+      (codex/update-link! params)
+      (response/redirect "/codex")))
 
   (route/resources "")
 

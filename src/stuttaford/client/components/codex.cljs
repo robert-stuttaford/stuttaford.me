@@ -67,7 +67,7 @@
       {:type        "text"
        :placeholder "Search for link"
        :auto-focus  "autofocus"
-       :value       query
+       :value       (or query "")
        :on-change   #(put! type-ahead-chan (.. % -currentTarget -value))}]
 
      (for [[category links] (->> (if query
@@ -79,13 +79,17 @@
        [:div
         [:h3 category]
         [:ul
-         (for [{:keys [link/uri link/title link/tags link/slug]} (sort-by :link/title links)]
+         (for [{:link/keys [uri title tags slug]} (sort-by :link/title links)]
            [:li.link
             [:a {:href uri} title]
             (when admin?
-              [:a {:href  (str "/codex/edit/" slug)
-                   :style {:color     "#444"
-                           :font-size "0.8em"}} "[edit]"])
+              (list
+               [:a {:href  (str "/codex/edit/" slug)
+                    :style {:color     "#444"
+                            :font-size "0.8em"}} "[edit]"]
+               [:a {:href  (str "/codex/delete/" slug)
+                    :style {:color     "#444"
+                            :font-size "0.8em"}} "[delete]"]))
             (for [{:keys [tag/name]} (sort-by :tag/name tags)]
               [:a.tag
                (cond-> {:on-click #(put! common/action-chan [::search name])}
