@@ -1,20 +1,20 @@
 (ns stuttaford.web.templates
-  (:use [plumbing.core])
   (:require [clj-time.format :as time-format]
             [stuttaford.web.posts :as posts]))
 
-(defnk page-template [[:page title content]]
+(defn page-template [{{:keys [title content]} :page}]
   [:div.page
    [:h1.page-title title]
    content])
 
-(defnk bare-template [[:page content]]
+(defn bare-template [{{:keys [content]} :page}]
   content)
 
 (def format-date (partial time-format/unparse (time-format/formatter "dd MMM yyyy")))
 
-(defnk post-template [recent-posts [:author twitter]
-                      [:page title content date {permalink nil}]]
+(defn post-template [{{:keys [title content date permalink]} :page
+                      {:keys [twitter]} :author
+                      :keys [recent-posts]}]
   (list
    [:div.post
     [:h1.post-title
@@ -35,10 +35,10 @@
           [:h3
            [:a {:href permalink} title " " [:small (format-date date)]]]])]])))
 
-(defnk home-template [latest-posts :as config]
+(defn home-template [{:keys [latest-posts] :as config}]
   [:div.posts
    (for [post (posts/latest latest-posts)]
-     (post-template (update-in config [:page] merge post)))])
+     (post-template (update config :page merge post)))])
 
 (def templates
   {:home home-template

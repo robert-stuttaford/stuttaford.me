@@ -1,5 +1,4 @@
 (ns stuttaford.web.posts
-  (:use [plumbing.core])
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [stuttaford.web.content :refer [parse-markdown-post]]))

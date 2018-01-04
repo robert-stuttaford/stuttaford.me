@@ -1,5 +1,4 @@
 (ns stuttaford.web.syntax-highlight
-  (:use [plumbing.core])
   (:require [clojure.walk :as walk]
             [me.raynes.conch :refer [let-programs]]
             [net.cgrand.enlive-html :as enlive]))

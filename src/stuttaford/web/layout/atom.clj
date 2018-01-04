@@ -1,5 +1,4 @@
 (ns stuttaford.web.layout.atom
-  (:use [plumbing.core])
   (:require [clj-time.format :as time-format]
             [clj-time.coerce :as time-coerce]
             [hiccup.core :refer [html]]
@@ -20,7 +19,8 @@
   (comp (partial time-format/unparse (time-format/formatters :date-time-no-ms))
         time-coerce/from-long))
 
-(defnk atom-entry [[:config url] [:post title last-modified permalink content]]
+(defn atom-entry [{{:keys [url]} :config
+                   {:keys [title last-modified permalink content]} :post}]
   (let [post-url (str url permalink)]
     [:entry
      [:title title]
@@ -29,7 +29,10 @@
      [:id post-url]
      [:content {:type "html"} (-> content util/escape-html)]]))
 
-(defnk atom-layout [base-url url [:meta title] [:author name email] :as config]
+(defn atom-layout [{{:keys [title]}      :meta
+                    {:keys [name email]} :author
+                    :keys [base-url url]
+                    :as   config}]
   (let [all-posts (posts/list-posts)]
     (xml
      [:feed {:xmlns "http://www.w3.org/2005/Atom"}

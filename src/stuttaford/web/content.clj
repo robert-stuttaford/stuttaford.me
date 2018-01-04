@@ -1,5 +1,4 @@
 (ns stuttaford.web.content
-  (:use [plumbing.core])
   (:require [clj-time.core :as time]
             [clojure.java.io :as io]
             [clojure.string :as string]

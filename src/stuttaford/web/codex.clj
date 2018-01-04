@@ -1,5 +1,4 @@
 (ns stuttaford.web.codex
-  (:use [plumbing.core])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]
             [stuttaford.db :as db]
@@ -32,7 +31,7 @@
      [:h3 "All Tags"]
      [:p (tag-list tags)])))
 
-(defn link-item [{:keys [link/title link/uri link/description link/image link/tags link/slug] :as link} admin?]
+(defn link-item [{:keys [link/title link/uri link/description link/tags link/slug]} admin?]
   (list
    [:p [:a {:href uri :title title} title] " "
     (when (seq tags)

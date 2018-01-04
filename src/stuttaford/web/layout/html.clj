@@ -1,9 +1,9 @@
 (ns stuttaford.web.layout.html
-  (:use [plumbing.core])
   (:require [hiccup.page :as page]
             [stuttaford.web.templates :refer [templates]]))
 
-(defnk header [base-url [:meta title description] page]
+(defn header [{:keys [base-url page]
+               {:keys [title description]} :meta}]
   [:head
    [:link {:rel "profile" :href "http://gmpg.org/xfn/11"}]
    [:meta {:content "IE=edge" :http-equiv "X-UA-Compatible"}]
@@ -30,10 +30,11 @@
    [:link {:href (str base-url "atom.xml") :rel "alternate"
            :type "application/rss+xml" :title "RSS"}]])
 
-(defnk nav-item [title path]
+(defn nav-item [{:keys [title path]}]
   [:small [:a {:href path} title]])
 
-(defnk masthead [base-url [:meta title description] nav]
+(defn masthead [{:keys [base-url nav]
+                 {:keys [title description]} :meta}]
   [:div.masthead
    [:h3.masthead-title
     [:a {:title "Home" :href base-url} title] " "
@@ -42,11 +43,12 @@
         (map nav-item)
         (interpose " &middot; "))])
 
-(defnk foot [year [:author name]]
+(defn foot [{:keys [year]
+             {:keys [name]} :author}]
   [:div.footer
    [:p "&copy; " name " " year ". All rights reserved. Some lefts, too."]])
 
-(defnk google-analytics [google-analytics-id domain]
+(defn google-analytics [{:keys [google-analytics-id domain]}]
   [:script {:type "text/javascript"}
    "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -55,7 +57,8 @@
     google_analytics('create', '" google-analytics-id "', '" domain "');
     google_analytics('send', 'pageview');"])
 
-(defnk html-layout [base-url [:page layout content] :as config]
+(defn html-layout [{{:keys [layout]} :page
+                    :as config}]
   (let [layout (keyword layout)]
     (page/html5
      (header config)

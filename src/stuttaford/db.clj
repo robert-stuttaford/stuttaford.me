@@ -1,6 +1,5 @@
 (ns stuttaford.db
   (:require [clojure.edn :as edn]
-            [clojure.set :as set]
             [clojure.string :as string]
             [datomic.api :as d]
             [net.cgrand.enlive-html :as html])
@@ -141,26 +140,27 @@
 
    {:db/id    "tempid.append-sort-in-scope"
     :db/ident :append-sort-in-scope
-    :db/fn    #db/fn {:lang   "clojure"
-                      :params [db new-id scope-attr sort-attr]
-                      :code   [[:db/add new-id sort-attr
-                                (->> (datomic.api/datoms db :aevt scope-attr)
-                                     (map :e)
-                                     (map (partial datomic.api/entity db))
-                                     (map sort-attr)
-                                     (reduce max 0)
-                                     (inc))]]}}
+    :db/fn    (d/function
+               '{:lang   "clojure"
+                 :params [db new-id scope-attr sort-attr]
+                 :code   [[:db/add new-id sort-attr
+                           (->> (datomic.api/datoms db :aevt scope-attr)
+                                (map :e)
+                                (map (partial datomic.api/entity db))
+                                (map sort-attr)
+                                (reduce max 0)
+                                (inc))]]})}
 
    {:db/id    "tempid.set-sort-in-scope"
     :db/ident :set-sort-in-scope
-    :db/fn    #db/fn {:lang   "clojure"
-                      :params [db scope-attr sort-attr sorted-ids]
-                      :code   (let [ids (map :e (datomic.api/datoms db :aevt scope-attr))]
-                                (->> sorted-ids
-                                     (set/difference ids)
-                                     (concat sorted-ids)
-                                     (map-indexed (fn [idx id]
-                                                    [:db/add id sort-attr idx]))))}}]
+    :db/fn    (d/function '{:lang   "clojure"
+                            :params [db scope-attr sort-attr sorted-ids]
+                            :code   (let [ids (map :e (datomic.api/datoms db :aevt scope-attr))]
+                                      (->> sorted-ids
+                                           (clojure.set/difference ids)
+                                           (concat sorted-ids)
+                                           (map-indexed (fn [idx id]
+                                                          [:db/add id sort-attr idx]))))})}]
 
   )
 
@@ -386,9 +386,6 @@
                    :tag/name})
   )
 
-(comment (first (all-datoms-for-radiant))
-         )
-
 (def category-order
   ["Clojure"
    "Datomic"
@@ -408,31 +405,3 @@
    "Learn by doing"
    "Forums"
    "Community"])
-
-(comment
-  (do (reset-database!)
-      (->> (mapcat
-            (fnk [name links]
-              (let [category (tempid)]
-                (concat
-                 [{:db/id         category
-                   :category/name name
-                   :category/sort (.indexOf category-order name)}]
-                 (map (fnk [name uri {tags nil}]
-                        (cond-> {:db/id         (tempid)
-                                 :link/category category
-                                 :link/title    name
-                                 :link/slug     (to-slug name)
-                                 :link/uri      uri}
-                          tags (assoc :link/tags
-                                      (map (comp :db/id
-                                                 (partial find-or-create-tag!
-                                                          stuttaford.db/uri)
-                                                 :name)
-                                           tags))))
-                      links))))
-            (-> "codex.edn" slurp read-string))
-           (d/transact (as-conn uri))
-           deref))
-
-  )
