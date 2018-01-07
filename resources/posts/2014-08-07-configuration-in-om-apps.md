@@ -3,6 +3,7 @@ layout: post
 title: Configuration in Om apps
 description: A simple pattern for providing configuration data to all the components in an Om app.
 tags: om, clojurescript
+archive: true
 ---
 
 I've found a nice and simple way for making configuration available to

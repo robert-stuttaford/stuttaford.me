@@ -3,6 +3,7 @@ layout: post
 title: Om interop with 3rd party JS libs
 description: Discover how to integrate non-React Javascript libraries into Om ClojureScript applications.
 tags: om, clojurescript, core.async, om-tools, ace-editor
+archive: true
 ---
 
 A couple days ago, I cheekily tweeted a piece of code for embedding
@@ -62,7 +63,7 @@ This code comes with a couple bonuses:
   components coordinate.
 * We'll use the simple but seriously handy `defcomponent` from
   [om-tools](https://github.com/Prismatic/om-tools), which <accronym
-  title="Don't repeat yourself">DRY</accronym>s up all the `reify IProtocol` 
+  title="Don't repeat yourself">DRY</accronym>s up all the `reify IProtocol`
   code you see in vanilla Om applications.
 * Also, we'll use [Ŝablono](https://github.com/r0man/sablono) to
   render HTML rather than the `om.dom` namespace provided by Om. I

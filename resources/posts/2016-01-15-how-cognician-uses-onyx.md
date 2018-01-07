@@ -3,6 +3,7 @@ layout: post
 title: How Cognician uses Onyx
 description: An overview of how Cognician uses Onyx, a distributed computation framework, to process user data in real time.
 tags: onyx, distributed, datomic
+archive: true
 ---
 
 [Cognician](https://www.cognician.com/), the ed-tech company I co-founded in 2010, uses the Clojure stack:
@@ -45,9 +46,9 @@ The Onyx data API is broken into several cleverly designed pieces (see the [docu
 
 - **The Catalog**, which defines the tasks that can make up an Onyx job. Think of this as a set of puzzle pieces before they’ve been assembled into a cohesive picture. There are many knobs and dials for controlling performance at the task level here, too. There are three kinds of task:
 
-	1. **Inputs**: typically queue consumers, such as Kafka, RabbitMQ, or Datomic (yep!). Core.Async channels work great too. Extensible; could be whatever you like.
-	2. Good old **functions**: pointers to your workhorse logic.
-	3. **Outputs**: typically some sort of persistence - SQL, S3, Datomic, etc. And yes, Core.Async channels too. Also extensible.
+    1. **Inputs**: typically queue consumers, such as Kafka, RabbitMQ, or Datomic (yep!). Core.Async channels work great too. Extensible; could be whatever you like.
+    2. Good old **functions**: pointers to your workhorse logic.
+    3. **Outputs**: typically some sort of persistence - SQL, S3, Datomic, etc. And yes, Core.Async channels too. Also extensible.
 
 - **The Workflow**, which arranges tasks from the catalog into a graph of inputs ⟶ functions ⟶ outputs. In the puzzle analogy, the catalog contains puzzle pieces, and the workflow is the completed puzzle.
 
@@ -57,7 +58,7 @@ These first three sets of data are required - you can build a fully functional (
 
 - **Lifecycles**, a way to manage the per-task and per-batch state for tasks, and also cross-cutting concerns like metrics and logging. We use these to send metrics to [DataDog’s](http://datadoghq.com/) statsd agent. Another great way to keep actual business logic simple. *Kind of* analogous to Ring middleware.
 
-We use both of these to great effect. Since we built our system, even more goodies have become available, which we’ve not yet had a chance to take advantage of: [Windows and Triggers, which Michael describes far better than I can here](http://michaeldrogalis.github.io/jekyll/update/2015/11/12/Onyx-0.8.0-Automatic-State-Management.html). 
+We use both of these to great effect. Since we built our system, even more goodies have become available, which we’ve not yet had a chance to take advantage of: [Windows and Triggers, which Michael describes far better than I can here](http://michaeldrogalis.github.io/jekyll/update/2015/11/12/Onyx-0.8.0-Automatic-State-Management.html).
 
 In summary, they allow you to gather up segments into buckets (Windows) and do something of consequence with them (Triggers). One use we have for this in the future is to “debounce” events for a single user; that is, prevent processing events for that user more often than, say, every 5 seconds. This is a great way to reduce overall workload when processing at scale.
 
@@ -79,7 +80,7 @@ Typically, when integrating a new system, you’d decouple it from the rest of y
 
 This is thanks to a great feature of Datomic’s, which is that every connected peer is aware of changes to the database **in real time**. They have to be, thanks to the way query works - see the green ’Live Index’ pictured in [this Datomic architecture diagram](http://docs.datomic.com/architecture.html).
 
-Highstorm’s primary input task simply watches the Datomic transaction log, and puts each transaction log entry into the system to be processed as they become available. Then, whatever changes to be stored ultimately reach Highstorm’s output task as transaction data, ready to be transacted. 
+Highstorm’s primary input task simply watches the Datomic transaction log, and puts each transaction log entry into the system to be processed as they become available. Then, whatever changes to be stored ultimately reach Highstorm’s output task as transaction data, ready to be transacted.
 
 Onyx has a Datomic plugin which provides both the [input](https://github.com/onyx-platform/onyx-datomic#read-log) and [output](https://github.com/onyx-platform/onyx-datomic#commit-bulk-tx) tasks that Highstorm uses.
 
@@ -111,7 +112,7 @@ When our system has to send email, such as when providing a user with a reset-yo
             [ring.util.response :as response))
 
 (defn save-pending-message! [db-uri template params]
-  @(d/transact-async 
+  @(d/transact-async
     (d/connect db-uri)
     [{:db/id (d/tempid :db.part/user)
       :msg/uuid (d/squuid)
@@ -193,9 +194,9 @@ Once this segment reaches the output task, its transaction data is committed to 
 
 So, to summarise the workflow, all of the segments in Highstorm follow this process, regardless of what the tasks in the middle do.
 
-1. `tx-log-input` 
-2. ⟶ `prepare-tx` 
-3. ⟶ `[task(s) matching datom pattern]` 
+1. `tx-log-input`
+2. ⟶ `prepare-tx`
+3. ⟶ `[task(s) matching datom pattern]`
 4. ⟶ `commit-tx`
 
 This is quite awesome, I think!
@@ -214,7 +215,7 @@ Given how core this system is to our platform, I have plenty of other topics tha
 
 # A huge, _huge_ thank you
 
-I want to thank the two (yes, just two!) guys in the Onyx team – [Michael Drogalis](https://twitter.com/michaeldrogalis), who first conceived of Onyx, and [Lucas Bradstreet](https://twitter.com/ghaz), who joined the cause about a year later – for their incredible patience and support during our learning curve with Onyx. 
+I want to thank the two (yes, just two!) guys in the Onyx team – [Michael Drogalis](https://twitter.com/michaeldrogalis), who first conceived of Onyx, and [Lucas Bradstreet](https://twitter.com/ghaz), who joined the cause about a year later – for their incredible patience and support during our learning curve with Onyx.
 
 I know that although we were able to contribute by sharing bug reports, or feedback on this API or the utility of that feature, we at Cognician by far got the better deal. Thank you, guys. You’re both menschen!
 

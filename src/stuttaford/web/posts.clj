@@ -4,28 +4,24 @@
             [stuttaford.web.content :refer [parse-markdown-post]]))
 
 (defn list-posts []
-  (->> "resources/posts"
-       io/file
+  (->> (io/file "resources/posts")
        .listFiles
-       (map str)
-       (map #(string/replace % #"resources/" ""))
-       (map parse-markdown-post)
+       (map #(-> (str %)
+                 (string/replace #"resources/" "")
+                 parse-markdown-post))
        (sort-by :date (comp - compare))))
 
-(defn latest
-  ([]
-     (latest 1))
-  ([count]
-     (->> (list-posts)
-          (take count))))
+(defn latest [count]
+  (->> (list-posts)
+       (remove :archive)
+       (take count)))
 
-(defn recent
-  ([]
-     (recent 1))
-  ([count]
-     (recent count nil))
-  ([count date]
-     (cond->> (list-posts)
-              date  (drop-while #(not= date (:date %)))
-              date  next
-              count (take count))))
+(defn recent [count date]
+  (cond->> (list-posts)
+    date  (drop-while #(not= date (:date %)))
+    date  next
+    count (take count)))
+
+(defn archived []
+  (->> (list-posts)
+       (filter :archive)))

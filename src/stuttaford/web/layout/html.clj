@@ -57,7 +57,7 @@
     google_analytics('create', '" google-analytics-id "', '" domain "');
     google_analytics('send', 'pageview');"])
 
-(defn html-layout [{{:keys [layout]} :page
+(defn html-layout [{{:keys [layout footer]} :page
                     :as config}]
   (let [layout (keyword layout)]
     (page/html5
@@ -68,6 +68,7 @@
          (masthead config))
        (when-let [page-layout (layout templates)]
          (page-layout config))
-       (when-not (= :bare layout)
+       (when-not (or (= :bare layout)
+                     (= "false" footer))
          (foot config))
        (google-analytics config)]])))

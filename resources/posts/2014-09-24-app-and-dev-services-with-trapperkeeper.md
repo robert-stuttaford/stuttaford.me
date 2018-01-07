@@ -3,6 +3,7 @@ layout: post
 title: App and dev services with Trapperkeeper
 description: A simple technique for splitting runtime and development time services up so that they're independently resetable.
 tags: component, reloaded workflow
+archive: true
 ---
 
 At Cognician, we've started building our next generation of

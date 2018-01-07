@@ -5,9 +5,7 @@
             [ring.util.response :as response]
             [stuttaford.db :as db]
             [stuttaford.web.codex :as codex]
-            [stuttaford.web.content
-             :refer
-             [parse-markdown-page parse-markdown-post]]
+            [stuttaford.web.content :refer [parse-markdown-page parse-markdown-post]]
             [stuttaford.web.layout.atom :refer [atom-layout]]
             [stuttaford.web.layout.html :refer [html-layout]]))
 
@@ -36,32 +34,37 @@
 (defn render [layout-fn view & args]
   (-> (apply view args) page-config layout-fn))
 
-;;(def render-memoized (memoize render))
-(def render-memoized render)
-
 (defn markdown-page [name]
-  (render-memoized html-layout parse-markdown-page (str name ".md")))
+  (render html-layout parse-markdown-page (str name ".md")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
 
 (defroutes app
   (GET "/" []
-    (render-memoized html-layout (constantly {:title nil :content "" :layout "home"})))
+    (markdown-page "about"))
 
   (GET "/atom.xml" []
-    (-> (render-memoized atom-layout (constantly {}))
+    (-> (render atom-layout (constantly {}))
         response/response
         (response/content-type "text/xml")
         (response/charset "utf-8")))
 
-  (GET "/about/"           [] (markdown-page "about"))
-  (GET "/speaking/"        [] (markdown-page "speaking"))
-  (GET "/open-source/"     [] (markdown-page "open-source"))
+  (GET "/blog/" []
+    (render html-layout (constantly {:title   "Blog"
+                                     :content ""
+                                     :layout  "blog"})))
+
+  (GET "/blog/archived/" []
+    (render html-layout (constantly {:title     "Older Blog Posts"
+                                     :content   ""
+                                     :layout    "archived-blog"})))
+  (GET "/speaking/" [] (markdown-page "speaking"))
+  (GET "/open-source/" [] (markdown-page "open-source"))
 
   (GET "/:year/:month/:date/:slug/" [year month date slug]
-    (render-memoized html-layout parse-markdown-post
-                     (format "posts/%s-%s-%s-%s.md" year month date slug)))
+    (render html-layout parse-markdown-post
+            (format "posts/%s-%s-%s-%s.md" year month date slug)))
 
   (context "/codex" []
 
@@ -92,4 +95,4 @@
 
   (route/resources "")
 
-  (route/not-found #(render-memoized html-layout (partial error-404 %))))
+  (route/not-found #(render html-layout (partial error-404 %))))

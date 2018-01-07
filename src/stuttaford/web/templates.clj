@@ -35,13 +35,26 @@
           [:h3
            [:a {:href permalink} title " " [:small (format-date date)]]]])]])))
 
-(defn home-template [{:keys [latest-posts] :as config}]
+(defn blog-template [{:keys [latest-posts] :as config}]
   [:div.posts
    (for [post (posts/latest latest-posts)]
-     (post-template (update config :page merge post)))])
+     (post-template (update config :page merge post)))
+   [:div.related
+    [:a {:href "/blog/archived/"}
+     "Older posts"]]])
+
+(defn archived-blog-template [_]
+  [:div.posts
+   [:h2 "Archived Posts"]
+   [:ul.related-posts
+    (for [{:keys [permalink title date]} (posts/archived)]
+      [:li
+       [:h3
+        [:a {:href permalink} title " " [:small (format-date date)]]]])]])
 
 (def templates
-  {:home home-template
-   :page page-template
-   :bare bare-template
-   :post post-template})
+  {:blog          blog-template
+   :archived-blog archived-blog-template
+   :page          page-template
+   :bare          bare-template
+   :post          post-template})
