@@ -123,7 +123,7 @@
         params (if (-> params :description seq)
                  (update-in params [:description] string/trim)
                  (dissoc params :description))]
-    (db/create-link! db/uri params))
+    (db/create-link! db params))
   :ok)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

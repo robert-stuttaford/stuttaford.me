@@ -146,14 +146,14 @@
     image       (assoc :link/image image)
     (seq tags)  (assoc :link/tags (map :db/id tags))))
 
-(defn ensure-link-category-and-tags! [uri link]
+(defn ensure-link-category-and-tags! [db link]
   (-> link
-      (update :category (partial find-or-create-category! uri))
-      (update :tags (partial map (partial find-or-create-tag! uri)))))
+      (update :category (partial find-or-create-category! db))
+      (update :tags (partial map (partial find-or-create-tag! db)))))
 
-(defn create-link! [uri link]
+(defn create-link! [db link]
   (let [link-tx (->> link
-                     (ensure-link-category-and-tags! uri)
+                     (ensure-link-category-and-tags! db)
                      new-link-tx)
         {:keys [db-after]} @(d/transact (conn) [link-tx])]
     (d/entity db-after [:link/slug (:link/slug link-tx)])))
