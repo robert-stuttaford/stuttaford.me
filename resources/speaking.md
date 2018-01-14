@@ -3,10 +3,10 @@ layout: page
 title: Speaking
 ---
 
-If you'd like me to appear your podcast or at your conference, get in touch!
+If you'd like me to appear your podcast or at your conference, please get in touch!
 
 
-## Podcasts
+## Podcast appearances
 
 #### Defn.audio
 
@@ -17,10 +17,14 @@ If you'd like me to appear your podcast or at your conference, get in touch!
 - [Episode 27](https://zadevchat.io/27/) - on Clojure, *February 2016*
 - [Episode 48](https://zadevchat.io/48/) - on Datomic, *July 2016*
 
+#### Cognicast
+
+- [Episode 41](http://blog.cognitect.com/cognicast/041-robert-stuttaford), *October 2013*
+
 
 <hr>
 
-## Presentations
+## Conference presentations
 
 
 #### Lessons from four years with Datomic
