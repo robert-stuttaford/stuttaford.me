@@ -43,9 +43,9 @@ I take great interest in the social side of software, and would love to share my
 
 60 to 90 minute sessions.
 
-Evenings and weekends in UTC+2 (I live in South Africa).
+Evenings and weekends in UTC+2 (I live in South Africa). [Compare timezones](https://www.worldtimebuddy.com/?pl=1&lid=3369157,8,5128581,2643743&h=3369157).
 
-<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
+<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
 
 Questions? [Direct Message me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:robert.stuttaford+consulting@gmail.com).
 
@@ -75,7 +75,7 @@ Also, we've dealt with many of the issues facing modern digital businesses today
 - Since Feb 2010 in the business, since April 2012 with the Clojure stack (nearly 6 years).
 - Clojure's concision has been absolutely instrumental to our success, during times of scarce resource.
 - Leading a 10 person dev + ops team as CTO.
-- **Taught Clojure** to most of our tech team - including myself! (only a couple folks joined with prior production Clojure experience).
+- **Taught Clojure** to most of our tech team (only a couple folks joined with prior production Clojure experience).
 - Early and vocal adopter of **Datomic**.
 - Several [speaking appearances](/speaking/) and [open-source contributions](/open-source/).
 - Past organiser of Cape Town Clojure user group.
@@ -122,7 +122,7 @@ How I help you is up to YOU to decide. Here's a sampling of the sort of thing I 
 
 This is one of the core skills I have as CTO, and I use it continuously. I love conceptual frameworks and mental models, and in this instance, the [Spine Model](http://spinemodel.info/) is an absolute gem. Once I understand what you're working to accomplish, and what principles and practices surround that, I can work with you to evaluate the tradeoffs of the options available to you in the Clojure ecosystem.
 
-It is true that the best code is no code at all, because while a suitable system is an asset, the code in that system is a liability. The more of it you have, the greater your cognitive load, and the greater your surface area is for complexity and defects. And thefore, the greater your cost of development and maintenance. If you can produce a suitable system with 1000 lines of code, the cost of ownership is going to be substantially less than a system that uses 10,000 lines - no matter what technology you use.
+It is true that the best code is no code at all, because while a suitable system is an asset, the code in that system is a liability. The more of it you have, the greater your cognitive load, and the greater your surface area is for complexity and defects. And therefore, the greater your cost of development and maintenance. If you can produce a suitable system with 1000 lines of code, the cost of ownership is going to be substantially less than a system that uses 10,000 lines - no matter what technology you use.
 
 One of my favourite things to do as an engineer, is to delete code that no longer provides enough value. Over time, this has helped me to develop a finely-tuned intuition for deciding when to prevent code being written at all - and as a consequence, to know that when we will write code, to be sure that the value to doing so is really there.
 
@@ -161,11 +161,11 @@ One of my favourite sayings is: **the worst thing that can happen is that you le
 
 We'll use [Zoom](https://zoom.us), and I can record our sessions and share them with you. I am also happy to write summaries of our conversations, so that their value can be more easily shared in your team.
 
-I have 6 hours a week available, which can happen in 60-90 minute blocks in the weekday evenings (one session a day) or any time on the weekend (where we can do up to two sessions in a day). I’m in UTC+2, so this aligns nicely with the USA West Coast morning, and USA East Coast afternoon.
+I have 6 hours a week available, which can happen in 60-90 minute blocks in the weekday evenings (one session a day) or any time on the weekend (where we can do up to two sessions in a day). I’m in UTC+2, so this aligns nicely with the USA West Coast morning, and USA East Coast afternoon. See a [timezone comparison on WorldTimeBuddy](https://www.worldtimebuddy.com/?pl=1&lid=3369157,8,5128581,2643743&h=3369157) here.
 
 I bill at <u>USD 250/hour</u>. I also offer a <u>5 hour package for USD 1000</u> (20% discount).
 
-<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
+<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
 
 If you have any questions, you can [DM me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:robert.stuttaford+stuttaford.me@gmail.com). I'd love to chat!
 
