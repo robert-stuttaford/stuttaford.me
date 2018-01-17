@@ -43,7 +43,7 @@ What follows is a fairly comprehensive listing of the various pieces uses to bui
 
 ## Datomic - coding, architecture, and tech ops
 
-- Datomic's shape: `eavt` - [see my talk on this](https://youtu.be/4BhZshZyf9E>).
+- Datomic's shape: `eavt` - [see my talk on this](https://youtu.be/4BhZshZyf9E).
 - Modelling domain data.
 - Data as connector between services, thanks to "strong time".
 - Model novelty as in your world as data - assertions and retractions.
