@@ -7,7 +7,7 @@
  :recent-posts        3
  :latest-posts        1
  :author              {:name    "Robert Stuttaford"
-                       :email   "robert.stuttaford@gmail.com"
+                       :email   "robert@stuttaford.me"
                        :twitter "https://twitter.com/RobStuttaford"
                        :github  "https://github.com/robert-stuttaford"}
  :meta                {:title       "Robert Stuttaford"

@@ -47,7 +47,7 @@ Evenings and weekends in UTC+2 (I live in South Africa). [Compare timezones](htt
 
 <a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
 
-Questions? [Direct Message me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:robert.stuttaford+consulting@gmail.com).
+Questions? [Direct Message me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:consulting@stuttaford.me).
 
 </div>
 
@@ -167,7 +167,7 @@ I bill at <u>USD 250/hour</u>. I also offer a <u>5 hour package for USD 1000</u>
 
 <a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
 
-If you have any questions, you can [DM me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:robert.stuttaford+stuttaford.me@gmail.com). I'd love to chat!
+If you have any questions, you can [DM me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:consulting@stuttaford.me). I'd love to chat!
 
 If it turns out that I'm not a good fit for you, I'd be happy to try to connect you with others in the community that may work out better for you.
 
