@@ -80,3 +80,38 @@ input#search {
 .tldr h3 {
     border-bottom: 1px solid #ccc;
 }
+
+.consulting .subnav {
+    background: #fff;
+}
+
+.consulting .subnav.cloned {
+    border-bottom: 1px solid #ccc;
+}
+
+.consulting .subnav ul {
+    margin: 0;
+    padding: 5px;
+    list-style-type: none;
+    text-align: center;
+}
+
+.consulting .subnav ul li {
+    display: inline;
+}
+
+.consulting .subnav ul li a {
+    text-decoration: none;
+    padding: .2em 1em;
+}
+
+.consulting .subnav ul li a:hover {
+    text-decoration: underline;
+}
+
+a.anchor {
+    display: block;
+    position: relative;
+    top: -70px;
+    visibility: hidden;
+}
