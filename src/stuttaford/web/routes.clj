@@ -35,7 +35,7 @@
   (-> (apply view args) page-config layout-fn))
 
 (defn markdown-page [name]
-  (render html-layout parse-markdown-page (str name ".md")))
+  (render html-layout parse-markdown-page name))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
@@ -67,7 +67,7 @@
 
   (GET "/:year/:month/:date/:slug/" [year month date slug]
     (render html-layout parse-markdown-post
-            (format "posts/%s-%s-%s-%s.md" year month date slug)))
+            (format "posts/%s-%s-%s-%s" year month date slug)))
 
   (context "/codex" []
 

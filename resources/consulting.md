@@ -5,13 +5,25 @@ title: Consulting
 
 <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
 
-<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript"></script>
+<div class="subnav">
 
-[TOC html level=2]
+<!-- [TOC html level=2] -->
+
+<ul>
+<li><a href="#tl-dr">TL;DR</a></li>
+<li><a href="#my-value">My value</a></li>
+<li><a href="#why-i-consult">Why consult?</a></li>
+<li><a href="#why-work-with-me-">Why work with me?</a></li>
+<li><a href="#my-offer">My offer</a></li>
+</ul>
+
+</div>
 
 <br>
 
 <div class="tldr">
+
+<a class="anchor" name="tl-dr"></a>
 
 ## TL;DR
 
@@ -53,6 +65,8 @@ Questions? [Direct Message me on Twitter](https://twitter.com/RobStuttaford), or
 
 <hr>
 
+<a class="anchor" name="my-value"></a>
+
 ## Why I can add value
 
 I have 20 years’ software development experience. 5 of those with Clojure.
@@ -81,6 +95,8 @@ Also, we've dealt with many of the issues facing modern digital businesses today
 - Past organiser of Cape Town Clojure user group.
 
 <hr>
+
+<a class="anchor" name="why-i-consult"></a>
 
 ## Why consult?
 
@@ -111,6 +127,8 @@ As a consequence, I try learn from just about everything I do - consciously, on 
 The third of my big 'whys' is: **I'm in it for _my_ 'aha' moment!**
 
 <hr>
+
+<a class="anchor" name="why-work-with-me-"></a>
 
 ## Why work with me?
 
@@ -157,6 +175,8 @@ One of my favourite sayings is: **the worst thing that can happen is that you le
 
 <hr>
 
+<a class="anchor" name="my-offer"></a>
+
 ## What am I offering?
 
 We'll use [Zoom](https://zoom.us), and I can record our sessions and share them with you. I am also happy to write summaries of our conversations, so that their value can be more easily shared in your team.
@@ -180,3 +200,42 @@ To write your code for you. I admit, a lot can be done with Clojure in 6 hours a
 To do your Clojure homework for you :-)
 
 Also, so it’s clear: **I am not looking for a new gig.** I am very happy at [Cognician](https://www.cognician.com)!
+
+
+
+
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript"></script>
+
+<script
+  src="https://code.jquery.com/jquery-3.3.0.slim.min.js"
+  integrity="sha256-AMg3I7ya76OLPD9M+Mk7kqrA29HUn/FuGBfT/9Uf9ls="
+  crossorigin="anonymous"></script>
+
+<script>
+
+// Create a clone of the menu, right next to original.
+$('.subnav').addClass('original').clone().insertAfter('.subnav').addClass('cloned').css('position','fixed').css('top','0').css('margin-top','0').css('z-index','500').removeClass('original').hide();
+
+scrollIntervalID = setInterval(stickIt, 10);
+
+function stickIt() {
+
+  var orgElementTop = $('.original').offset().top;
+
+  if ($(window).scrollTop() >= orgElementTop) {
+    // scrolled past the original position; now only show the cloned, sticky element.
+
+    // Cloned element should always have same left position and width as original element.
+    orgElement = $('.original');
+    coordsOrgElement = orgElement.offset();
+    leftOrgElement = coordsOrgElement.left;
+    widthOrgElement = orgElement.css('width');
+    $('.cloned').css('left',leftOrgElement+'px').css('top',0).css('width',widthOrgElement).show();
+    $('.original').css('visibility','hidden');
+  } else {
+    // not scrolled past the menu; only show the original menu.
+    $('.cloned').hide();
+    $('.original').css('visibility','visible');
+  }
+}
+</script>

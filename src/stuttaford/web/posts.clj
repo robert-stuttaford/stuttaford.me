@@ -8,6 +8,7 @@
        .listFiles
        (map #(-> (str %)
                  (string/replace #"resources/" "")
+                 (string/replace #".md" "")
                  parse-markdown-post))
        (sort-by :date (comp - compare))))
 

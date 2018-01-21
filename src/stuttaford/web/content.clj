@@ -32,15 +32,16 @@
           (.getData (doto (AbstractYamlFrontMatterVisitor.)
                       (.visit doc))))))
 
-(defn parse-markdown-page [filename]
-  (when-let [file (some-> filename io/resource)]
+(defn parse-markdown-page [name]
+  (when-let [file (some-> name (str ".md") io/resource)]
     (when-let [raw (slurp file)]
-      (assoc (parse-markdown raw)
-             :last-modified (-> file io/file .lastModified)))))
+      (merge (parse-markdown raw)
+             {:page-name     name
+              :last-modified (-> file io/file .lastModified)}))))
 
-(defn parse-markdown-post [filename]
-  (when-let [page (parse-markdown-page filename)]
-    (let [[year month date slug] (-> filename
+(defn parse-markdown-post [name]
+  (when-let [page (parse-markdown-page name)]
+    (let [[year month date slug] (-> name
                                      (string/replace #"(posts/|\.md)" "")
                                      (string/split #"-" 4))]
       (merge page

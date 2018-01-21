@@ -18,7 +18,6 @@
    (page/include-css
     "https://fonts.googleapis.com/css?family=Volkhov"
     (str base-url "css/poole.css")
-    (str base-url "css/syntax.css")
     (str base-url "css/stuttaford.css"))
    (when-let [css (seq (:css page))]
      (->> css
@@ -57,12 +56,12 @@
     google_analytics('create', '" google-analytics-id "', '" domain "');
     google_analytics('send', 'pageview');"])
 
-(defn html-layout [{{:keys [layout footer]} :page
+(defn html-layout [{{:keys [layout footer page-name]} :page
                     :as config}]
   (let [layout (keyword layout)]
     (page/html5
      (header config)
-     [:body
+     [:body (when (some? page-name) {:class page-name})
       [:div.container.content
        (when-not (= :bare layout)
          (masthead config))
