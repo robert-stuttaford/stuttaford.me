@@ -3,7 +3,11 @@ layout: page
 title: The Clojure Way
 ---
 
-What follows is a fairly comprehensive listing of the various pieces uses to build full-stack Clojure applications.
+Skills and capabilites I have learned and applied while building [Cognician](https://www.cognician.com).
+
+It's not _the_ Clojure way, of course, but simply _a_ way... and it is mine :-)
+
+(This page is part of my [consulting](/consulting/) offering).
 
 ## Data
 
@@ -12,6 +16,7 @@ What follows is a fairly comprehensive listing of the various pieces uses to bui
 - Immutability.
 - Dynamism.
 - Structured code editing.
+- Functional programming.
 
 ## Libraries to use, and how to compose them
 
@@ -51,7 +56,7 @@ What follows is a fairly comprehensive listing of the various pieces uses to bui
 - Auditability.
 - Speculative databases.
 
-Much of this applies to Datascript as well.
+Much of this applies to Datascript as well!
 
 ## Spec
 
