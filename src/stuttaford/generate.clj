@@ -66,6 +66,7 @@
   (let [session (peridot/session (service/handler))]
     (generate-path session "/" "/index.html")
     (generate-path session "/the-clojure-way/" "/the-clojure-way/index.html")
+    (generate-path session "/testimonials/" "/testimonials/index.html")
     (generate-path session "/atom.xml" "/atom.xml")
     (doseq [path (map :path (:nav (routes/site-config)))]
       (generate-html-path session path))
