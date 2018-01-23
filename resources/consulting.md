@@ -173,6 +173,8 @@ In summary, I have a lot of experience in using the Clojure stack to solve real 
 
 One of my favourite sayings is: **the worst thing that can happen is that you learn something.**
 
+Some folks in the community think I have value to offer, and kindly said so publically - so here are some [testimonials](/testimonials/).
+
 <hr>
 
 <a class="anchor" name="my-offer"></a>

@@ -63,6 +63,7 @@
   (GET "/speaking/"        [] (markdown-page "speaking"))
   (GET "/open-source/"     [] (markdown-page "open-source"))
   (GET "/consulting/"      [] (markdown-page "consulting"))
+  (GET "/testimonials/"    [] (markdown-page "testimonials"))
   (GET "/the-clojure-way/" [] (markdown-page "the-clojure-way"))
 
   (GET "/:year/:month/:date/:slug/" [year month date slug]
