@@ -1,6 +1,6 @@
 (ns stuttaford.web.routes
   (:require [clojure.edn :as edn]
-            [compojure.core :refer [context defroutes GET POST]]
+            [compojure.core :refer [context defroutes GET POST routes]]
             [compojure.route :as route]
             [ring.util.response :as response]
             [stuttaford.db :as db]
@@ -40,63 +40,64 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes
 
-(defroutes app
-  (GET "/" []
-    (markdown-page "about"))
+(def app
+  (apply
+   routes
+   (concat
+    (for [page (:pages (site-config))]
+      (GET (str "/" page "/") [] (markdown-page page)))
 
-  (GET "/atom.xml" []
-    (-> (render atom-layout (constantly {}))
-        response/response
-        (response/content-type "text/xml")
-        (response/charset "utf-8")))
+    [(GET "/" []
+       (markdown-page "about"))
 
-  (GET "/blog/" []
-    (render html-layout (constantly {:title   "Blog"
-                                     :content ""
-                                     :layout  "blog"})))
+     (GET "/atom.xml" []
+       (-> (render atom-layout (constantly {}))
+           response/response
+           (response/content-type "text/xml")
+           (response/charset "utf-8")))
 
-  (GET "/blog/archived/" []
-    (render html-layout (constantly {:title     "Older Blog Posts"
-                                     :content   ""
-                                     :layout    "archived-blog"})))
+     (GET "/blog/" []
+       (render html-layout (constantly {:title   "Blog"
+                                        :content ""
+                                        :layout  "blog"})))
 
-  (GET "/speaking/"        [] (markdown-page "speaking"))
-  (GET "/open-source/"     [] (markdown-page "open-source"))
-  (GET "/consulting/"      [] (markdown-page "consulting"))
-  (GET "/testimonials/"    [] (markdown-page "testimonials"))
-  (GET "/the-clojure-way/" [] (markdown-page "the-clojure-way"))
+     (GET "/blog/archived/" []
+       (render html-layout (constantly {:title   "Older Blog Posts"
+                                        :content ""
+                                        :layout  "archived-blog"})))
 
-  (GET "/:year/:month/:date/:slug/" [year month date slug]
-    (render html-layout parse-markdown-post
-            (format "posts/%s-%s-%s-%s" year month date slug)))
+     (GET "/:year/:month/:date/:slug/" [year month date slug]
+       (render html-layout parse-markdown-post
+               (format "posts/%s-%s-%s-%s" year month date slug)))
 
-  (context "/codex" []
+     (context "/codex" []
 
-    (GET "/" {query-params :query-params}
-      (render html-layout codex/codex
-              {:db     (db/db)
-               :admin? (some-> query-params (get "admin") boolean)
-               :debug? (some-> query-params (get "debug") boolean)
-               :dev?   (not PROD-MODE?)}))
+       (GET "/" {query-params :query-params}
+         (render html-layout codex/codex
+                 {:db     (db/db)
+                  :admin? (some-> query-params (get "admin") boolean)
+                  :debug? (some-> query-params (get "debug") boolean)
+                  :dev?   (not PROD-MODE?)}))
 
-    (GET "/new" []
-      (render html-layout codex/new-form (db/db)))
+       (GET "/new" []
+         (render html-layout codex/new-form (db/db)))
 
-    (POST "/new" {params :params}
-      (codex/save-link! (db/db) params)
-      (response/redirect "/codex/new"))
+       (POST "/new" {params :params}
+         (codex/save-link! (db/db) params)
+         (response/redirect "/codex/new"))
 
-    (GET "/edit/:slug" [slug]
-      (render html-layout codex/edit-form (db/db) slug))
+       (GET "/edit/:slug" [slug]
+         (render html-layout codex/edit-form (db/db) slug))
 
-    (GET "/delete/:slug" [slug]
-      (codex/delete-link! (db/db) slug)
-      (response/redirect "/codex"))
+       (GET "/delete/:slug" [slug]
+         (codex/delete-link! (db/db) slug)
+         (response/redirect "/codex"))
 
-    (POST "/edit/:slug" {params :params}
-      (codex/update-link! (db/db) params)
-      (response/redirect "/codex")))
+       (POST "/edit/:slug" {params :params}
+         (codex/update-link! (db/db) params)
+         (response/redirect "/codex")))
 
-  (route/resources "")
+     (route/resources "")
 
-  (route/not-found #(render html-layout (partial error-404 %))))
+     (route/not-found #(render html-layout (partial error-404 %)))]))
+  )

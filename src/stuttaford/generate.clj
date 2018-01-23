@@ -65,12 +65,11 @@
   (copy-public-to-site)
   (let [session (peridot/session (service/handler))]
     (generate-path session "/" "/index.html")
-    (generate-path session "/the-clojure-way/" "/the-clojure-way/index.html")
-    (generate-path session "/testimonials/" "/testimonials/index.html")
     (generate-path session "/atom.xml" "/atom.xml")
-    (doseq [path (map :path (:nav (routes/site-config)))]
-      (generate-html-path session path))
-    (generate-path session "/blog/archived/" "/blog/archived/index.html")
+    (doseq [page (:page (routes/site-config))]
+      (generate-html-path session (str "/" page "/")))
+    (generate-path session "/blog/archived/"
+                   "/blog/archived/index.html")
     (doseq [permalink (map :permalink (posts/list-posts))]
       (generate-html-path session permalink)))
   (log/info "Done."))
