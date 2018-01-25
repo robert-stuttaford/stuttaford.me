@@ -44,7 +44,7 @@
   (apply
    routes
    (concat
-    (for [page (:pages (site-config))]
+    (for [page (:markdown-pages (site-config))]
       (GET (str "/" page "/") [] (markdown-page page)))
 
     [(GET "/" []

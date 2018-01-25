@@ -9,7 +9,7 @@ I'm Robert Stuttaford, a Clojure enthusiast living in Cape Town, South Africa.
 
 I head up the tech team as CTO at [Cognician](https://www.cognician.com), which provides digital coaching solutions to global management consultancies and their clients to improve productivity at scale.
 
-<u>I'd love to chat!</u> [Direct Message me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:robert@stuttaford.me).
+<u>I'd love to chat!</u> [Direct Message me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:robert@stuttaford.me). If it's your thing, we can also connect via my [LinkedIn](https://www.linkedin.com/in/robertstuttaford/) profile.
 
 <div style="clear:both"></div>
 

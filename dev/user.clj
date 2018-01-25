@@ -15,9 +15,4 @@
   (stop-web-server!)
   (refresh :after 'user/start!))
 
-(defn generate []
-  (alter-var-root #'routes/PROD-MODE? (constantly true))
-  (generate/build)
-  (alter-var-root #'routes/PROD-MODE? (constantly false)))
-
-#_ (generate)
+#_ (generate/build)

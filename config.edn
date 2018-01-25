@@ -14,10 +14,8 @@
  :meta
  {:title       "Robert Stuttaford"
   :description "Clojure Enthusiast"}
- :pages
- ["blog"
-  "codex"
-  "consulting"
+ :markdown-pages
+ ["consulting"
   "open-source"
   "speaking"
   "testimonials"

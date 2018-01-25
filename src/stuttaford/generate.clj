@@ -66,7 +66,9 @@
   (let [session (peridot/session (service/handler))]
     (generate-path session "/" "/index.html")
     (generate-path session "/atom.xml" "/atom.xml")
-    (doseq [page (:page (routes/site-config))]
+    (generate-html-path session "/blog/")
+    (generate-html-path session "/codex/")
+    (doseq [page (:markdown-pages (routes/site-config))]
       (generate-html-path session (str "/" page "/")))
     (generate-path session "/blog/archived/"
                    "/blog/archived/index.html")
