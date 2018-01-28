@@ -57,6 +57,7 @@
   (generate-path session path (str path "index.html")))
 
 (defn build []
+  (alter-var-root #'routes/PROD-MODE? (constantly true))
   (log/info "=======================================")
   (log/info "Building site")
   (clean)
@@ -74,6 +75,7 @@
                    "/blog/archived/index.html")
     (doseq [permalink (map :permalink (posts/list-posts))]
       (generate-html-path session permalink)))
+  (alter-var-root #'routes/PROD-MODE? (constantly false))
   (log/info "Done."))
 
 (defn -main [& args]

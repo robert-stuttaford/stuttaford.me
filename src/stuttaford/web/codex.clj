@@ -2,7 +2,7 @@
   (:require [stuttaford.db :as db]
             [stuttaford.web.client :as client]))
 
-(defn codex [{:keys [db admin? debug? dev?]}]
+(defn codex [{:keys [db dev?]}]
   {:title  "Clojure Codex"
    :layout "page"
    :content
@@ -15,11 +15,9 @@
        :data-related "RobStuttaford" :data-dnt "true"}]
      [:script "!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');"]]
     (client/client-app "codex" debug? dev?
-                       (cond-> {:db (db/datascript-db db
-                                                      #{:link/tags
-                                                        :link/title
-                                                        :link/uri
-                                                        :tag/name})
-                                :admin? admin?}
-                         admin? (assoc :admin? admin?))))})
+                       {:db (db/datascript-db db
+                                              #{:link/tags
+                                                :link/title
+                                                :link/uri
+                                                :tag/name})}))})
 

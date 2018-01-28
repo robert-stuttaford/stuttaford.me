@@ -76,10 +76,8 @@
 
        (GET "/" {query-params :query-params}
          (render html-layout codex/codex
-                 {:db     (db/db)
-                  :admin? (some-> query-params (get "admin") boolean)
-                  :debug? (some-> query-params (get "debug") boolean)
-                  :dev?   (not PROD-MODE?)})))
+                 {:db   (db/db)
+                  :dev? (not PROD-MODE?)})))
 
      (route/resources "")
 
