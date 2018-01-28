@@ -1,11 +1,13 @@
 (ns stuttaford.web.routes
   (:require [clojure.edn :as edn]
-            [compojure.core :refer [context defroutes GET POST routes]]
+            [compojure.core :refer [context GET routes]]
             [compojure.route :as route]
             [ring.util.response :as response]
             [stuttaford.db :as db]
             [stuttaford.web.codex :as codex]
-            [stuttaford.web.content :refer [parse-markdown-page parse-markdown-post]]
+            [stuttaford.web.content
+             :refer
+             [parse-markdown-page parse-markdown-post]]
             [stuttaford.web.layout.atom :refer [atom-layout]]
             [stuttaford.web.layout.html :refer [html-layout]]))
 
@@ -77,25 +79,7 @@
                  {:db     (db/db)
                   :admin? (some-> query-params (get "admin") boolean)
                   :debug? (some-> query-params (get "debug") boolean)
-                  :dev?   (not PROD-MODE?)}))
-
-       (GET "/new" []
-         (render html-layout codex/new-form (db/db)))
-
-       (POST "/new" {params :params}
-         (codex/save-link! (db/db) params)
-         (response/redirect "/codex/new"))
-
-       (GET "/edit/:slug" [slug]
-         (render html-layout codex/edit-form (db/db) slug))
-
-       (GET "/delete/:slug" [slug]
-         (codex/delete-link! (db/db) slug)
-         (response/redirect "/codex"))
-
-       (POST "/edit/:slug" {params :params}
-         (codex/update-link! (db/db) params)
-         (response/redirect "/codex")))
+                  :dev?   (not PROD-MODE?)})))
 
      (route/resources "")
 

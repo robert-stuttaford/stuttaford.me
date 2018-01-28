@@ -4,17 +4,17 @@
                  :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[ch.qos.logback/logback-classic "1.2.3"]
                  [clj-time "0.14.2"]
-                 [com.datomic/datomic-free "0.9.5656"
-                  :exclusions [org.slf4j/slf4j-nop
-                               org.slf4j/slf4j-log4j12
-                               com.google.guava/guava]]
+                 [com.datomic/client-pro "0.8.14"]
                  [com.google.guava/guava "20.0"]
                  [compojure "1.6.0"]
-                 [enlive "1.1.6"]
+                 [enlive "1.1.6" :exclusions [org.jsoup/jsoup]]
                  [hiccup "1.0.5"]
-                 [com.vladsch.flexmark/flexmark-all "0.28.32"]
+                 [com.vladsch.flexmark/flexmark-all "0.28.34"]
                  [me.raynes/fs "1.4.6"]
                  [org.clojure/clojure "1.9.0"]
+                 [org.eclipse.jetty/jetty-server "9.3.7.v20160115"]
+                 [org.eclipse.jetty/jetty-http "9.3.7.v20160115"]
+                 [org.eclipse.jetty/jetty-io "9.3.7.v20160115"]
                  [org.clojure/tools.logging "0.4.0"]
                  [peridot "0.5.0"]
                  [ring/ring-core "1.6.3"]
@@ -31,7 +31,7 @@
                    [com.cemerick/url "0.1.1"]
                    [datascript "0.16.3"]
                    [org.clojure/clojurescript "1.9.946"]
-                   [org.clojure/core.async "0.3.465"]
+                   [org.clojure/core.async "0.4.474"]
                    [org.clojure/tools.namespace "0.2.10"]
                    [rum "0.10.8"]]
 

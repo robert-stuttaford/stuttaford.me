@@ -29,20 +29,11 @@
     [(search ?link ?pattern)
      [?tag :tag/name ?value]
      [(re-find ?pattern ?value)]
-     [?link :link/tags ?tag]]
-
-    [(search ?link ?pattern)
-     [?category :category/name ?value]
-     [(re-find ?pattern ?value)]
-     [?link :link/category ?category]]])
+     [?link :link/tags ?tag]]])
 
 (def link-pull
-  [:link/description
-   :link/image
-   :link/slug
-   :link/title
+  [:link/title
    :link/uri
-   {:link/category [:category/name]}
    {:link/tags [:tag/name]}])
 
 (defn search-links [db query]
@@ -55,13 +46,8 @@
   (d/q '[:find [?link ...] :in $ :where [?link :link/uri]] db))
 
 (rum/defc codex < rum/reactive [state]
-  (let [{:keys [db query admin?]} (rum/react state)]
+  (let [{:keys [db query]} (rum/react state)]
     [:div
-
-     (when admin?
-       [:a {:href  "/codex/new"
-            :style {:color     "#444"
-                    :font-size "0.8em"}} "[Add link]"])
 
      [:input#search
       {:type        "text"
@@ -70,29 +56,19 @@
        :value       (or query "")
        :on-change   #(put! type-ahead-chan (.. % -currentTarget -value))}]
 
-     (for [[category links] (->> (if query
-                                   (search-links db query)
-                                   (all-links db))
-                                 (map (partial d/pull db link-pull))
-                                 (group-by (comp :category/name :link/category))
-                                 (sort-by first))]
-       [:div
-        [:h3 category]
-        [:ul
-         (for [{:link/keys [uri title tags slug]} (sort-by :link/title links)]
-           [:li.link
-            [:a {:href uri} title]
-            (when admin?
-              (list
-               [:a {:href  (str "/codex/edit/" slug)
-                    :style {:color     "#444"
-                            :font-size "0.8em"}} "[edit]"]
-               [:a {:href  (str "/codex/delete/" slug)
-                    :style {:color     "#444"
-                            :font-size "0.8em"}} "[delete]"]))
-            (for [{:keys [tag/name]} (sort-by :tag/name tags)]
-              [:a.tag
-               (cond-> {:on-click #(put! common/action-chan [::search name])}
-                 (and query (re-find (regex-for-query query) name))
-                 (assoc :class "active"))
-               name])])]])]))
+     [:hr]
+
+     [:ul
+      (for [{:link/keys [uri title tags]} (->> (if query
+                                                 (search-links db query)
+                                                 (all-links db))
+                                               (map (partial d/pull db link-pull))
+                                               (sort-by :link/title))]
+        [:li.link
+         [:a {:href uri} title]
+         (for [{:keys [tag/name]} (sort-by :tag/name tags)]
+           [:a.tag
+            (cond-> {:on-click #(put! common/action-chan [::search name])}
+              (and query (re-find (regex-for-query query) name))
+              (assoc :class "active"))
+            name])])]]))
