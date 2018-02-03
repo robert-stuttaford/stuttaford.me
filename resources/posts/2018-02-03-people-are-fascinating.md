@@ -15,9 +15,9 @@ So, given this fascination, I have encountered a handful of helpful conceptual f
 
 Before we dive in, here are some ways you can take advantage of them:
 
-- At minimum, these are all applicable to the grand project of getting to know yourself, but you can also use them to figure out what may be making a colleague, superior, or direct report tick. 
+- At minimum, these are all applicable to the grand project of getting to know yourself, but you can also use them to figure out what may be making a colleague, superior, or direct report tick.
 
-- They’re great tools to use during 1:1 conversations, whether you’re the coach or the person receiving the coaching. 
+- They’re great tools to use during 1:1 conversations, whether you’re the coach or the person receiving the coaching.
 
 - They’re helpful for team retrospectives, where you unpack the way in which things unfolded, rather than the results themselves.
 
@@ -30,13 +30,13 @@ Onwards!
 
 ## Introvert / extrovert spectrum
 
-I’m a 10/10 introvert. 
+I’m a 10/10 introvert.
 
-That’s according to [Susan Cain’s Quiet Introvert/Extrovert test](https://www.quietrev.com/the-introvert-test/). It wasn’t surprising that I’m on this side of this continuum, but what I was surprised by the degree to which I actually am so.
+That’s according to [Susan Cain’s Quiet Introvert/Extrovert test](https://www.quietrev.com/the-introvert-test/). It wasn’t surprising that I’m on this side of this continuum, but the degree to which I am actually so surprised me.
 
 When I shared this news with a colleague, he was surprised - because he had only ever encountered my “pseudo-extrovert” persona, that I put on like a suit of clothing whenever it was time to be social.
 
-Given my audience, it’s quite likely that you’re more introvert than extrovert too, and that you have an extrovert persona which you wear when needed. It’s also possible that you weren’t aware about either of these things until now.
+Given my audience, it’s quite likely that you’re more introvert than extrovert too, and that you have an extrovert persona which you wear when needed.
 
 Very often, the root cause of a ‘disturbance in the force’ with someone on your team can simply be that all their energy is being used in an excessively social setting. E.g. An open-plan office with no quiet-time rules, or scheduled focus time, can lead otherwise stable people to a frustrated madness.
 
@@ -53,19 +53,19 @@ This one’s golden. I’ve had so many productive coaching conversations thanks
 
 Dan Pink wrote a book called Drive, in which he unpacks what we currently understand about motivating human beings.
 
-Here's a great 10 min video overview: 
+Here's a great 10 min video overview:
 
 [Drive: The surprising truth about what motivates us](https://www.youtube.com/watch?v=u6XAPnuFjJc).
 
-The heart of the matter is that there are basically two kinds of motivation - extrinsic (namely, **Carrot** and **Stick**), and intrinsic (**Mastery**, **Autonomy**, and **Purpose**). 
+The heart of the matter is that there are basically two kinds of motivation - extrinsic (namely, **Carrot** and **Stick**), and intrinsic (**Mastery**, **Autonomy**, and **Purpose**).
 
 Although it’s vital that you get those first two right, the idea is that you can only ‘get’ so much using them. If you want truly phenomenal performance (for yourself, or for someone in your team), you need to focus on the last three.
 
 This model is so useful, because each person is motivated by different things, to differing extents, and this framework makes no assumptions about what any person should have in either. I’ve used these 5 motoivators with great success in helping someone break out of a slump, resolve anxiety, or find growth areas to focus on.
 
-If you use this model, be aware that each person has a different mix, and that this mix changes as people grow. 
+If you use this model, be aware that each person has a different mix, and that this mix changes as people grow.
 
-For instance, junior engineers typically have a major Mastery theme, but a modest Autonomy theme. As they grow into self-managing engineers, their Autonomy gradually rises to the level of their Mastery. 
+For instance, junior engineers typically have a major Mastery theme, but a modest Autonomy theme. As they grow into self-managing engineers, their Autonomy gradually rises to the level of their Mastery.
 
 Some more experienced hands may have a more modest Mastery theme, and are more concerned with applying their talents according to a very clear Purpose, and with a high degree of Autonomy.
 
@@ -81,7 +81,7 @@ Personally, I both need and have a high degree of Mastery, Autonomy, and Purpose
 
 This is the one that underpins it all, for me. One of the intrinsic motivators above is Mastery - which I summarise as “learning and the application of that learning” - and it is a major theme of my personality.
 
-Carol Dweck wrote a small book with a huge idea in it about [Mindsets](https://www.brainpickings.org/2014/01/29/carol-dweck-mindset/), which has unlocked an endless supply of Mastery for me: the Growth Mindset. 
+Carol Dweck wrote a small book with a huge idea in it about [Mindsets](https://www.brainpickings.org/2014/01/29/carol-dweck-mindset/), which has unlocked an endless supply of Mastery for me: the Growth Mindset.
 
 Fundamentally, it’s the idea that the story is never finished. Change is always possible. Improvement is always possible. The Japanese embody it with "Kaizen". Having told so many people about this already, I’ve come to summarise it with the pithy phrase “**curiosity over identity**,” which describes the way I use it in daily life.
 
@@ -96,17 +96,17 @@ Over, and over, whenever someone is unhappy, or causing unhappiness for the peop
 If you’re having a tough time agreeing on something, or feel a dissatisfaction with the state of your environment or your team, look inward. Find your fixed mindsets about those things. See if you actually want those opinions - sometimes, they were put there long before you were able to choose them for yourself.
 
 - *Where are your fixed mindsets?*
-- *What could you begin improving in your life today if you decided to get curious about it, instead of re-tell yourself the same tired story about it?*
+- *What could you begin improving in your life today if you decided to get curious about it, instead of re-telling yourself the same tired story about it?*
 
 <hr>
 
-## All models are wrong
+## All models are 'wrong'
 
-What’s crucial to note about all of these frameworks is that there’s no ‘right’ or ‘wrong’ - there is only appropriate/inappropriate, suitable/unsuitable, skilful/unskillful (thanks, Buddhism!). If it’s not helping (and you’re pretty sure you’ve not misapplied it), find another way.
+What’s crucial to note about all of these frameworks is that there’s no ‘right’ or ‘wrong’ - there is only appropriate/inappropriate, suitable/unsuitable, skilful/unskilful (thanks, Buddhism!). If it’s not helping (and you’re pretty sure you’ve not misapplied it), find another way.
 
-The truth is, like all models, they’re ‘wrong’. They’re not truly describing you or the people around you, or their behaviours or attitudes. I don’t think we can ever truly do that. But, they are useful. And using them turns getting to know yourself, and the people to know you, into a fascinating experience.
+The truth is, like all models, they are approximations. They’re not truly describing you or the people around you, or their behaviours or attitudes. I don’t think we can ever truly do that. But, they are useful. And using them turns getting to know yourself, and the people to know you, into a fascinating experience.
 
-If you’re aware that something isn’t working in your team, or in your role - I encourage you to assess your preferences within each of these frameworks, and find where the mismatches are with the environment you’re in.
+If you’re aware that something isn’t working in your team, or in your role, I encourage you to assess your preferences within each of these frameworks, and find where the mismatches are with the environment you’re in.
 
 Then, use those differences to start a new conversation about how things can change, and to pick a tangible next action or two.
 
@@ -118,9 +118,9 @@ After all, we’re all creative problem-solvers - often, all we need is the righ
 
 ## Conclusion
 
-A fixed mindset I know that I have is an *intense* dislike of advertising. 
+A fixed mindset I know that I have is an *intense* dislike of advertising.
 
-However, I’ve recently decided to share all my learning with the community as a consultant, and so, I’m having to advertise myself. This is proving to be quite a challenge! 
+However, I’ve recently decided to share all my learning with the community as a consultant, and so, I’m having to advertise myself. This is proving to be quite a challenge!
 
 I’m accepting that I have to make folks aware of what I’m offering. So, the fun is in finding a way to do this that doesn’t trigger my own highly developed advertising filter!
 
@@ -132,6 +132,6 @@ Phew. I think I did OK. Growth mindset, right?
 
 If nothing else, I hope that I have inspired you to re-examine your relationships - with yourself, and with the fine folks you’ve chosen to spend a great deal of your precious, irreplaceable time with - and find ways to deepen those bonds, and enjoy your time together more fully.
 
-If I have inspired you, (or if I haven’t), I would love to know about it. 
+If I have inspired you, (or if I haven’t), I would love to know about it.
 
 [Please tell me](/)!
