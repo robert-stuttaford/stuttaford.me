@@ -14,7 +14,7 @@
       {:href         "https://twitter.com/intent/tweet?button_hashtag=codex&text=%40RobStuttaford%20Link%3A%20your-link-here"
        :data-related "RobStuttaford" :data-dnt "true"}]
      [:script "!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');"]]
-    (client/client-app "codex" debug? dev?
+    (client/client-app "codex" dev?
                        {:db (db/datascript-db db
                                               #{:link/tags
                                                 :link/title

@@ -17,11 +17,13 @@
        (remove :archive)
        (take count)))
 
-(defn recent [count date]
+(defn recent [count date archived?]
   (cond->> (list-posts)
-    date  (drop-while #(not= date (:date %)))
-    date  next
-    count (take count)))
+    date            (drop-while #(not= date (:date %)))
+    archived?       (filter :archive)
+    (not archived?) (remove :archive)
+    date            next
+    count           (take count)))
 
 (defn archived []
   (->> (list-posts)

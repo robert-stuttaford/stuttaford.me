@@ -13,7 +13,6 @@
 (def format-date (partial time-format/unparse (time-format/formatter "dd MMM yyyy")))
 
 (defn post-template [{{:keys [title content date permalink]} :page
-                      {:keys [twitter]} :author
                       :keys [recent-posts]}]
   (list
    [:div.post
@@ -22,11 +21,8 @@
        [:a {:href permalink} title]
        title)]
     [:span.post-date (format-date date)]
-    content
-    [:p.post-suffix
-     "I hope you found this post useful. I don't have comments on here yet, "
-     "but please feel free to reach out on " [:a {:href twitter} "Twitter"] "!"]]
-   (when-let [related (seq (posts/recent recent-posts date))]
+    content]
+   (when-let [related (seq (posts/recent recent-posts date false))]
      [:div.related
       [:h2 "Related Posts"]
       [:ul.related-posts
