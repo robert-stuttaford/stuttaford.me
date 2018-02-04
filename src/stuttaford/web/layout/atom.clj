@@ -1,7 +1,7 @@
 (ns stuttaford.web.layout.atom
-  (:require [clj-time.format :as time-format]
-            [clj-time.coerce :as time-coerce]
-            [hiccup.core :refer [html]]
+  (:require [clj-time.coerce :as time-coerce]
+            [clj-time.format :as time-format]
+            [hiccup.core :as hiccup]
             [hiccup.page :as page]
             [hiccup.util :as util]
             [stuttaford.web.posts :as posts]))
@@ -11,7 +11,7 @@
   (if-not (map? options)
     `(xml {} ~options ~@contents)
     `(let [options# ~options]
-       (html {:mode :xml}
+       (hiccup/html {:mode :xml}
          (page/xml-declaration (options# :encoding "UTF-8"))
          ~@contents))))
 

@@ -1,7 +1,7 @@
 (ns stuttaford.web.posts
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
-            [stuttaford.web.content :refer [parse-markdown-post]]))
+            [stuttaford.markdown :as markdown]))
 
 (defn list-posts []
   (->> (io/file "resources/posts")
@@ -9,7 +9,7 @@
        (map #(-> (str %)
                  (string/replace #"resources/" "")
                  (string/replace #".md" "")
-                 parse-markdown-post))
+                 markdown/parse-markdown-post))
        (sort-by :date (comp - compare))))
 
 (defn latest [count]

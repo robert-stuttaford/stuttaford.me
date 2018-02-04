@@ -5,7 +5,6 @@
             [me.raynes.fs :as fs]
             [peridot.core :as peridot]
             [stuttaford.web.posts :as posts]
-            [stuttaford.web.service :as service]
             [stuttaford.web.routes :as routes]))
 
 (def SITE "site")
@@ -20,7 +19,6 @@
 (defn clean-non-prod-js []
   (log/info " * Cleaning non-production js")
   (fs/delete-dir "resources/public/js/out")
-  (fs/delete "resources/public/js/stuttaford.debug.js")
   (fs/delete "resources/public/js/stuttaford.js")
   (fs/delete "resources/public/js/manifest.json"))
 
@@ -64,7 +62,7 @@
   (ensure-site)
   (clean-non-prod-js)
   (copy-public-to-site)
-  (let [session (peridot/session (service/handler))]
+  (let [session (peridot/session routes/app)]
     (generate-path session "/" "/index.html")
     (generate-path session "/atom.xml" "/atom.xml")
     (generate-html-path session "/blog/")
@@ -78,6 +76,4 @@
   (alter-var-root #'routes/PROD-MODE? (constantly false))
   (log/info "Done."))
 
-(defn -main [& args]
-  (build)
-  (System/exit 0))
+#_ (build)

@@ -64,11 +64,12 @@
                                                  (all-links db))
                                                (map (partial d/pull db link-pull))
                                                (sort-by :link/title))]
-        [:li.link
+        [:li.link {:key uri}
          [:a {:href uri} title]
          (for [{:keys [tag/name]} (sort-by :tag/name tags)]
            [:a.tag
-            (cond-> {:on-click #(put! common/action-chan [::search name])}
+            (cond-> {:key      (str uri name)
+                     :on-click #(put! common/action-chan [::search name])}
               (and query (re-find (regex-for-query query) name))
               (assoc :class "active"))
             name])])]]))

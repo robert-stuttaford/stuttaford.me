@@ -1,6 +1,6 @@
 ---
 layout: page
-footer: false
+title: Testimonials
 ---
 
 ### Patrick Kayton, Cognician founder

@@ -1,8 +1,6 @@
 (ns stuttaford.db
   (:require [clojure.edn :as edn]
-            [datomic.client.api :as d]
-            [net.cgrand.enlive-html :as html])
-  (:import java.net.URL))
+            [datomic.client.api :as d]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Database

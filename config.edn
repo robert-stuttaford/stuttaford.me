@@ -12,8 +12,8 @@
   :twitter "https://twitter.com/RobStuttaford"
   :github  "https://github.com/robert-stuttaford"}
  :meta
- {:title       "Robert Stuttaford"
-  :description "Clojure Enthusiast"}
+ {:site-title       "Robert Stuttaford"
+  :site-description "Clojure Enthusiast"}
  :markdown-pages
  ["consulting"
   "open-source"
