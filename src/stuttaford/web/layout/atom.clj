@@ -29,14 +29,14 @@
      [:id post-url]
      [:content {:type "html"} (-> content util/escape-html)]]))
 
-(defn atom-layout [{{:keys [title]}      :meta
+(defn atom-layout [{{:keys [site-title]}      :meta
                     {:keys [name email]} :author
                     :keys [base-url url]
                     :as   config}]
   (let [all-posts (posts/list-posts)]
     (xml
      [:feed {:xmlns "http://www.w3.org/2005/Atom"}
-      [:title title]
+      [:title site-title]
       [:link {:href (str url base-url "atom.xml") :rel "self"}]
       [:link {:href (str url base-url)}]
       [:updated (-> all-posts first :last-modified atom-timestamp-format)]

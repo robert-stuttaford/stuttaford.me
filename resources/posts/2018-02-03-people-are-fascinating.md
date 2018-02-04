@@ -104,7 +104,7 @@ If you’re having a tough time agreeing on something, or feel a dissatisfaction
 
 What’s crucial to note about all of these frameworks is that there’s no ‘right’ or ‘wrong’ - there is only appropriate/inappropriate, suitable/unsuitable, skilful/unskilful (thanks, Buddhism!). If it’s not helping (and you’re pretty sure you’ve not misapplied it), find another way.
 
-The truth is, like all models, they are approximations. They’re not truly describing you or the people around you, or their behaviours or attitudes. I don’t think we can ever truly do that. But, they are useful. And using them turns getting to know yourself, and the people to know you, into a fascinating experience.
+The truth is, like all models, they are approximations. They’re not truly describing you or the people around you, or their behaviours or attitudes. I don’t think we can ever truly do that. But, they are useful. And using them turns getting to know yourself, and the people around you, into a fascinating experience.
 
 If you’re aware that something isn’t working in your team, or in your role, I encourage you to assess your preferences within each of these frameworks, and find where the mismatches are with the environment you’re in.
 
