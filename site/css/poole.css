@@ -98,9 +98,14 @@ h3 {
   margin-top: 1.5rem;
   font-size: 1.25rem;
 }
-h4, h5, h6 {
+h4 {
   margin-top: 1rem;
   font-size: 1rem;
+}
+h5, h6 {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-style: italic;
 }
 
 /* Body text */
@@ -118,6 +123,10 @@ strong {
 ul, ol, dl {
   margin-top: 0;
   margin-bottom: 1rem;
+}
+
+ul ul {
+  margin-bottom: 0;
 }
 
 dt {
