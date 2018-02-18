@@ -243,6 +243,8 @@ Taking inspiration from my colleague [tonsky](https://twitter.com/nikitonsky), w
 
 No matter what else, I'll be sharing the code and writing developer diaries along the way, just as I have done today.
 
+<hr>
+
 ## In closing
 
 I have no idea where I'll end up with this project. I recognise that many projects that start this way, never get finished, which I guess is a risk I'll just have to take.
