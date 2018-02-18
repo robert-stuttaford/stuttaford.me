@@ -100,7 +100,8 @@
       [:meta {:name "description" :content description}])
     (page/include-css "https://fonts.googleapis.com/css?family=Volkhov"
                       (str base-url "css/poole.css")
-                      (str base-url "css/stuttaford.css"))
+                      (str base-url "css/stuttaford.css")
+                      "//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css")
     [:link {:href (str base-url "apple-touch-icon-precomposed.png") :sizes "152x152"
             :rel  "apple-touch-icon-precomposed"}]
     [:link {:href (str base-url "favicon.ico") :rel "shortcut icon"}]
@@ -116,6 +117,30 @@
              [:small [:a {:href path} title]])
            (interpose " &middot; "))]
      (template config)
+     [:div#mc_embed_signup
+      [:form#mc-embedded-subscribe-form.validate
+       {:action "https://stuttaford.us17.list-manage.com/subscribe/post?u=fb5cca3ecb94dac76560e8fd8&id=4aa6be7af7"
+        :method "post"
+        :name   "mc-embedded-subscribe-form"
+        :target "_blank"}
+       [:div#mc_embed_signup_scroll
+        [:input#mce-EMAIL.email
+         {:type        "email"
+          :value       ""
+          :name        "EMAIL"
+          :placeholder "Subscribe for updates"}]
+        [:div {:style "position: absolute; left: -5000px;"
+               :aria-hidden "true"}
+         [:input {:type "text"
+                  :name "b_fb5cca3ecb94dac76560e8fd8_4aa6be7af7"
+                  :tabindex "-1"
+                  :value ""}]]
+        [:div.clear
+         [:input#mc-embedded-subscribe.button
+          {:type  "submit"
+           :value "Subscribe"
+           :name  "subscribe"
+           :style "margin-left: 0.5rem"}]]]]]
      [:div.footer
       [:p "&copy; " name " " year ". All rights reserved. Some lefts, too."]]
      [:script {:type "text/javascript"}

@@ -116,3 +116,20 @@ a.anchor {
     top: -70px;
     visibility: hidden;
 }
+
+#mc_embed_signup {
+    background: #fff;
+    clear: left;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.footer {
+    padding-top: 0.5rem;
+    border-top: 1px solid #ccc;
+}
+
+.footer p {
+    font-size 0.9em;
+}
