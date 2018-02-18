@@ -41,7 +41,7 @@ I got some really interesting replies to that second question. In between the to
 - A multi-player code editor.
 - A multi-player game.
 
-That last one is verrrry tempting. I actually did start something like this with the Cape Town Clojure user group, along with [@cmdrdats](https://twitter.com/cmdrdats) : [Steel Plains TCG](https://github.com/cape-town-clojure/steel-plains-tcg). 
+That last one is verrrry tempting. I actually did start something like this with the Cape Town Clojure user group, along with [@cmdrdats](https://twitter.com/cmdrdats) : [Steel Plains TCG](https://github.com/cape-town-clojure/steel-plains-tcg).
 
 I built a [deck builder with Om](https://github.com/cape-town-clojure/steel-plains-tcg/blob/master/src/cljs/sptcg/deck_builder.cljs), and [specified the card and deck model with Schema](https://github.com/cape-town-clojure/steel-plains-tcg/blob/master/src/cljx/sptcg/card_schema.cljx) — remember those? :-) As with many projects like this, we didn't get very far, but it was tremendous fun.
 
@@ -70,7 +70,7 @@ Happily, for this project, I have someone I can talk to, to understand requireme
 
 I haven't ever attended a ClojureBridge event, mostly due to where I live, which makes me a little sad. So, this gives me my own way to participate somehow.
 
-If I succeed, I'll provide something that's useful in organising volunteer-driven work that grows our community in a very necessary and healthy way. 
+If I succeed, I'll provide something that's useful in organising volunteer-driven work that grows our community in a very necessary and healthy way.
 
 That feels good!
 
@@ -80,7 +80,7 @@ Because of the first two points above, I have clarity on what to build, and why 
 
 ### It's full-featured
 
-In hammock mode, I wrote up a [list of capabilities, roles, verbs and views](https://github.com/robert-stuttaford/bridge/blob/master/doc/system.md#views-and-verbs-by-capability-and-role). 
+In hammock mode, I wrote up a [list of capabilities, roles, verbs and views](https://github.com/robert-stuttaford/bridge/blob/master/doc/system.md#views-and-verbs-by-capability-and-role).
 
 Here are some highlights:
 
@@ -94,9 +94,9 @@ There's no avoiding it. Systems that matter need to interact with human beings. 
 
 #### Event management
 
-The heart of the application. 
+The heart of the application.
 
-Interesting, because events are anchored in time, which means that time is a first class aspect of the system's behaviour: 
+Interesting, because events are anchored in time, which means that time is a first class aspect of the system's behaviour:
 
 - What you can see and do changes as time passes.
 - Some things need to happen automatically at a predetermined time.
@@ -116,17 +116,17 @@ There's a cyclical, multi-person interaction when handling the invite process. A
 
 ##### Reporting
 
-Ah, good old reporting. Organisers need to be able to quickly determine head-counts for things like t-shirt sizes, catering choices, child-care, and so on. 
+Ah, good old reporting. Organisers need to be able to quickly determine head-counts for things like t-shirt sizes, catering choices, child-care, and so on.
 
 More friction to remove!
 
 ##### Learning groups
 
-Another interesting bit is how participants are grouped during a live ClojureBridge event. Several factors play a part: who's actually available, language preference, prior experience, coaching preference — all of this matters. 
+Another interesting bit is how participants are grouped during a live ClojureBridge event. Several factors play a part: who's actually available, language preference, prior experience, coaching preference — all of this matters.
 
-It'll be interesting to see how we might solve this algorithmically. 
+It'll be interesting to see how we might solve this algorithmically.
 
-Perhaps it'll give me a strong enough impetus to understand [core.logic](https://github.com/clojure/core.logic) enough to solve an actual challenge? 
+Perhaps it'll give me a strong enough impetus to understand [core.logic](https://github.com/clojure/core.logic) enough to solve an actual challenge?
 
 This does feel a bit like planning who sits next to whom at a wedding :-)
 
@@ -134,7 +134,7 @@ This does feel a bit like planning who sits next to whom at a wedding :-)
 
 If things go as well as I hope, I'd like to see this system used by ClojureBridge around the world, not just the chapter in Berlin. That means that there'll be an additional layer beyond users and events, where we control who organises which chapter, adding new chapters, and so forth.
 
-A personal goal (one I acknowledge may not be possible, because it's not actually up to me) is that this system lives on the main [ClojureBridge](www.clojurebridge.org) site somehow. 
+A personal goal (one I acknowledge may not be possible, because it's not actually up to me) is that this system lives on the main [ClojureBridge](http://www.clojurebridge.org) site somehow.
 
 I suppose am in control of one thing; I can ensure that I make this as useful as possible!
 
@@ -152,23 +152,23 @@ There's loads of things to build into a single-page app backed by an EDN API, bu
 
 #### No Leiningen
 
-Since the release of Clojure 1.9, [Clojure ships with its own cli tool](https://clojure.org/guides/deps_and_cli). As I've been happily ensconced in my fortress of `project.clj` files these past six years, I've had no reason to get to grips with this tool, or any of its implications. 
+Since the release of Clojure 1.9, [Clojure ships with its own cli tool](https://clojure.org/guides/deps_and_cli). As I've been happily ensconced in my fortress of `project.clj` files these past six years, I've had no reason to get to grips with this tool, or any of its implications.
 
 I've decided to apply a simple forcing function for this project: do it with `clojure` and [tools.deps.alpha](https://clojure.org/reference/deps_and_cli) / `deps.edn` alone — no Leiningen!
 
 #### Libraries I've had an itch to try out
 
-I've long been a fan of [Stuart Sierra](twitter.com/stuartsierra)'s [Reloaded workflow](http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded), as I am sure many Clojurians (Clojurists? Clojurologists? Clojuronimoes?) are. 
+I've long been a fan of [Stuart Sierra](https://twitter.com/stuartsierra)'s [Reloaded workflow](http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded), as I am sure many Clojurians (Clojurists? Clojurologists? Clojuronimoes?) are.
 
-Having used [Component](http://github.com/stuartsierra/component) and [TrapperKeeper](https://github.com/puppetlabs/trapperkeeper) thus far, I've been aware of several other takes on this, such as [Daniel Szmulewicz](https://twitter.com/danielszmu)' [System](https://github.com/danielsz/system) and [James Reeves](https://twitter.com/weavejester)' [Integrant](https://github.com/weavejester/integrant). 
+Having used [Component](http://github.com/stuartsierra/component) and [TrapperKeeper](https://github.com/puppetlabs/trapperkeeper) thus far, I've been aware of several other takes on this, such as [Daniel Szmulewicz](https://twitter.com/danielszmu)' [System](https://github.com/danielsz/system) and [James Reeves](https://twitter.com/weavejester)' [Integrant](https://github.com/weavejester/integrant).
 
-I decided to give Integrant and [Ataraxy](https://github.com/weavejester/ataraxy) (also by James) a try. I like their design, and I just love saying their names. 
+I decided to give Integrant and [Ataraxy](https://github.com/weavejester/ataraxy) (also by James) a try. I like their design, and I just love saying their names.
 
 Makes me feel a little like I'm living in a [Culture novel](https://en.wikipedia.org/wiki/Culture_series) :-)
 
 #### Datomic On-Prem vs Datomic Cloud
 
-I did intend on using [Datomic Cloud](https://www.datomic.com/) for this, as this is something I wish to experience, but it's not quite ready yet. 
+I did intend on using [Datomic Cloud](https://www.datomic.com/) for this, as this is something I wish to experience, but it's not quite ready yet.
 
 Critically, it has no support for [excision](https://docs.datomic.com/on-prem/excision.html), which is a key requirement for this app — we'd be honour (and legally) bound to lose people's <abbr title="Personally Identifiable Information">PII</abbr> when they request it. Given that Datomic doesn't actually delete anything, this is a problem which only excision can solve.
 
@@ -192,9 +192,9 @@ That way, one day, I'll be able to convert the project to use Cloud when it's re
 
 ## Progress so far
 
-I've waited to write about all of this, because I wanted to have some progress to show. So, here's the code! 
+I've waited to write about all of this, because I wanted to have some progress to show. So, here's the code!
 
-​	[https://github.com/robert-stuttaford/bridge](https://github.com/robert-stuttaford/bridge)
+​    [https://github.com/robert-stuttaford/bridge](https://github.com/robert-stuttaford/bridge)
 
 So far, it has:
 
@@ -247,11 +247,11 @@ No matter what else, I'll be sharing the code and writing developer diaries alon
 
 I have no idea where I'll end up with this project. I recognise that many projects that start this way, never get finished, which I guess is a risk I'll just have to take.
 
-Of course, I have a selfish reason for doing this, that goes beyond the pure and simple *fun* of building something — and that's to promote my [consulting](http://localhost:3000/consulting/) practice. My hope is that I can demonstrate my value, rather than writing short novels about it — "show, don't tell," if you will.
+Of course, I have a selfish reason for doing this, that goes beyond the pure and simple *fun* of building something — and that's to promote my [consulting](/consulting/) practice. My hope is that I can demonstrate my value, rather than writing short novels about it — "show, don't tell," if you will.
 
-Regardless of whether my consulting interests you, if you're at all interested in this adventure, I'd love to hear from you. 
+Regardless of whether my consulting interests you, if you're at all interested in this adventure, I'd love to hear from you.
 
-**What aspects interest you? What are you hoping I'll cover?** 
+**What aspects interest you? What are you hoping I'll cover?**
 
 I'm particularly interested in unpacking the 'why' questions, because it leads to interesting discussions around the tradeoffs involved, and how the need and the solution fit together.
 
