@@ -3,7 +3,7 @@ layout: post
 title: A Clojure learning journey
 ---
 
-A year or two ago, I gave up trying to track all the interesting stuff happening in the Clojure universe, because the rate of change was simply too high — too many awesome new things were happing too frequently for me to be able to try them all out, or find a "nail to hammer" with whichever new interesting thing came out that week.
+A year or two ago, I gave up trying to track all the interesting stuff happening in the Clojure universe, because the rate of change was simply too high — too many awesome new things were happening too frequently for me to be able to try them all out, or find a "nail to hammer" with whichever new interesting thing came out that week.
 
 That, combined with the fact that everything we were doing "in anger" was working just fine, led me to a sort of complacence, where I didn't try new things out.
 
