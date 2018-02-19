@@ -3,6 +3,24 @@ layout: page
 title: Testimonials
 ---
 
+### Barry Kayton, Cognician founder
+
+<div class="tldr" style="padding-top: 1rem">
+
+In 2009 we were looking for an experienced developer who could become Cognician's CTO. A freelancer who had been working on our prototype said, "You should meet Robert Stuttaford." Little did I know then how valuable those five words would prove to be. Not only did Robert meet us, and join us as CTO, but we also had a meeting of minds that has proven extraordinarily valuable to us as founders, and as consultants to our corporate clients.
+
+Robert has an energizing and inspiring sense of life. Whether you're meeting in person or on a call, Robert has a way of bringing the best out of everyone, showing a path to order and clarity where there was previously disorder and uncertainty, highlighting signal where there was previously only noise. And if that's not enough, he's simply fun to work with. 
+
+What I like most about Robert's work is his ability to differentiate the fundamental building blocks of value in any business problem, which can then be defined in code, and combined to deliver robust software solutions to clients. Robert was able to take our abstract ideas about digital coaching and translate them into software that has been delivering value to our clients and users now for almost 10 years. 
+
+Robert doesn't just help you to think about your business/software challenges. He helps you to think about how you're thinking about them. This is a non-trivial skill and exactly what you need in a CTO or software consultant. Robert helps you structure how to think about a business/software problem, which sets you on a path to fundamentally better solutions than would otherwise be possible. 
+
+Robert has been such an effective CTO at Cognician that he's attracted a team of developers many of which have sought out the opportunity to work with us. Developers are drawn by the opportunity to learn from Robert and team, and enjoy the respectful, innovative, life-affirming culture that Robert has been instrumental in shaping at Cognician. 
+
+I highly recommend Robert as a remarkable thinker who provides exceptional value.
+
+</div>
+
 ### Patrick Kayton, Cognician founder
 
 <div class="tldr" style="padding-top: 1rem">
