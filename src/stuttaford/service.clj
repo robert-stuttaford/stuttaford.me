@@ -40,4 +40,5 @@
 
 (defn reset []
   (alter-var-root #'system c/stop)
-  (refresh :after 'stuttaford.service/start-system!))
+  (refresh :after 'stuttaford.service/start-system!)
+  :done)
