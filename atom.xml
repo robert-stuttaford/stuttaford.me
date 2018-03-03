@@ -1,5 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-02-19T14:45:05Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>A Clojure learning journey</title><link href="http://www.stuttaford.me/2018/02/18/a-clojure-learning-journey/" /><updated>2018-02-19T14:45:05Z</updated><id>http://www.stuttaford.me/2018/02/18/a-clojure-learning-journey/</id><content type="html">&lt;p&gt;A year or two ago, I gave up trying to track all the interesting stuff happening in the Clojure universe, because the rate of change was simply too high — too many awesome new things were happening too frequently for me to be able to try them all out, or find a &amp;quot;nail to hammer&amp;quot; with whichever new interesting thing came out that week.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-03T15:28:49Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Datomic mode</title><link href="http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/" /><updated>2018-03-03T15:28:49Z</updated><id>http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/a7ae33baa9aed47d39882b635b2b0ede4dcac5d9...be515cdcc591b2a5b0123c871f41d7a7e74b880a&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;datomic-peer-vs-datomic-client&quot;&gt;Datomic Peer vs Datomic Client&lt;/h2&gt;
+&lt;p&gt;Although I&apos;m planning for the app to use Datomic Peer in production, as a learning exercise, I&apos;ve decided to implement the Datomic layer with both the Peer and the Client at the same time.&lt;/p&gt;
+&lt;p&gt;This&apos;ll serve to highlight the differences between the two (or non-differences), and allow us to explore some ways in which Clojure supports abstractions like this.&lt;/p&gt;
+&lt;p&gt;In practice, you&apos;ll switch between these with a &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn#L2&quot;&gt;single configuration setting&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Of course, this assumes that the respective transactor and peer-server processes are running.&lt;/p&gt;
+&lt;h3 id=&quot;caveat-toolsdepsalpha-and-datomic-pro-peer&quot;&gt;Caveat: tools.deps.alpha and Datomic Pro Peer&lt;/h3&gt;
+&lt;p&gt;It&apos;s not possible to use the Datomic Pro Peer library with &lt;code&gt;deps.edn&lt;/code&gt;  at the moment, because &lt;a href=&quot;https://github.com/clojure/tools.deps.alpha&quot;&gt;tools.deps.alpha&lt;/a&gt; doesn&apos;t currently support Maven authentication.&lt;/p&gt;
+&lt;p&gt;It&apos;s being worked on; see &lt;a href=&quot;https://dev.clojure.org/jira/browse/TDEPS-9&quot;&gt;the relevant Jira ticket here&lt;/a&gt; — please vote for it :-)&lt;/p&gt;
+&lt;p&gt;Because of this, we can&apos;t use Datomic Pro in Peer mode. This doesn&apos;t matter for the moment, because my initial development will happen with an in-memory database, but when the time comes to use storage, we&apos;ll have to use the &lt;code&gt;datomic:free://&lt;/code&gt; Datomic URI modality.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;code-changes&quot;&gt;Code changes&lt;/h2&gt;
+&lt;h3 id=&quot;datomic-integrant-implementation-update&quot;&gt;Datomic Integrant implementation update&lt;/h3&gt;
+&lt;p&gt;As described earlier, we now support both Peer and Client.&lt;/p&gt;
+&lt;p&gt;Our Integrant &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn&quot;&gt;system map&lt;/a&gt; now includes configuration for both modes.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22&quot;&gt;Datomic implementation&lt;/a&gt; now returns a map two or three keys:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;{:datomic/mode   :peer | :client
+ :datomic/conn   ...
+ :datomic/client ...}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Of course, the &lt;code&gt;:datomic/client&lt;/code&gt; is only present if we&apos;re using that mode.&lt;/p&gt;
+&lt;p&gt;Then, the Ring middleware merges this map, plus a Datomic database value at &lt;code&gt;:datomic/db&lt;/code&gt;, into the request map, for our handlers to use as needed.&lt;/p&gt;
+&lt;p&gt;It&apos;s going to be interesting to see how dealing with both APIs at once turns out. Even if it results in code that I wouldn&apos;t be happy with in a &amp;quot;serious&amp;quot; production setting (which may not even happen!), I think it&apos;s worth trying, as a way to directly confront the API differences head on.&lt;/p&gt;
+&lt;h3 id=&quot;explicit-environment-variables&quot;&gt;Explicit environment variables&lt;/h3&gt;
+&lt;p&gt;I moved the environment defaults from &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn&quot;&gt;system.edn&lt;/a&gt; to its own file &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/bridge.env&quot;&gt;bridge.env&lt;/a&gt;, so that they can be used outside of Clojure processes (e.g. when running the peer-server).&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/Makefile&quot;&gt;makefile&lt;/a&gt; sources this file before running any Clojure processes that require it.&lt;/p&gt;
+&lt;h3 id=&quot;datomic-transactor--peer-server-helper-scripts&quot;&gt;Datomic transactor / peer server helper scripts&lt;/h3&gt;
+&lt;p&gt;If you&apos;re new to Datomic, I&apos;ve provided some &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/tree/be515cdcc591b2a5b0123c871f41d7a7e74b880a/script&quot;&gt;bash scripts&lt;/a&gt; to ease you into it:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;install-datomic-free.sh&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Does what it says on the tin!&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;install-datomic-pro.sh&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If you decide to use the Datomic Client option, you&apos;ll need to use Datomic Pro, which you can get for free via &lt;a href=&quot;https://my.datomic.com/account/create&quot;&gt;Datomic Pro Starter&lt;/a&gt;. Once registered, you&apos;ll put your credentials into this script and it&apos;ll take care of the rest for you.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;datomic-transactor.sh&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Run your Datomic transactor, which works whether you decide to use Free or Pro.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;datomic-peer-server.sh&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Again, if you decide to use the Datomic Client option, you&apos;ll run the peer-server alongside your transactor.&lt;/p&gt;
+&lt;h3 id=&quot;new-debug-page&quot;&gt;New debug page&lt;/h3&gt;
+&lt;p&gt;I added a &lt;code&gt;/system&lt;/code&gt; page which prints out the fully realised Integrant system configuration, as well as the Ring request.&lt;/p&gt;
+&lt;p&gt;This&apos;ll be useful for debugging both Integrant system issues as well as Ring middleware, particularly as we work on the user authentication and authorisation stuff.&lt;/p&gt;
+&lt;h3 id=&quot;dependency-updates&quot;&gt;Dependency updates&lt;/h3&gt;
+&lt;p&gt;One disadvantage of using &lt;code&gt;:git/url&lt;/code&gt; and &lt;code&gt;:sha&lt;/code&gt; with &lt;code&gt;deps.edn&lt;/code&gt; is that it puts all of the source from these dependencies on your classpath — which means that &lt;code&gt;tools.namespace&lt;/code&gt; includes it in the &lt;code&gt;refresh&lt;/code&gt; cycle. It&apos;s merely an annoyance, that goes away after your first &lt;code&gt;refresh&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Even so, it&apos;s nice that we can now use the freshly minted &lt;a href=&quot;https://github.com/clojure/clojurescript/releases/tag/r1.10.64&quot;&gt;ClojureScript 1.10.64&lt;/a&gt; release. You can watch an awesome livecast about some of the changes in this release here: &lt;a href=&quot;https://www.youtube.com/watch?v=KG9uFtXaqYg&quot;&gt;Apropos Episode 1&lt;/a&gt; — follow &lt;a href=&quot;https://twitter.com/apropos_cast&quot;&gt;Apropos&lt;/a&gt; account on Twitter to learn when the next episode is!&lt;/p&gt;
+&lt;p&gt;I&apos;m really excited about the potential of &lt;code&gt;cljs.main&lt;/code&gt;!&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;That&apos;s it for now.&lt;/p&gt;
+&lt;p&gt;Keep an eye on my Twitter account, where I&apos;ll be posting my live-stream schedule soon!&lt;/p&gt;
+&lt;p&gt;Thanks for reading, and feel free to &lt;a href=&quot;/&quot;&gt;reach out any time&lt;/a&gt; if you have thoughts or questions to share.&lt;/p&gt;
+</content></entry><entry><title>A Clojure learning journey</title><link href="http://www.stuttaford.me/2018/02/18/a-clojure-learning-journey/" /><updated>2018-02-19T14:45:05Z</updated><id>http://www.stuttaford.me/2018/02/18/a-clojure-learning-journey/</id><content type="html">&lt;p&gt;A year or two ago, I gave up trying to track all the interesting stuff happening in the Clojure universe, because the rate of change was simply too high — too many awesome new things were happening too frequently for me to be able to try them all out, or find a &amp;quot;nail to hammer&amp;quot; with whichever new interesting thing came out that week.&lt;/p&gt;
 &lt;p&gt;That, combined with the fact that everything we were doing &amp;quot;in anger&amp;quot; was working just fine, led me to a sort of complacence, where I didn&apos;t try new things out.&lt;/p&gt;
 &lt;p&gt;That changes today!&lt;/p&gt;
 &lt;p&gt;I&apos;ve decided to give myself a multi-faceted learning / sharing goal, and this post serves to document what it is, and why I&apos;m doing it.&lt;/p&gt;
