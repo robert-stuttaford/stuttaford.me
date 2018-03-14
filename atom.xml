@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-03T15:28:49Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Datomic mode</title><link href="http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/" /><updated>2018-03-03T15:28:49Z</updated><id>http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-14T09:41:27Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Datomic mode</title><link href="http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/" /><updated>2018-03-14T09:41:27Z</updated><id>http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/a7ae33baa9aed47d39882b635b2b0ede4dcac5d9...be515cdcc591b2a5b0123c871f41d7a7e74b880a&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;datomic-peer-vs-datomic-client&quot;&gt;Datomic Peer vs Datomic Client&lt;/h2&gt;
@@ -16,7 +16,7 @@
 &lt;h3 id=&quot;datomic-integrant-implementation-update&quot;&gt;Datomic Integrant implementation update&lt;/h3&gt;
 &lt;p&gt;As described earlier, we now support both Peer and Client.&lt;/p&gt;
 &lt;p&gt;Our Integrant &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn&quot;&gt;system map&lt;/a&gt; now includes configuration for both modes.&lt;/p&gt;
-&lt;p&gt;The &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22&quot;&gt;Datomic implementation&lt;/a&gt; now returns a map two or three keys:&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22&quot;&gt;Datomic implementation&lt;/a&gt; now returns a map with two or three keys:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;{:datomic/mode   :peer | :client
  :datomic/conn   ...
  :datomic/client ...}
