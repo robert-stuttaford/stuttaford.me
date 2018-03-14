@@ -45,7 +45,7 @@ As described earlier, we now support both Peer and Client.
 
 Our Integrant [system map](https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn) now includes configuration for both modes.
 
-The [Datomic implementation](https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22) now returns a map two or three keys:
+The [Datomic implementation](https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22) now returns a map with two or three keys:
 
 ```clojure
 {:datomic/mode   :peer | :client

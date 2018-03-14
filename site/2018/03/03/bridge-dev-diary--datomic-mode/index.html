@@ -16,7 +16,7 @@
 <h3 id="datomic-integrant-implementation-update">Datomic Integrant implementation update</h3>
 <p>As described earlier, we now support both Peer and Client.</p>
 <p>Our Integrant <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn">system map</a> now includes configuration for both modes.</p>
-<p>The <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22">Datomic implementation</a> now returns a map two or three keys:</p>
+<p>The <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22">Datomic implementation</a> now returns a map with two or three keys:</p>
 <pre><code class="language-clojure">{:datomic/mode   :peer | :client
  :datomic/conn   ...
  :datomic/client ...}
