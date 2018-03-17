@@ -144,7 +144,7 @@ After working through about half of the use-cases, a pattern emerged:
 (defn process-thing [<destructure request>]
   <check the input + database, and then either:>
    <show (thing-page) with error>
-   <do thing, then redirect or show (thing-page)>)
+   <do thing, then redirect or show (thing-success-page)>)
 
 (defn thing [request] ;; referenced by routing table
   (or (process-thing request)

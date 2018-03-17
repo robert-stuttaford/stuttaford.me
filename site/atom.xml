@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-17T18:41:50Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Modelling access</title><link href="http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/" /><updated>2018-03-17T18:41:50Z</updated><id>http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-17T18:56:07Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Modelling access</title><link href="http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/" /><updated>2018-03-17T18:56:07Z</updated><id>http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/94cacca10a3e3c06cfef54a81dda9f2e3d0c451e...3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
 &lt;hr&gt;
@@ -87,7 +87,7 @@
 (defn process-thing [&amp;lt;destructure request&amp;gt;]
   &amp;lt;check the input + database, and then either:&amp;gt;
    &amp;lt;show (thing-page) with error&amp;gt;
-   &amp;lt;do thing, then redirect or show (thing-page)&amp;gt;)
+   &amp;lt;do thing, then redirect or show (thing-success-page)&amp;gt;)
 
 (defn thing [request] ;; referenced by routing table
   (or (process-thing request)
