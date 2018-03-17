@@ -9,7 +9,7 @@ This is a development diary for the `bridge` project I'm working on, described i
 
 This diary entry covers the [changes in this diff](https://github.com/robert-stuttaford/bridge/compare/a7ae33baa9aed47d39882b635b2b0ede4dcac5d9...be515cdcc591b2a5b0123c871f41d7a7e74b880a).
 
-
+<hr>
 
 ## Datomic Peer vs Datomic Client
 
