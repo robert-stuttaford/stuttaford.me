@@ -1,7 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-14T09:41:27Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Datomic mode</title><link href="http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/" /><updated>2018-03-14T09:41:27Z</updated><id>http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-17T18:41:50Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Modelling access</title><link href="http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/" /><updated>2018-03-17T18:41:50Z</updated><id>http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/94cacca10a3e3c06cfef54a81dda9f2e3d0c451e...3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;datomic-peer-and-client-together&quot;&gt;Datomic Peer and Client together&lt;/h2&gt;
+&lt;p&gt;Ok, so once I actually started using both together, it quickly became apparent that passing the &lt;code&gt;:mode&lt;/code&gt; along with the &lt;code&gt;:conn&lt;/code&gt; / &lt;code&gt;:db&lt;/code&gt; values into the Datomic abstraction was creating all sorts of difficulties.&lt;/p&gt;
+&lt;p&gt;I chose instead to control &lt;code&gt;:mode&lt;/code&gt; with a &lt;a href=&quot;https://clojure.org/reference/vars&quot;&gt;dynamic var&lt;/a&gt;, at:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;bridge.data.datomic/*DATOMIC-MODE*&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The downside is that this value must always be bound before the abstraction can be called, but the upside is that it became easy to provide a wrapper layer over functions in the Datomic Peer and Client libraries.&lt;/p&gt;
+&lt;p&gt;Consumers of the abstraction can continue to pass a connection or a database value as we are used to doing.&lt;/p&gt;
+&lt;p&gt;To deal with that downside, there&apos;s a &lt;code&gt;with-datomic-mode&lt;/code&gt; macro to wrap forms with a binding for this var, which is now used in all the right places in the project: middleware, tests, and REPL helpers.&lt;/p&gt;
+&lt;p&gt;A nice benefit of this abstraction is that we now have a clear place to add transaction annotations later, when it&apos;s time to link transactions to the users who created them.&lt;/p&gt;
+&lt;p&gt;It&apos;s still early days, but I must say, given that it&apos;s working just fine at the REPL, from tests, and within all the app code, I&apos;m feeling good about this idea!&lt;/p&gt;
+&lt;p&gt;To see what I&apos;ve touched on so far, you can review the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/data/datomic.clj#L37-L70&quot;&gt;API differences here&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;modelling-people&quot;&gt;Modelling people&lt;/h2&gt;
+&lt;p&gt;To begin modelling people, I chose to implement the standard set of access control gestures that a person will use to self-service-manage their own access:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Sign up, and confirm email.&lt;/li&gt;
+&lt;li&gt;Log in, and log out.&lt;/li&gt;
+&lt;li&gt;Forgot password, and its sibling, reset password.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I felt this was a good place to start, because many of the features of &lt;code&gt;bridge&lt;/code&gt; rely on what we know about the currently signed-in user, and it&apos;d be nice to have this stuff out of the way.&lt;/p&gt;
+&lt;p&gt;It also means that it&apos;s secure from day 1, so deciding when to host on the public Internet won&apos;t be impeded by this.&lt;/p&gt;
+&lt;p&gt;Also, this gives us a nice way to establish some norms, like how we organise the code layers that make up the system, how we&apos;ll name things, and so on.&lt;/p&gt;
+&lt;h3 id=&quot;person-attributes&quot;&gt;Person attributes&lt;/h3&gt;
+&lt;p&gt;Ultimately, we&apos;ll record a fairly &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/doc/schema.md#user&quot;&gt;large number of values&lt;/a&gt; for a given person, but thanks to Datomic&apos;s design, we don&apos;t need to concern ourselves with all of them at once just to get started with these basics.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Aside&lt;/strong&gt;: to soak yourself in some of the consequences of this sort of thinking, I highly recommend this post on treating your database as a &amp;quot;living, breathing thing&amp;quot;: &lt;a href=&quot;http://blog.datomic.com/2017/01/the-ten-rules-of-schema-growth.html&quot;&gt;The Ten Rules of Schema Growth&lt;/a&gt;, by Stuart Halloway.&lt;/p&gt;
+&lt;p&gt;Ok! We start with six attributes:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:person/name&lt;/code&gt; — string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;What we&apos;ll display when this person needs to be displayed anywhere.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:person/email&lt;/code&gt; — unique string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;How people identify themselves when signing in, and also how we&apos;ll send them messages.&lt;/p&gt;
+&lt;p&gt;We won&apos;t display this anywhere unless absolutely necessary.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:person/password&lt;/code&gt; — string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Thankfully, the excellent &lt;a href=&quot;https://github.com/funcool/buddy&quot;&gt;https://github.com/funcool/buddy&lt;/a&gt; library made the cryptography concerns easy to deal with.&lt;/p&gt;
+&lt;p&gt;We use &lt;code&gt;buddy.hashers/derive&lt;/code&gt; to hash passwords (&lt;code&gt;bcrypt+sha512&lt;/code&gt; by default), and &lt;code&gt;buddy.hashers/check&lt;/code&gt; to verify the password on login.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:person/status&lt;/code&gt; — enum keyword&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This is so that we can control access independently of their credentials. Possible values:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;:status/active&lt;/code&gt; - default; account is in good standing.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:status/suspended&lt;/code&gt; - disabled by an administrative person.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:status/deleted&lt;/code&gt; - the person used the &amp;quot;forget me&amp;quot; capability.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:person/confirm-email-token&lt;/code&gt; — unique string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:person/reset-password-token&lt;/code&gt; — unique string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A random token that we&apos;ll send via email, for them to provide back to us when they confirm their email, or reset their password, respectively.&lt;/p&gt;
+&lt;p&gt;Buddy comes to the rescue again; this time, we compose &lt;code&gt;buddy.core.nonce/random-nonce&lt;/code&gt;   with &lt;code&gt;buddy.core.codecs/bytes-&amp;gt;hex&lt;/code&gt; to produce secure random tokens for use in email messages.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;code-organisation&quot;&gt;Code organisation&lt;/h2&gt;
+&lt;p&gt;I&apos;ve found that I prefer to keep all the different technical aspects for a given concern together, rather than grouping code by its behaviour.&lt;/p&gt;
+&lt;p&gt;To say that another way, I&apos;d rather find all the queries, transactions, and web page code for a section of the system together in a folder, rather than keeping all the database code in a folder, and separately keeping all the web page code together in a different folder somewhere else.&lt;/p&gt;
+&lt;p&gt;So, rather than this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bridge
+├───data
+│   └───person.clj
+└───web
+    └───access
+        ├──login.clj
+        ├──sign_up.clj
+        └──...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I far prefer this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bridge
+└───person
+    ├───data.clj
+    ├───access.clj
+    └───access
+        ├───login.clj
+        ├───sign_up.clj
+        └───...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It feels better to have everything about a named concern together, rather than spread across different folders in the source code.&lt;/p&gt;
+&lt;p&gt;Later, I&apos;ll have more top-level concerns, like &amp;quot;chapter&amp;quot; and &amp;quot;event&amp;quot;, and more sub-concerns like, &amp;quot;person -&amp;gt; profile -&amp;gt; edit, delete&amp;quot;.&lt;/p&gt;
+&lt;p&gt;I&apos;m not entirely sure where this idea comes from. It could be Domain Driven Design, or elsewhere, but my preference for this is mostly intuitive; it likely has a name and a whitepaper written by someone far smarter than me!&lt;/p&gt;
+&lt;p&gt;Consequently, This is how I&apos;ve arranged the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/tree/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/person&quot;&gt;code for those six access gestures&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;access-page-organisation&quot;&gt;Access page organisation&lt;/h2&gt;
+&lt;p&gt;After working through about half of the use-cases, a pattern emerged:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(defn thing-page [&amp;lt;maybe error&amp;gt;] 
+  &amp;lt;hiccup, maybe with error&amp;gt;)
+
+(defn thing-success-page []
+  &amp;lt;hiccup&amp;gt;)
+
+(defn process-thing [&amp;lt;destructure request&amp;gt;]
+  &amp;lt;check the input + database, and then either:&amp;gt;
+   &amp;lt;show (thing-page) with error&amp;gt;
+   &amp;lt;do thing, then redirect or show (thing-page)&amp;gt;)
+
+(defn thing [request] ;; referenced by routing table
+  (or (process-thing request)
+      (thing-page)))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I ended up collapsing &lt;code&gt;process-thing&lt;/code&gt; into the top-level &lt;code&gt;thing&lt;/code&gt;, as the top-level ended up being utterly identical boilerplate across all six use-cases.&lt;/p&gt;
+&lt;p&gt;Now, for &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/tree/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/person/access&quot;&gt;all six gestures&lt;/a&gt;, we have a dedicated namespace with views at the top and the controlling logic at the bottom, which defers to the common &lt;code&gt;bridge.person.data&lt;/code&gt; namespace for all the database interactions (discussed further down).&lt;/p&gt;
+&lt;p&gt;The Hiccup code I was using started to feel a bit repetitive, so I moved the outer, common bits to their own namespace. This helped to focus the individual use-case page code on what&apos;s unique about them, without overdoing the whole DRY thing.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;I&apos;d be particularly interested in hearing feedback, especially from newer Clojure folks, on how approachable this code is for you.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Did it help you to understand the flow, or hinder you? Why?&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;access-page-data-interactions&quot;&gt;Access page data interactions&lt;/h2&gt;
+&lt;p&gt;The common data namespace brings together several things - the cryptography issues described above, and:&lt;/p&gt;
+&lt;h3 id=&quot;rules-for-data-sanitisation-and-correctness&quot;&gt;Rules for data sanitisation and correctness&lt;/h3&gt;
+&lt;p&gt;To prevent issues, we trim and lower-case email addresses whenever a person provides one via HTTP request.&lt;/p&gt;
+&lt;p&gt;We require that passwords be at least 8 characters, and that confirmed passwords match.&lt;/p&gt;
+&lt;h3 id=&quot;naming-the-ways-in-which-people-can-be-found&quot;&gt;Naming the ways in which people can be found&lt;/h3&gt;
+&lt;p&gt;Right now, we can find a person in three ways - through their email, and through the confirm and reset tokens.&lt;/p&gt;
+&lt;p&gt;Over time, we may come up with additional ways, or require new rules be included in existing ways.&lt;/p&gt;
+&lt;p&gt;By putting these generic queries in named functions, we hook the rest of our system to these semantics.&lt;/p&gt;
+&lt;h3 id=&quot;defining-how-people-are-created-and-altered&quot;&gt;Defining how people are created and altered&lt;/h3&gt;
+&lt;p&gt;I&apos;ve split the &amp;quot;make-new-person&amp;quot; transaction code from the function that actually transacts it. This allows us to test the rules that govern what it means to be a new person in our system, independently of actually commiting it to the database.&lt;/p&gt;
+&lt;p&gt;To take advantage of this split, I&apos;ve written specs and instrumented this function, and unit-tested this function as well.&lt;/p&gt;
+&lt;p&gt;We also have named functions for the key access control alterations — actually confirming that email address, and resetting that password.&lt;/p&gt;
+&lt;h3 id=&quot;defining-when-messages-are-sent-to-the-person&quot;&gt;Defining when messages are sent to the person&lt;/h3&gt;
+&lt;p&gt;In two cases, we generate a token, and need to inform the person by email.&lt;/p&gt;
+&lt;p&gt;Right now, all we do is log the email, but later, once we have an email sending abstraction in place, this invocation will likely move &apos;up&apos; one layer, out of the data layer, and into the access controller layer, but call back &apos;down&apos; one layer into the email sending abstraction.&lt;/p&gt;
+&lt;p&gt;For now, it&apos;s fine where it is.&lt;/p&gt;
+&lt;h3 id=&quot;the-relevant-datomic-schema&quot;&gt;The relevant Datomic schema&lt;/h3&gt;
+&lt;p&gt;I firmly believe that the database should be the source of truth for its state — schema included — rather than some source code in your app.&lt;/p&gt;
+&lt;p&gt;This becomes especially true when your database has been around for a while, and when you have multiple independent apps interacting with it.&lt;/p&gt;
+&lt;p&gt;In fact, I wrote &lt;a href=&quot;https://github.com/cognician/datomic-doc#rationale&quot;&gt;Datomic Doc&lt;/a&gt; to make inspecting your database idents (schema, enums, functions) easier to do.&lt;/p&gt;
+&lt;p&gt;However, in terms of being able to test the &lt;em&gt;code&lt;/em&gt; that interacts with the database, it&apos;s useful to keep those schema definitions handy. And, as I describe below in about development data, it&apos;s useful to be able to rebuild your database from scratch, if you need to.&lt;/p&gt;
+&lt;p&gt;So, this is why the schema is kept here.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;development-time-data&quot;&gt;Development-time data&lt;/h2&gt;
+&lt;p&gt;Until I&apos;m ready to commit to a durable storage, I&apos;m using an in-memory database with Datomic. This gives me total freedom if I need to make substantial alterations to the database schema — something that experience has taught me is valuable!&lt;/p&gt;
+&lt;p&gt;The consequence of this is that I&apos;m forced to manually interact with the system to get it into an interesting state for the code I&apos;m working on.&lt;/p&gt;
+&lt;p&gt;Of course, this is something that can be automated, so that&apos;s what I did!&lt;/p&gt;
+&lt;p&gt;I&apos;ve added a new Integrant component which also depends on the Datomic component. &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/data/dev_data.clj&quot;&gt;All it does is transact data&lt;/a&gt;. Right now, it handles transacting the schema described above, and a single person entity, which is neatly packaged into an idempotent function that can easily be called at the REPL.&lt;/p&gt;
+&lt;p&gt;As I go deeper into implementing &lt;code&gt;bridge&lt;/code&gt;, I&apos;ll be able to build up this code, keeping the database in a suitable state for demonstrating features or for preparing testing things interactively.&lt;/p&gt;
+&lt;p&gt;It also serves as nice documentation: the minimum data to make the system go!&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;specs-and-tests&quot;&gt;Specs and tests&lt;/h2&gt;
+&lt;p&gt;I used Spec to describe the data layer, which defines rules about the contents and the composition of those Datomic attributes described earlier. Rather than hardcoding meaning into the specs defined at the &amp;quot;person&amp;quot; level, I wrote generic specs - for &apos;non blank string&apos;, &apos;nonce&apos; (a.k.a. token) and email, and had the person specs use those.&lt;/p&gt;
+&lt;p&gt;I added &lt;a href=&quot;https://github.com/bhb/expound&quot;&gt;expound&lt;/a&gt; and &lt;a href=&quot;https://github.com/jeaye/orchestra&quot;&gt;orchestra&lt;/a&gt; as standard Spec conveniences.&lt;/p&gt;
+&lt;p&gt;I use a throwaway in-memory Datomic database, which gets set up and torn down on for each test.&lt;/p&gt;
+&lt;p&gt;I&apos;m only scratching the surface here, as I&apos;ve only got one example-based test written so far, for the &amp;quot;sign up&amp;quot; user gesture. A likely very-next step is to flesh out these tests so that the rest of the named things in &lt;code&gt;bridge.person.data&lt;/code&gt; have exemplars.&lt;/p&gt;
+&lt;h3 id=&quot;dabbling-with-generative-tests&quot;&gt;Dabbling with generative tests&lt;/h3&gt;
+&lt;p&gt;I actually ended up quite far down a small rabbit-hole trying to set up generative tests with these specs. Turns out, doing so for email addresses wasn&apos;t very straightforward.&lt;/p&gt;
+&lt;p&gt;I did try using a couple different email regexes I found on the web with Steve Miner&apos;s frankly awesome &lt;a href=&quot;https://github.com/miner/strgen&quot;&gt;https://github.com/miner/strgen&lt;/a&gt;, but as the Readme describes, it can only support a subset of the regex engine&apos;s language, and for whatever reason, email regexes have a burning need to be &lt;a href=&quot;http://www.perlmonks.org/?node_id=62389&quot;&gt;Perl quines&lt;/a&gt; or something.&lt;/p&gt;
+&lt;p&gt;When I felt the jaws starting to close around me, I decided to park that idea for now, and focus on getting a working UI built. I&apos;d love to come back to this, though, and have generative tests in place for the full &amp;quot;people API&amp;quot;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;If you know of a way to generate emails using a regex that&apos;s suitably valid, please let me know!&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;other-code-changes&quot;&gt;Other code changes&lt;/h2&gt;
+&lt;h3 id=&quot;added-repl-conveniences&quot;&gt;Added REPL conveniences&lt;/h3&gt;
+&lt;p&gt;So that I can quickly poke around in the database from the REPL, I added &lt;code&gt;bridge.dev.repl&lt;/code&gt;, which has zero-arg &lt;code&gt;conn&lt;/code&gt; and &lt;code&gt;db&lt;/code&gt; functions.&lt;/p&gt;
+&lt;p&gt;I usually use these from within &lt;code&gt;(comment ...)&lt;/code&gt; forms in whichever namespace I&apos;m currently working in.&lt;/p&gt;
+&lt;h3 id=&quot;display-stacktraces-via-the-web-server&quot;&gt;Display stacktraces via the web server&lt;/h3&gt;
+&lt;p&gt;I added the &lt;code&gt;ring.middleware.stacktrace&lt;/code&gt; middleware, as the default Jetty handler shows very little on its own when an exception is thrown.&lt;/p&gt;
+&lt;h3 id=&quot;bumped-cider-and-clj-refactor-to-snapshot&quot;&gt;Bumped CIDER and clj-refactor to SNAPSHOT&lt;/h3&gt;
+&lt;p&gt;So that I can test them out, and also get rid of those deprecation warnings when starting a REPL.&lt;/p&gt;
+&lt;h3 id=&quot;makefile-updates&quot;&gt;Makefile updates&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Run the peer-server easily.&lt;/li&gt;
+&lt;li&gt;Compiling ClojureScript via &lt;code&gt;cljs.main&lt;/code&gt; complains if you don&apos;t provide a &lt;code&gt;:source-map &amp;quot;path&amp;quot;&lt;/code&gt; config when using &lt;code&gt;-O advanced&lt;/code&gt;. I fixed that.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;That&apos;s it for now.&lt;/p&gt;
+&lt;p&gt;As always, I&apos;m looking to learn from others just as much as I am looking to share my experience. If you have any advice, or questions, or feedback of any kind, please &lt;a href=&quot;/&quot;&gt;get in touch&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+</content></entry><entry><title>Bridge dev diary: Datomic mode</title><link href="http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/" /><updated>2018-03-17T18:41:59Z</updated><id>http://www.stuttaford.me/2018/03/03/bridge-dev-diary--datomic-mode/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/a7ae33baa9aed47d39882b635b2b0ede4dcac5d9...be515cdcc591b2a5b0123c871f41d7a7e74b880a&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
 &lt;h2 id=&quot;datomic-peer-vs-datomic-client&quot;&gt;Datomic Peer vs Datomic Client&lt;/h2&gt;
 &lt;p&gt;Although I&apos;m planning for the app to use Datomic Peer in production, as a learning exercise, I&apos;ve decided to implement the Datomic layer with both the Peer and the Client at the same time.&lt;/p&gt;
 &lt;p&gt;This&apos;ll serve to highlight the differences between the two (or non-differences), and allow us to explore some ways in which Clojure supports abstractions like this.&lt;/p&gt;
