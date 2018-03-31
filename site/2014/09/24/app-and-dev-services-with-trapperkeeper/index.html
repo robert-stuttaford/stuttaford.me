@@ -54,7 +54,7 @@ two systems - two for production and two for development:</p>
 </ul>
 <p>Here's the code so you can follow along:</p>
 <p><a href="https://github.com/robert-stuttaford/tk-app-dev">https://github.com/robert-stuttaford/tk-app-dev</a></p>
-<h2 id="app-services">App services</h2>
+<h2 id="app-services"><a href="#app-services" id="app-services">App services</a></h2>
 <p>These run in both development and production contexts. Only the app
 services run when you issue <code>lein tk</code> at the command line, which makes
 use of the <code>bootstrap.cfg</code> file to determine how to satisfy
@@ -62,7 +62,7 @@ dependencies at startup. You can learn more in the
 <a href="https://github.com/puppetlabs/trapperkeeper/wiki/Bootstrapping">Trapperkeeper bootstrapping</a>
 documentation. In fact, I heartily recommend reading
 <a href="https://github.com/puppetlabs/trapperkeeper/wiki">all their documentation</a>!</p>
-<h3 id="datomic-service">Datomic service</h3>
+<h3 id="datomic-service"><a href="#datomic-service" id="datomic-service">Datomic service</a></h3>
 <p>Code: <a href="https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/services/datomic.clj">src/tkad/services/datomic.clj</a></p>
 <p>This service manages our Datomic database connection, and ensures that
 we have a database, and that all the schema we have defined is
@@ -75,7 +75,7 @@ to discover all the configured Datomic database uris.</p>
 will only affect the database if there are actually changes to make.</p>
 <p>Once initialised, this service provides access to Datomic database
 connections and to database values.</p>
-<h3 id="pedestal-service">Pedestal service</h3>
+<h3 id="pedestal-service"><a href="#pedestal-service" id="pedestal-service">Pedestal service</a></h3>
 <p>Code: <a href="https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/services/pedestal.clj">src/tkad/services/pedestal.clj</a></p>
 <p>This service manages the lifecycle of the Pedestal web server. Here we
 configure all the interceptors, notably injecting config and Datomic
@@ -86,7 +86,7 @@ web requests, and ensures that - by default - our database queries use
 a common time basis.</p>
 <p>Of course, we have the connection as well, which means we can easily
 create new database values, submit transactions, and so on.</p>
-<h2 id="dev-services">Dev services</h2>
+<h2 id="dev-services"><a href="#dev-services" id="dev-services">Dev services</a></h2>
 <p>These services only ever run on a developer machine. When started,
 both of these services watch the file-system for changes and recompile
 their output as needed. As this automated reloading is in place once
@@ -96,14 +96,14 @@ source tree; instead they are in <code>/dev</code> which is only added to the
 source path for the <code>dev</code> Leiningen profile. This prevents any of this
 code from loading into memory in production, where all this output
 would already have been compiled.</p>
-<h3 id="cljx-service">Cljx service</h3>
+<h3 id="cljx-service"><a href="#cljx-service" id="cljx-service">Cljx service</a></h3>
 <p>Code: <a href="https://github.com/robert-stuttaford/tk-app-dev/tree/master/dev/services/cljx.clj">dev/services/cljx.clj</a></p>
 <p>Pretty simple - compiles all .cljx files to both .clj and .cljs files
 as they change. We make use of Juxt's
 <a href="https://github.com/juxt/dirwatch">dirwatch</a> library to watch the
 file-system recursively, and only invoke <code>cljx/cljx-compile</code> when
 we know a <code>.cljx</code> file changed.</p>
-<h3 id="shadow-service">Shadow service</h3>
+<h3 id="shadow-service"><a href="#shadow-service" id="shadow-service">Shadow service</a></h3>
 <p>Code: <a href="https://github.com/robert-stuttaford/tk-app-dev/tree/master/dev/services/shadow.clj">dev/services/shadow.clj</a></p>
 <p>This one is interesting. Shadow-build is quite low-level to use (which
 is great), so we added a thin layer over the top to support our own
@@ -113,13 +113,13 @@ it's hardcoded as a preamble to all output, and its externs are used
 for advanced compilation.</p>
 <p>Then, we have created two output modes (both of which produce
 Javascript source maps):</p>
-<h4 id="debug"><code>:debug</code></h4>
+<h4 id="debug"><a href="#debug" id="debug"><code>:debug</code></a></h4>
 <ul>
 <li>Writes to <code>(MODULE-NAME)-debug.js</code>.</li>
 <li>Uses unminifed React.</li>
 <li>Output is not optimised and is pretty printed.</li>
 </ul>
-<h4 id="production"><code>:production</code></h4>
+<h4 id="production"><a href="#production" id="production"><code>:production</code></a></h4>
 <ul>
 <li>Writes to <code>(MODULE-NAME).js</code>.</li>
 <li>Uses minifed React.</li>
@@ -152,7 +152,7 @@ in the only web view we have set up here:</p>
 <p><a href="https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/web/routes.clj#L20-L21">src/tkad/web/routes.clj</a></p>
 <p>It's important to recognise that even with advanced optimisations,
 these two Javascript files can interoperate!</p>
-<h2 id="composing-services-as-systems">Composing services as systems</h2>
+<h2 id="composing-services-as-systems"><a href="#composing-services-as-systems" id="composing-services-as-systems">Composing services as systems</a></h2>
 <p>Ok! So now that we understand what these services do, we can finally
 see how to compose them into two systems. It's actually rather
 simple - it's all explained in the comments:</p>
@@ -178,7 +178,7 @@ and ensures that any new schema is present in your database)!</p>
 be automatically recompiled - usually quickly enough for it to be
 ready by the time you refresh your browser.</p>
 <p>Awesome!</p>
-<h3 id="caveat-an-escape-hatch-for-cljx">Caveat: an escape hatch for cljx</h3>
+<h3 id="caveat-an-escape-hatch-for-cljx"><a href="#caveat-an-escape-hatch-for-cljx" id="caveat-an-escape-hatch-for-cljx">Caveat: an escape hatch for cljx</a></h3>
 <p>Sometimes you might end up with a code-path from <code>dev/user</code> that
 depends on forms present in the <code>.clj</code> output of the code in <code>.cljx</code>
 files, which, when missing, prevents the REPL from starting up.</p>
@@ -188,7 +188,7 @@ via Leiningen:</p>
 </code></pre>
 <p>That'll invoke cljx in its own Leiningen profile which doesn't load
 the <code>dev/</code> code at all.</p>
-<h2 id="emacs-shortcuts">Emacs shortcuts</h2>
+<h2 id="emacs-shortcuts"><a href="#emacs-shortcuts" id="emacs-shortcuts">Emacs shortcuts</a></h2>
 <p>No Clojure how-to is complete without a snippet of Emacs lisp to add
 to your dotfiles. Here are two simple keybinds for resetting the app
 and dev systems respectively. The second one uses <code>shift+r</code> instead of

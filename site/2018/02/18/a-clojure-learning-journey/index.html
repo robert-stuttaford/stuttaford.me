@@ -4,7 +4,7 @@
 <p>That changes today!</p>
 <p>I've decided to give myself a multi-faceted learning / sharing goal, and this post serves to document what it is, and why I'm doing it.</p>
 <hr>
-<h2 id="what-do-you-need">What do you need?</h2>
+<h2 id="what-do-you-need"><a href="#what-do-you-need" id="what-do-you-need">What do you need?</a></h2>
 <p>Around 3-4 weeks ago, I wrote to the Internet:</p>
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">What would you like to see discussed and dissected about <a href="https://twitter.com/hashtag/Datomic?src=hash&amp;ref_src=twsrc%5Etfw">#Datomic</a>? Please RT :-)</p>&mdash; Robert Stuttaford (@RobStuttaford) <a href="https://twitter.com/RobStuttaford/status/956407817245724677?ref_src=twsrc%5Etfw">January 25, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -34,28 +34,28 @@
 </ol>
 <p>So that's what I'm going to do!</p>
 <hr>
-<h2 id="clojurebridge-registration-system">ClojureBridge registration system</h2>
+<h2 id="clojurebridge-registration-system"><a href="#clojurebridge-registration-system" id="clojurebridge-registration-system">ClojureBridge registration system</a></h2>
 <p>This is such a nice project for me, for a number of reasons.</p>
-<h3 id="collaboration">Collaboration</h3>
+<h3 id="collaboration"><a href="#collaboration" id="collaboration">Collaboration</a></h3>
 <p>I have come to learn that I work best when I have someone to work with. This is one of the reasons why I consult — I get to interact with another human being, and learn from them, and provide them with value.</p>
 <p>Happily, for this project, I have someone I can talk to, to understand requirements, and verify that what I'm building actually solves the problem. Crucially, that person — <a href="https://twitter.com/plexus">Arne Brasseur</a>, of <a href="https://lambdaisland.com/p/about">Lambda Island</a> and <a href="https://clojureverse.org/">ClojureVerse</a> fame — is willing and able. Thanks, Arne! I truly appreciate it.</p>
-<h3 id="not-just-a-toy-project">Not just a toy project</h3>
+<h3 id="not-just-a-toy-project"><a href="#not-just-a-toy-project" id="not-just-a-toy-project">Not just a toy project</a></h3>
 <p>I haven't ever attended a ClojureBridge event, mostly due to where I live, which makes me a little sad. So, this gives me my own way to participate somehow.</p>
 <p>If I succeed, I'll provide something that's useful in organising volunteer-driven work that grows our community in a very necessary and healthy way.</p>
 <p>That feels good!</p>
-<h3 id="clear-goal">Clear goal</h3>
+<h3 id="clear-goal"><a href="#clear-goal" id="clear-goal">Clear goal</a></h3>
 <p>Because of the first two points above, I have clarity on what to build, and why it'll work. This is thanks largely to the <a href="https://github.com/robert-stuttaford/bridge/blob/master/doc/requirements.md">excellent write-up that Arne provided</a>, which describes what they need, and why.</p>
-<h3 id="its-full-featured">It's full-featured</h3>
+<h3 id="its-full-featured"><a href="#its-full-featured" id="its-full-featured">It's full-featured</a></h3>
 <p>In hammock mode, I wrote up a <a href="https://github.com/robert-stuttaford/bridge/blob/master/doc/system.md#views-and-verbs-by-capability-and-role">list of capabilities, roles, verbs and views</a>.</p>
 <p>Here are some highlights:</p>
-<h4 id="user-management">User management</h4>
+<h4 id="user-management"><a href="#user-management" id="user-management">User management</a></h4>
 <p>There's no avoiding it. Systems that matter need to interact with human beings. We have to model them in our system, and provide safe ways for them to do their part to move things forward.</p>
 <ul>
 <li>Authentication and authorisation (role-based and content-based).</li>
 <li>Profile management: self-service registration and account recovery, data protection and privacy concerns.</li>
 <li>Audit trail: who did what? Who altered this thing?</li>
 </ul>
-<h4 id="event-management">Event management</h4>
+<h4 id="event-management"><a href="#event-management" id="event-management">Event management</a></h4>
 <p>The heart of the application.</p>
 <p>Interesting, because events are anchored in time, which means that time is a first class aspect of the system's behaviour:</p>
 <ul>
@@ -63,41 +63,41 @@
 <li>Some things need to happen automatically at a predetermined time.</li>
 </ul>
 <p>There are a handful of interesting event manangement features to build:</p>
-<h5 id="content-management">Content management</h5>
+<h5 id="content-management"><a href="#content-management" id="content-management">Content management</a></h5>
 <p>There are two content management pieces here:</p>
 <ul>
 <li>The events themselves — scheduling, detailing, and managing the status of events and the individuals involved.</li>
 <li>Email templates. Much of the work of organising such an event is clear communication, and, given the fact that this whole effort is focused on helping to establish a new narrative for women in tech — the words <strong>really</strong> matter. So, removing the friction around sending the right words at the right time is important.</li>
 </ul>
-<h5 id="invite-process">Invite process</h5>
+<h5 id="invite-process"><a href="#invite-process" id="invite-process">Invite process</a></h5>
 <p>There's a cyclical, multi-person interaction when handling the invite process. Arne would like the app to make it <a href="https://github.com/robert-stuttaford/bridge/blob/master/doc/requirements.md#self-service-acceptdecline">totally self-service</a>.</p>
-<h5 id="reporting">Reporting</h5>
+<h5 id="reporting"><a href="#reporting" id="reporting">Reporting</a></h5>
 <p>Ah, good old reporting. Organisers need to be able to quickly determine head-counts for things like t-shirt sizes, catering choices, child-care, and so on.</p>
 <p>More friction to remove!</p>
-<h5 id="learning-groups">Learning groups</h5>
+<h5 id="learning-groups"><a href="#learning-groups" id="learning-groups">Learning groups</a></h5>
 <p>Another interesting bit is how participants are grouped during a live ClojureBridge event. Several factors play a part: who's actually available, language preference, prior experience, coaching preference — all of this matters.</p>
 <p>It'll be interesting to see how we might solve this algorithmically.</p>
 <p>Perhaps it'll give me a strong enough impetus to understand <a href="https://github.com/clojure/core.logic">core.logic</a> enough to solve an actual challenge?</p>
 <p>This does feel a bit like planning who sits next to whom at a wedding :-)</p>
-<h4 id="chapter-management">Chapter management</h4>
+<h4 id="chapter-management"><a href="#chapter-management" id="chapter-management">Chapter management</a></h4>
 <p>If things go as well as I hope, I'd like to see this system used by ClojureBridge around the world, not just the chapter in Berlin. That means that there'll be an additional layer beyond users and events, where we control who organises which chapter, adding new chapters, and so forth.</p>
 <p>A personal goal (one I acknowledge may not be possible, because it's not actually up to me) is that this system lives on the main <a href="http://www.clojurebridge.org">ClojureBridge</a> site somehow.</p>
 <p>I suppose am in control of one thing; I can ensure that I make this as useful as possible!</p>
 <p>Perhaps when the time is right, I'll be able to make a strong case for having this system facilitate all the ClojureBridge events around the world.</p>
 <hr>
-<h3 id="its-full-stack">It's full stack</h3>
+<h3 id="its-full-stack"><a href="#its-full-stack" id="its-full-stack">It's full stack</a></h3>
 <p>That I'll be using Clojure 1.9, ClojureScript, and Datomic are <em>quite</em> obvious :-)</p>
-<h4 id="rich-user-experience">Rich user experience</h4>
+<h4 id="rich-user-experience"><a href="#rich-user-experience" id="rich-user-experience">Rich user experience</a></h4>
 <p>There's loads of things to build into a single-page app backed by an EDN API, but also a fair amount of simple server-rendered pages. We'll be able to see both approaches working in unison.</p>
-<h4 id="no-leiningen">No Leiningen</h4>
+<h4 id="no-leiningen"><a href="#no-leiningen" id="no-leiningen">No Leiningen</a></h4>
 <p>Since the release of Clojure 1.9, <a href="https://clojure.org/guides/deps_and_cli">Clojure ships with its own cli tool</a>. As I've been happily ensconced in my fortress of <code>project.clj</code> files these past six years, I've had no reason to get to grips with this tool, or any of its implications.</p>
 <p>I've decided to apply a simple forcing function for this project: do it with <code>clojure</code> and <a href="https://clojure.org/reference/deps_and_cli">tools.deps.alpha</a> / <code>deps.edn</code> alone — no Leiningen!</p>
-<h4 id="libraries-ive-had-an-itch-to-try-out">Libraries I've had an itch to try out</h4>
+<h4 id="libraries-ive-had-an-itch-to-try-out"><a href="#libraries-ive-had-an-itch-to-try-out" id="libraries-ive-had-an-itch-to-try-out">Libraries I've had an itch to try out</a></h4>
 <p>I've long been a fan of <a href="https://twitter.com/stuartsierra">Stuart Sierra</a>'s <a href="http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded">Reloaded workflow</a>, as I am sure many Clojurians (Clojurists? Clojurologists? Clojuronimoes?) are.</p>
 <p>Having used <a href="http://github.com/stuartsierra/component">Component</a> and <a href="https://github.com/puppetlabs/trapperkeeper">TrapperKeeper</a> thus far, I've been aware of several other takes on this, such as <a href="https://twitter.com/danielszmu">Daniel Szmulewicz</a>' <a href="https://github.com/danielsz/system">System</a> and <a href="https://twitter.com/weavejester">James Reeves</a>' <a href="https://github.com/weavejester/integrant">Integrant</a>.</p>
 <p>I decided to give Integrant and <a href="https://github.com/weavejester/ataraxy">Ataraxy</a> (also by James) a try. I like their design, and I just love saying their names.</p>
 <p>Makes me feel a little like I'm living in a <a href="https://en.wikipedia.org/wiki/Culture_series">Culture novel</a> :-)</p>
-<h4 id="datomic-on-prem-vs-datomic-cloud">Datomic On-Prem vs Datomic Cloud</h4>
+<h4 id="datomic-on-prem-vs-datomic-cloud"><a href="#datomic-on-prem-vs-datomic-cloud" id="datomic-on-prem-vs-datomic-cloud">Datomic On-Prem vs Datomic Cloud</a></h4>
 <p>I did intend on using <a href="https://www.datomic.com/">Datomic Cloud</a> for this, as this is something I wish to experience, but it's not quite ready yet.</p>
 <p>Critically, it has no support for <a href="https://docs.datomic.com/on-prem/excision.html">excision</a>, which is a key requirement for this app — we'd be honour (and legally) bound to lose people's <abbr title="Personally Identifiable Information">PII</abbr> when they request it. Given that Datomic doesn't actually delete anything, this is a problem which only excision can solve.</p>
 <img src="https://memegenerator.net/img/instances/78164808/say-gdpr-one-more-time.jpg">
@@ -108,14 +108,14 @@
 <p>The other thing, though, is that someone has to pay to host this once it's built, and a USD40/month VPS running Datomic Free and our Clojure app is likely to be all we need. Using Datomic Cloud will cost at least 2-3x that, due to the need for multiple AWS resources.</p>
 <p>All is not lost, though! I will use this opportunity to build with the <a href="https://docs.datomic.com/client-api/index.html">Datomic Client</a> library instead of the <a href="https://docs.datomic.com/on-prem/clojure/index.html">Datomic Peer</a> library, as it is a substantially simpler (and therefore different) API. This'll also teach me about running a <a href="https://docs.datomic.com/on-prem/peer-server.html">Peer Server</a>.</p>
 <p>That way, one day, I'll be able to convert the project to use Cloud when it's ready. I expect that conversion to be a quick one.</p>
-<h4 id="im-not-a-designer">I'm not a designer</h4>
+<h4 id="im-not-a-designer"><a href="#im-not-a-designer" id="im-not-a-designer">I'm not a designer</a></h4>
 <p>… so I'll be using <a href="https://bulma.io">Bulma</a> to style all of the pages. Not only does it look great, it doesn't force any JavaScript on you.</p>
 <hr>
-<h2 id="progress-so-far">Progress so far</h2>
+<h2 id="progress-so-far"><a href="#progress-so-far" id="progress-so-far">Progress so far</a></h2>
 <p>I've waited to write about all of this, because I wanted to have some progress to show. So, here's the code!</p>
 <p>​    <a href="https://github.com/robert-stuttaford/bridge">https://github.com/robert-stuttaford/bridge</a></p>
 <p>So far, it has:</p>
-<h4 id="development-and-build-tools-without-leiningen">Development and build tools without Leiningen</h4>
+<h4 id="development-and-build-tools-without-leiningen"><a href="#development-and-build-tools-without-leiningen" id="development-and-build-tools-without-leiningen">Development and build tools without Leiningen</a></h4>
 <p>All using the <code>clojure</code> CLI, and a <code>Makefile</code> to save the repetitive typing:</p>
 <ul>
 <li>REPL + Figwheel, with CIDER/clj-refactor middleware.</li>
@@ -127,7 +127,7 @@
 <pre><code class="language-sh">clojure -Sdeps '{:deps {org.clojure/clojurescript {:git/url &quot;https://github.com/clojure/clojurescript&quot; :sha &quot;4df0542339e533b2d1e1dd7f6ffa8824eab64893&quot;}}}' -m cljs.main -h
 </code></pre>
 <p>With all of these in place, I'm happy that I can provision CI and run this in a production setting.</p>
-<h4 id="web-service">Web service</h4>
+<h4 id="web-service"><a href="#web-service" id="web-service">Web service</a></h4>
 <p>An Integrant system, connecting a Jetty web server, a Datomic connection, and a <em>say-it-with-me</em> Ataraxy  Ring handler.</p>
 <p>It was fun to compose Integrant with <a href="https://github.com/hlship/dyn-edn">dyn-edn</a>, released just a couple days ago. By providing its capability as data readers, it was trivial to use with Integrant's own <code>read-string</code>. Thanks again, <a href="https://twitter.com/hlship">@hlship</a>!</p>
 <p>It also has:</p>
@@ -147,13 +147,13 @@
 </li>
 </ul>
 <hr>
-<h2 id="next-steps-from-here">Next steps from here</h2>
+<h2 id="next-steps-from-here"><a href="#next-steps-from-here" id="next-steps-from-here">Next steps from here</a></h2>
 <p>So, there we have it!</p>
 <p>I'm all set to begin building the actual application, now. That means starting with that most-requested Datomic feature: modelling data.</p>
 <p>Taking inspiration from my colleague <a href="https://twitter.com/nikitonsky">tonsky</a>, who <a href="https://www.youtube.com/watch?v=Oy3IImX-nSU">live-streams Clojure programming</a> (in Russian),  I'd like to experiment with doing this in a live-stream, too. Failing that, I may simply record a couple programming sessions, and share it that way.</p>
 <p>No matter what else, I'll be sharing the code and writing developer diaries along the way, just as I have done today.</p>
 <hr>
-<h2 id="in-closing">In closing</h2>
+<h2 id="in-closing"><a href="#in-closing" id="in-closing">In closing</a></h2>
 <p>I have no idea where I'll end up with this project. I recognise that many projects that start this way, never get finished, which I guess is a risk I'll just have to take.</p>
 <p>Of course, I have a selfish reason for doing this, that goes beyond the pure and simple <em>fun</em> of building something — and that's to promote my <a href="/consulting/">consulting</a> practice. My hope is that I can demonstrate my value, rather than writing short novels about it — &quot;show, don't tell,&quot; if you will.</p>
 <p>Regardless of whether my consulting interests you, if you're at all interested in this adventure, I'd love to hear from you.</p>

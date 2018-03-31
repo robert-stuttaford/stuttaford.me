@@ -3,18 +3,18 @@
 <p><a href="/2018/02/18/a-clojure-learning-journey/">A Clojure learning journey</a></p>
 <p>This diary entry covers the <a href="https://github.com/robert-stuttaford/bridge/compare/a7ae33baa9aed47d39882b635b2b0ede4dcac5d9...be515cdcc591b2a5b0123c871f41d7a7e74b880a">changes in this diff</a>.</p>
 <hr>
-<h2 id="datomic-peer-vs-datomic-client">Datomic Peer vs Datomic Client</h2>
+<h2 id="datomic-peer-vs-datomic-client"><a href="#datomic-peer-vs-datomic-client" id="datomic-peer-vs-datomic-client">Datomic Peer vs Datomic Client</a></h2>
 <p>Although I'm planning for the app to use Datomic Peer in production, as a learning exercise, I've decided to implement the Datomic layer with both the Peer and the Client at the same time.</p>
 <p>This'll serve to highlight the differences between the two (or non-differences), and allow us to explore some ways in which Clojure supports abstractions like this.</p>
 <p>In practice, you'll switch between these with a <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn#L2">single configuration setting</a>.</p>
 <p>Of course, this assumes that the respective transactor and peer-server processes are running.</p>
-<h3 id="caveat-toolsdepsalpha-and-datomic-pro-peer">Caveat: tools.deps.alpha and Datomic Pro Peer</h3>
+<h3 id="caveat-toolsdepsalpha-and-datomic-pro-peer"><a href="#caveat-toolsdepsalpha-and-datomic-pro-peer" id="caveat-toolsdepsalpha-and-datomic-pro-peer">Caveat: tools.deps.alpha and Datomic Pro Peer</a></h3>
 <p>It's not possible to use the Datomic Pro Peer library with <code>deps.edn</code>  at the moment, because <a href="https://github.com/clojure/tools.deps.alpha">tools.deps.alpha</a> doesn't currently support Maven authentication.</p>
 <p>It's being worked on; see <a href="https://dev.clojure.org/jira/browse/TDEPS-9">the relevant Jira ticket here</a> — please vote for it :-)</p>
 <p>Because of this, we can't use Datomic Pro in Peer mode. This doesn't matter for the moment, because my initial development will happen with an in-memory database, but when the time comes to use storage, we'll have to use the <code>datomic:free://</code> Datomic URI modality.</p>
 <hr>
-<h2 id="code-changes">Code changes</h2>
-<h3 id="datomic-integrant-implementation-update">Datomic Integrant implementation update</h3>
+<h2 id="code-changes"><a href="#code-changes" id="code-changes">Code changes</a></h2>
+<h3 id="datomic-integrant-implementation-update"><a href="#datomic-integrant-implementation-update" id="datomic-integrant-implementation-update">Datomic Integrant implementation update</a></h3>
 <p>As described earlier, we now support both Peer and Client.</p>
 <p>Our Integrant <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn">system map</a> now includes configuration for both modes.</p>
 <p>The <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22">Datomic implementation</a> now returns a map with two or three keys:</p>
@@ -25,10 +25,10 @@
 <p>Of course, the <code>:datomic/client</code> is only present if we're using that mode.</p>
 <p>Then, the Ring middleware merges this map, plus a Datomic database value at <code>:datomic/db</code>, into the request map, for our handlers to use as needed.</p>
 <p>It's going to be interesting to see how dealing with both APIs at once turns out. Even if it results in code that I wouldn't be happy with in a &quot;serious&quot; production setting (which may not even happen!), I think it's worth trying, as a way to directly confront the API differences head on.</p>
-<h3 id="explicit-environment-variables">Explicit environment variables</h3>
+<h3 id="explicit-environment-variables"><a href="#explicit-environment-variables" id="explicit-environment-variables">Explicit environment variables</a></h3>
 <p>I moved the environment defaults from <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn">system.edn</a> to its own file <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/bridge.env">bridge.env</a>, so that they can be used outside of Clojure processes (e.g. when running the peer-server).</p>
 <p>The <a href="https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/Makefile">makefile</a> sources this file before running any Clojure processes that require it.</p>
-<h3 id="datomic-transactor--peer-server-helper-scripts">Datomic transactor / peer server helper scripts</h3>
+<h3 id="datomic-transactor--peer-server-helper-scripts"><a href="#datomic-transactor--peer-server-helper-scripts" id="datomic-transactor--peer-server-helper-scripts">Datomic transactor / peer server helper scripts</a></h3>
 <p>If you're new to Datomic, I've provided some <a href="https://github.com/robert-stuttaford/bridge/tree/be515cdcc591b2a5b0123c871f41d7a7e74b880a/script">bash scripts</a> to ease you into it:</p>
 <p><code>install-datomic-free.sh</code></p>
 <p>Does what it says on the tin!</p>
@@ -38,10 +38,10 @@
 <p>Run your Datomic transactor, which works whether you decide to use Free or Pro.</p>
 <p><code>datomic-peer-server.sh</code></p>
 <p>Again, if you decide to use the Datomic Client option, you'll run the peer-server alongside your transactor.</p>
-<h3 id="new-debug-page">New debug page</h3>
+<h3 id="new-debug-page"><a href="#new-debug-page" id="new-debug-page">New debug page</a></h3>
 <p>I added a <code>/system</code> page which prints out the fully realised Integrant system configuration, as well as the Ring request.</p>
 <p>This'll be useful for debugging both Integrant system issues as well as Ring middleware, particularly as we work on the user authentication and authorisation stuff.</p>
-<h3 id="dependency-updates">Dependency updates</h3>
+<h3 id="dependency-updates"><a href="#dependency-updates" id="dependency-updates">Dependency updates</a></h3>
 <p>One disadvantage of using <code>:git/url</code> and <code>:sha</code> with <code>deps.edn</code> is that it puts all of the source from these dependencies on your classpath — which means that <code>tools.namespace</code> includes it in the <code>refresh</code> cycle. It's merely an annoyance, that goes away after your first <code>refresh</code>.</p>
 <p>Even so, it's nice that we can now use the freshly minted <a href="https://github.com/clojure/clojurescript/releases/tag/r1.10.64">ClojureScript 1.10.64</a> release. You can watch an awesome livecast about some of the changes in this release here: <a href="https://www.youtube.com/watch?v=KG9uFtXaqYg">Apropos Episode 1</a> — follow <a href="https://twitter.com/apropos_cast">Apropos</a> account on Twitter to learn when the next episode is!</p>
 <p>I'm really excited about the potential of <code>cljs.main</code>!</p>

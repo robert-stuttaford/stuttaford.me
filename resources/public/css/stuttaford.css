@@ -134,10 +134,10 @@ a.anchor {
     font-size 0.9em;
 }
 
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+.post h1 a, .post h2 a, .post h3 a, .post h4 a, .post h5 a, .post h6 a {
     color: #313131;
 }
 
-h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+.post h1 a:hover, .post h2 a:hover, .post h3 a:hover, .post h4 a:hover, .post h5 a:hover, .post h6 a:hover {
     color: #268bd2;
 }
