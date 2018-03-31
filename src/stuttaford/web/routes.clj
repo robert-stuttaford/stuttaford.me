@@ -8,7 +8,7 @@
             [stuttaford.web.content :as content]
             [stuttaford.web.layout.atom :as atom]))
 
-(def ^:dynamic PROD-MODE? false)
+(def ^:dynamic PROD-MODE? true)
 
 (def site-config
   #(-> "config.edn" slurp edn/read-string))

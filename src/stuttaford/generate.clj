@@ -76,4 +76,6 @@
   (alter-var-root #'routes/PROD-MODE? (constantly false))
   (log/info "Done."))
 
-#_ (build)
+(defn -main [& args]
+  (build)
+  (System/exit 0))

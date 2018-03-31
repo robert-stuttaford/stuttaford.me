@@ -4,8 +4,8 @@
 
   compojure                         {:mvn/version "1.6.0"}
   peridot                           {:mvn/version "0.5.0"}
-  datascript                        {:mvn/version "0.16.3"}
-  com.vladsch.flexmark/flexmark-all {:mvn/version "0.28.38"}
+  datascript                        {:mvn/version "0.16.4"}
+  com.vladsch.flexmark/flexmark-all {:mvn/version "0.32.18"}
   me.raynes/fs                      {:mvn/version "1.4.6"}
   ring/ring-core                    {:mvn/version "1.6.3"}
   org.clojure/core.async            {:mvn/version "0.4.474"}
@@ -24,13 +24,13 @@
   ring/ring-devel                {:mvn/version "1.6.3"}
 
   ;; Cljs
-  org.clojure/clojurescript {:mvn/version "1.10.64"}
-  figwheel-sidecar          {:mvn/version "0.5.14" :exclusions
+  org.clojure/clojurescript {:mvn/version "1.10.238"}
+  figwheel-sidecar          {:mvn/version "0.5.15" :exclusions
                              [com.google.javascript/closure-compiler]}
-  rum                       {:mvn/version "0.11.1"}
+  rum                       {:mvn/version "0.11.2"}
 
   ;; REPL
-  org.clojure/tools.nrepl {:mvn/version "0.2.12"}
+  org.clojure/tools.nrepl {:mvn/version "0.2.13"}
   cider/cider-nrepl       {:mvn/version "0.17.0-SNAPSHOT"}
   refactor-nrepl          {:mvn/version "2.4.0-SNAPSHOT"}}
 
@@ -40,4 +40,16 @@
    :extra-paths ["dev"]
    :extra-deps
    {integrant/repl     {:mvn/version "0.3.0"}
-    com.taoensso/tufte {:mvn/version "1.1.2"}}}}}
+    com.taoensso/tufte {:mvn/version "1.1.2"}}}
+
+  :outdated
+  {:extra-deps {olical/depot {:mvn/version "1.0.1"}}
+   :main-opts  ["-m" "depot.outdated.main"]}
+
+  :serve
+  {:jvm-opts  ["-Dlogback.configurationFile=resources/logback.xml"]
+   :main-opts ["-m" "stuttaford.service"]}
+
+  :generate
+  {:jvm-opts  ["-Dlogback.configurationFile=resources/logback.xml"]
+   :main-opts ["-m" "stuttaford.generate"]}}}

@@ -19,3 +19,6 @@
   (stop-web!)
   (refresh :after 'stuttaford.service/start-web!)
   :done)
+
+(defn -main [& args]
+  (start-web!))
