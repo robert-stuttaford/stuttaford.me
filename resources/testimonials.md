@@ -3,6 +3,20 @@ layout: page
 title: Testimonials
 ---
 
+### Steve Buikhuizen, a consulting client
+
+<div class="tldr" style="padding-top: 1rem">
+
+I'm building a Clojure/Datomic based web-app and was unsure about some of my architecture choices. I decided to try out Rob's consulting offering after seeing his open source "Bridge" project. What a relief that I did. 
+
+Not only has Rob helped me avoid a lot of costly mistakes but his broad experience has helped me improve my Clojure code, feature priorities and even UX. 
+
+He is great to riff off when not sure about directions of thought. He always checks that he's providing value for the time spent, ensuring that I'm getting as much as possible.
+
+I'll continue to use Rob as an advisor going forward without hesitation. It's saving me time and money.
+
+</div>
+
 ### Barry Kayton, Cognician founder
 
 <div class="tldr" style="padding-top: 1rem">
