@@ -7,7 +7,7 @@ title: Testimonials
 
 <div class="tldr" style="padding-top: 1rem">
 
-I'm building a Clojure/Datomic based web-app and was unsure about some of my architecture choices. I decided to try out Rob's consulting offering after seeing his open source "Bridge" project. What a relief that I did. 
+I'm building a Clojure/Datomic based web-app and was unsure about some of my architecture choices. I decided to try out Rob's consulting offering after seeing his open source "[Bridge](github.com/robert-stuttaford/bridge)" project. What a relief that I did. 
 
 Not only has Rob helped me avoid a lot of costly mistakes but his broad experience has helped me improve my Clojure code, feature priorities and even UX. 
 
