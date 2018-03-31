@@ -1,9 +1,432 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-17T18:56:07Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Modelling access</title><link href="http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/" /><updated>2018-03-17T18:56:07Z</updated><id>http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-03-31T17:58:29Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Events API</title><link href="http://www.stuttaford.me/2018/04/01/bridge-dev-diary--events-api/" /><updated>2018-03-31T17:58:29Z</updated><id>http://www.stuttaford.me/2018/04/01/bridge-dev-diary--events-api/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Since then, I&apos;ve written other dev diary entries:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/03/bridge-dev-diary--datomic-mode/&quot;&gt;Bridge dev diary: Datomic mode&lt;/a&gt; — 3 March, 2018&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/17/bridge-dev-diary--modelling-access/&quot;&gt;Bridge dev diary: Modelling access&lt;/a&gt; — 17 March, 2018&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Today&apos;s diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c...7f2b0822ae6837589b584f9f07cf58d472ef7a37&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;A small preface: I&apos;m discovering that it&apos;s amazing just how much better your code gets when you write about it. I ended up doing &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/7007fcd65b6f676a5b8df79056f4560b89e95b28...7f2b0822ae6837589b584f9f07cf58d472ef7a37&quot;&gt;quite a bit more&lt;/a&gt; to organise code, rename things and generally make things consistent in the code during the writing of this post.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;I highly encourage you to try it some time: the next time you finish writing some code, write a post to your colleagues explaining what you did, and why. See what happens to your understanding, and, what happens to the code! :-)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Please let me know how it goes for you, if you do actually this!&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;A small warning: this is a very long, dense post!&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;You might want to bookmark this post to read in several sittings :-)&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#dealing-with-events&quot;&gt;Dealing with events&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#the-approach-ive-taken&quot;&gt;The approach I&apos;ve taken&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#layers&quot;&gt;Layers&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#people-a-small-update&quot;&gt;People: a small update&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#naming-things-correctly-is-important&quot;&gt;Naming things correctly is important&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#example-tests&quot;&gt;Example tests&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#new-entity-chapters&quot;&gt;New entity: Chapters&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#chapter-schema&quot;&gt;Chapter schema&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#chapter-behaviours&quot;&gt;Chapter behaviours&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#new-entity-events&quot;&gt;New entity: Events&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#event-schema&quot;&gt;Event schema&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#event-behaviours&quot;&gt;Event behaviours&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#intermission&quot;&gt;&lt;em&gt;Intermission&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#events-api&quot;&gt;Events API&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#api-request-handler&quot;&gt;API request handler&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#authentication-as-middleware&quot;&gt;Authentication as middleware&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#modelling-fine-grained-updates&quot;&gt;Modelling fine-grained updates&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#building-a-validation-chain&quot;&gt;Building a validation chain&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#reifying-the-update-context&quot;&gt;Reifying the update context&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#custom-validators&quot;&gt;Custom validators&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#refactoring-for-consistency&quot;&gt;Refactoring for consistency&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#actually-updating-the-heckin-database&quot;&gt;Actually updating the heckin&apos; database&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#various-other-updates&quot;&gt;Various other updates&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#spec-code-organisation&quot;&gt;Spec code organisation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#tests&quot;&gt;Tests&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#client&quot;&gt;Client&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#dependencies&quot;&gt;Dependencies&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;dealing-with-events&quot;&gt;&lt;a href=&quot;#dealing-with-events&quot; id=&quot;dealing-with-events&quot;&gt;Dealing with events&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;My current programming goal here is for an organser to be able to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create a new event&lt;/li&gt;
+&lt;li&gt;Alter an event&apos;s details&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;My guiding UX principle is to ask the user to commit to as little as possible in any given interaction.&lt;/p&gt;
+&lt;p&gt;Ok, that sounds pretty abstract. How does this play out in practice?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Create a new event: only ask for the essentials - title and start/end dates. We&apos;ll infer sensible defaults for other mandatory fields from these.&lt;/li&gt;
+&lt;li&gt;Alter an event&apos;s details: be able to update each field in place, rather than re-submitting a form with all the fields possibly changing.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This makes each of these interaction small, and therefore easy to reason about, and to provide fast feedback to the user for.&lt;/p&gt;
+&lt;p&gt;It also makes it easy for the user to make corrections — to undo any recent change — by doing the same thing, but in reverse.&lt;/p&gt;
+&lt;h3 id=&quot;the-approach-ive-taken&quot;&gt;&lt;a href=&quot;#the-approach-ive-taken&quot; id=&quot;the-approach-ive-taken&quot;&gt;The approach I&apos;ve taken&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;On the surface, those two use-cases are quite simple — after all, we&apos;ve all built CRUD apps before — it&apos;s just two forms, right?&lt;/p&gt;
+&lt;p&gt;Rather than using that excuse to quickly trot out messy-but-working &lt;code&gt;add-event&lt;/code&gt; / &lt;code&gt;edit-event&lt;/code&gt; forms, I decided to slow down, and consciously build each layer up, one by one.&lt;/p&gt;
+&lt;p&gt;To give myself the space to establish good patterns for dealing with all the concerns involved in shepherding user data from the browser to the database, and back out again.&lt;/p&gt;
+&lt;p&gt;Concerns like authorisation and error handling, but also, things like how the code is organised, consistent use of naming conventions, and things like that.&lt;/p&gt;
+&lt;p&gt;I reasoned to myself that once I had done all of this for two or three use-cases, adding more use-cases will go much faster, because I would be able to lean on the abstractions I had built up.&lt;/p&gt;
+&lt;p&gt;It has been a really rewarding process to consciously slow down like this, and deliberately piece these things together. I&apos;ve had tremendous fun.&lt;/p&gt;
+&lt;p&gt;Here&apos;s to hoping that it allows me to move quickly later, as I lean on this foundational work!&lt;/p&gt;
+&lt;h3 id=&quot;layers&quot;&gt;&lt;a href=&quot;#layers&quot; id=&quot;layers&quot;&gt;Layers&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Here are the layers that have emerged as I&apos;ve chewed on these two cases:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.datomic.com/on-prem/schema.html&quot;&gt;Datomic schema&lt;/a&gt; — the &apos;bottom&apos;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://clojure.org/guides/spec&quot;&gt;Specs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Functions, each with their own example unit-tests:
+&lt;ol&gt;
+&lt;li&gt;Queries to establish permission&lt;/li&gt;
+&lt;li&gt;Validate inputs&lt;/li&gt;
+&lt;li&gt;Make transactions&lt;/li&gt;
+&lt;li&gt;Commit transactions&lt;/li&gt;
+&lt;li&gt;Normal data queries&lt;/li&gt;
+&lt;li&gt;API layer to compose all of the above&lt;/li&gt;
+&lt;li&gt;HTTP interaction with the API — the current &apos;top&apos;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Keep an eye out for these layers as we go through what&apos;s been added since last time.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;people-a-small-update&quot;&gt;&lt;a href=&quot;#people-a-small-update&quot; id=&quot;people-a-small-update&quot;&gt;People: a small update&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I didn&apos;t feel that I was quite done with the code I wrote last time.&lt;/p&gt;
+&lt;h3 id=&quot;naming-things-correctly-is-important&quot;&gt;&lt;a href=&quot;#naming-things-correctly-is-important&quot; id=&quot;naming-things-correctly-is-important&quot;&gt;Naming things correctly is important&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;First, I had a name to fix.&lt;/p&gt;
+&lt;p&gt;I had named the &lt;code&gt;valid-password?&lt;/code&gt; function using the Clojure convention of using a &lt;code&gt;?&lt;/code&gt; suffix for naming predicates (which return either &lt;code&gt;true&lt;/code&gt; or &lt;code&gt;false&lt;/code&gt;), but in fact, this function returned either an error keyword or &lt;code&gt;nil&lt;/code&gt;. I renamed it to  &lt;code&gt;check-password-validity&lt;/code&gt; instead.&lt;/p&gt;
+&lt;p&gt;Incidentally, you absolutely must read &lt;a href=&quot;https://leanpub.com/elementsofclojure&quot;&gt;Elements of Clojure&lt;/a&gt; by &lt;a href=&quot;https://twitter.com/ztellman&quot;&gt;Zach Tellman&lt;/a&gt; — the first chapter on Names is &lt;em&gt;so good&lt;/em&gt;!&lt;/p&gt;
+&lt;h3 id=&quot;example-tests&quot;&gt;&lt;a href=&quot;#example-tests&quot; id=&quot;example-tests&quot;&gt;Example tests&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Then, I also decided not to let any technical debt accrue, and made sure to add &lt;a href=&quot;https://lispcast.com/unit-testing-in-functional-languages/&quot;&gt;example tests&lt;/a&gt; for all of the functions that are used by our &lt;a href=&quot;/2018/03/17/bridge-dev-diary--modelling-access/#modelling-people&quot;&gt;access pages&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;While doing this, some basic testing patterns emerged pretty quickly, which I&apos;ve since reused:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Using &apos;constant&apos; &lt;code&gt;def&lt;/code&gt;s for commonly used test values; e.g. &lt;code&gt;TEST-EMAIL&lt;/code&gt;, rather than hardcoding the actual values everywhere.&lt;/li&gt;
+&lt;li&gt;Using a no-arg function to wrap invocation of &lt;code&gt;new-person-tx&lt;/code&gt;, so that Spec instrumentation can report on issues. Previously, I had &lt;code&gt;def&lt;/code&gt;ed this result as a constant value, which unfortunately happens while instrumentation is not enabled.&lt;/li&gt;
+&lt;li&gt;Mocking impure functions that generate random data, like &lt;code&gt;nonce&lt;/code&gt;, by wrapping a call to the actual function with &lt;code&gt;constantly&lt;/code&gt;. This means I still test the actual function, even if just to generate a value for testing other things later!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I also tremendously enjoyed using the slick tooling &lt;a href=&quot;https://cider.readthedocs.io/en/latest/running_tests/&quot;&gt;CIDER provides for testing&lt;/a&gt;. Being able to &lt;code&gt;run-last-failing-test&lt;/code&gt;, &lt;code&gt;run-tests-for-this-ns&lt;/code&gt;, and &lt;code&gt;run-all-tests&lt;/code&gt;, and get quick feedback without disrupting what I&apos;m editing, made keeping working tests updated very easy to do.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;new-entity-chapters&quot;&gt;&lt;a href=&quot;#new-entity-chapters&quot; id=&quot;new-entity-chapters&quot;&gt;New entity: Chapters&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Once I had done my first pass with Events (which I&apos;ll get to later), I recognised that I had to model Chapters too. I needed a way to model the check we need to do to see whether the active person may create events.&lt;/p&gt;
+&lt;p&gt;I decided to model just enough about Chapters for it to be useful in this way, and to be consistent about covering all the same bases I had just done for our Person entity — that is, to ensure that we have schema, specs, a data namespace, and example tests.&lt;/p&gt;
+&lt;h3 id=&quot;chapter-schema&quot;&gt;&lt;a href=&quot;#chapter-schema&quot; id=&quot;chapter-schema&quot;&gt;Chapter schema&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, now I have the following schema:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:chapter/title&lt;/code&gt; — string&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;:chapter/location&lt;/code&gt; — string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So that we have a name, and a way to record suitable geographical info.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:chapter/slug&lt;/code&gt; — unique string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A common web pattern is to store an identifier suitable for use in web URLs, rather than to expose an internal database ID directly.&lt;/p&gt;
+&lt;p&gt;Given that we know we&apos;ll be doing a lot of stuff in the context of a chapter, we&apos;ll need one of those here.&lt;/p&gt;
+&lt;h4 id=&quot;url-slugs&quot;&gt;&lt;a href=&quot;#url-slugs&quot; id=&quot;url-slugs&quot;&gt;URL slugs&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Rather than re-invent the wheel here, I looked around to see what others had done, and found &lt;a href=&quot;https://github.com/rlander/slugify&quot;&gt;Slugify&lt;/a&gt; by &lt;a href=&quot;https://twitter.com/rlander&quot;&gt;Rodrigo Landerdahl&lt;/a&gt;, which is &lt;em&gt;6 years old&lt;/em&gt;, but still perfectly capable!&lt;/p&gt;
+&lt;p&gt;I particularly liked that it dealt with non-ASCII characters, by using Java&apos;s &lt;code&gt;java.text.Normalizer&lt;/code&gt; (&lt;a href=&quot;https://docs.oracle.com/javase/7/docs/api/java/text/Normalizer.html&quot;&gt;reference&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;I didn&apos;t quite like the API Rodrigo came up with, and also didn&apos;t need to parameterise the delimiter, so I copied his code and tests, and reworked them to suit my tastes. I&apos;ve kept a comment refering to his library, however.&lt;/p&gt;
+&lt;p&gt;I also wrote a generic regex-backed slug spec for my entity specs to use.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:chapter/status&lt;/code&gt; — enum keyword&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As with Person, this gives us a way to easily disable a Chapter without having to retract data. I&apos;ve since realised that I like this approach due to that UX principle I mentioned above - it&apos;s easy to toggle between two enum states.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:chapter/organisers&lt;/code&gt; — ref, many&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Our first entity relationship! This opened up a fun Spec rabbit-hole...&lt;/p&gt;
+&lt;h4 id=&quot;specing-datomic-references&quot;&gt;&lt;a href=&quot;#specing-datomic-references&quot; id=&quot;specing-datomic-references&quot;&gt;Spec&apos;ing Datomic references&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;… and when the dust settled, I had (just enough) specs for my use of Datomic&apos;s transactions and pull results.&lt;/p&gt;
+&lt;p&gt;Currently, this includes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Datomic database - using &lt;code&gt;instance?&lt;/code&gt; (Peer) and &lt;code&gt;satisfies?&lt;/code&gt; (Client)&lt;/li&gt;
+&lt;li&gt;Temp ids - the simple string type, as well as those with partitions&lt;/li&gt;
+&lt;li&gt;Storage ids - i.e. normal longs&lt;/li&gt;
+&lt;li&gt;Lookup refs&lt;/li&gt;
+&lt;li&gt;Nested maps&lt;/li&gt;
+&lt;li&gt;Collections of all the above, for use with cardinality-many refs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These are all used to spec functions that take Datomic databases and/or lookup refs, deal with creating transactions, and with returning pull results.&lt;/p&gt;
+&lt;p&gt;By no means do I consider them to be an exhaustive coverage of the Datomic data API, but then, I don&apos;t need them to be. All I want is to be sure that &lt;em&gt;my&lt;/em&gt; transactions and pull results are ok. I&apos;m pretty sure they&apos;ll undergo tweaks and extensions as I cover more use-cases.&lt;/p&gt;
+&lt;p&gt;The nice outcome of all this work is that the combination of &lt;code&gt;s/fdef&lt;/code&gt; to instrument my functions, and my example tests, means that I need to do very little to verify data &lt;em&gt;inside&lt;/em&gt; the functions themselves, keeping them easy to reason about.&lt;/p&gt;
+&lt;h3 id=&quot;chapter-behaviours&quot;&gt;&lt;a href=&quot;#chapter-behaviours&quot; id=&quot;chapter-behaviours&quot;&gt;Chapter behaviours&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;We apply the patterns we&apos;ve already established when we did Person:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;new-chapter-tx&lt;/code&gt; - transaction.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;save-new-chapter!&lt;/code&gt; - commit.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;chapter-id-by-slug&lt;/code&gt; - query.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dev-data&lt;/code&gt; code to easily construct a Chapter, passing in our pre-existing dev-data Person as the sole organiser.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And we add new capability to support authorisation further &apos;up&apos;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;person-is-organiser?&lt;/code&gt; predicate, which verifies a given person as an organiser for a given chapter — or not.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;check-chapter-organiser&lt;/code&gt; validation function, which models the error condition for this predicate.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Of course, all of these behaviours come with example tests!&lt;/p&gt;
+&lt;h4 id=&quot;the-check-n-pattern&quot;&gt;&lt;a href=&quot;#the-check-n-pattern&quot; id=&quot;the-check-n-pattern&quot;&gt;The &lt;code&gt;check-n&lt;/code&gt; pattern&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;As we saw with the choosing of a better name for password validation above, I established a bit of a norm, arranged around the &lt;code&gt;check-n&lt;/code&gt; function name pattern.&lt;/p&gt;
+&lt;p&gt;In essence, a function with this prefix is expected to return error info if the check fails, or &lt;code&gt;nil&lt;/code&gt; if the check succeeds.&lt;/p&gt;
+&lt;p&gt;This way, using &lt;code&gt;nil&lt;/code&gt; for success means that we can chain multiple &lt;code&gt;check-n&lt;/code&gt; functions together with &lt;code&gt;or&lt;/code&gt;, with the actual business logic taking the last spot in that &lt;code&gt;or&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(or (check-something)
+    (check-a-different-thing)
+    (do-or-query-something-safely))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;See if you can spot the two places in the code where I use this pattern.&lt;/p&gt;
+&lt;h4 id=&quot;giving-error-conditions-their-own-names&quot;&gt;&lt;a href=&quot;#giving-error-conditions-their-own-names&quot; id=&quot;giving-error-conditions-their-own-names&quot;&gt;Giving error conditions their own names&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;I also decided to be specific about the shape of that error info. It should either be a simple keyword, or a map with an &lt;code&gt;:error&lt;/code&gt; key + keyword value.&lt;/p&gt;
+&lt;p&gt;As an experiment, I added a spec for this error shape, to ensure that this error keyword value has both &apos;bridge&apos; and &apos;error&apos; in its namespace, which allows error values like:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;:bridge.error/some-generic-error&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:bridge.chapter.error/some-chapter-error&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;My hypothesis is that this is going to force me to fully think through my error conditions, whenever I write any code in that direction, because I&apos;m going to have to be intentional about &lt;em&gt;naming&lt;/em&gt; those conditions.&lt;/p&gt;
+&lt;p&gt;I&apos;m planning to consume those error value names on the client later, to provide fine-grained feedback to the user.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;new-entity-events&quot;&gt;&lt;a href=&quot;#new-entity-events&quot; id=&quot;new-entity-events&quot;&gt;New entity: Events&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;On to modelling events!&lt;/p&gt;
+&lt;h3 id=&quot;event-schema&quot;&gt;&lt;a href=&quot;#event-schema&quot; id=&quot;event-schema&quot;&gt;Event schema&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:event/title&lt;/code&gt; — string&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;:event/slug&lt;/code&gt; — unique string&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Same as with Chapters - identity on the page and in the URL.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:event/status&lt;/code&gt; — enum keyword&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Because events model something that&apos;s time-bound (rather than a long-lived real-world entity), the &apos;active / deleted&apos; pattern doesn&apos;t really apply here.&lt;/p&gt;
+&lt;p&gt;Rather, an event can be one of six states:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;:status/draft&lt;/code&gt;&lt;/strong&gt;: It&apos;s not yet ready for the public to know about.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;:status/registering&lt;/code&gt;&lt;/strong&gt;: The event is public, and accepting registrations.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;:status/inviting&lt;/code&gt;&lt;/strong&gt;: Registration has closed, now finalising participants.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;:status/in-progress&lt;/code&gt;&lt;/strong&gt;: The event is happening right now!&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;:status/complete&lt;/code&gt;&lt;/strong&gt;: It&apos;s done, all the cake has been eaten, and there are several new Clojure programmers in the world!&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;:status/cancelled&lt;/code&gt;&lt;/strong&gt;: Something unexpected happened — it&apos;s no longer going to happen.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The status progression for successful events looks like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-mermaid&quot;&gt;graph LR
+D(Draft)
+R(Registering)
+IV(Inviting)
+IP(In Progress)
+CO(Complete)
+D--&amp;gt;R
+R--&amp;gt;IV
+IV--&amp;gt;IP
+IP--&amp;gt;CO
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, reality is often unkind; it&apos;s possible for events to be cancelled. This could happen for many reasons, almost all of which are outside of the scope of this app, so unless an event has already concluded, we&apos;ll simply allow an event to be cancelled at any time.&lt;/p&gt;
+&lt;p&gt;Of course, we&apos;ll make very sure to have the organiser confirm cancellation, because we won&apos;t allow this to be undone. Why? We plan to automatically send emails to everyone involved when this happens.&lt;/p&gt;
+&lt;p&gt;Here&apos;s the updated diagram, with cancellation included:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-mermaid&quot;&gt;graph LR
+D(Draft)
+R(Registering)
+IV(Inviting)
+IP(In Progress)
+CO(Complete)
+CA(Cancelled)
+D--&amp;gt;R
+R--&amp;gt;IV
+IV--&amp;gt;IP
+IP--&amp;gt;CO
+D-.-&amp;gt;CA
+R-.-&amp;gt;CA
+IV-.-&amp;gt;CA
+IP-.-&amp;gt;CA
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:event/chapter&lt;/code&gt; — ref&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;We set this once when creating the event, and never change it.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:event/organisers&lt;/code&gt; — ref, many&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Just as chapters have organisers, so too do events.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:event/start-date&lt;/code&gt; — inst&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;:event/end-date&lt;/code&gt; — inst&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The all-important scheduling info. Some ClojureBridge events can be 1-day events, and so we allow these dates to be identical.&lt;/p&gt;
+&lt;p&gt;However, we ensure that the start is never &lt;em&gt;after&lt;/em&gt; the end, with a spec — a simple Clojure predicate function over the &lt;code&gt;new-event-tx&lt;/code&gt; map.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:event/registration-close-date&lt;/code&gt; — inst&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;We track when registration closes separately to the event start date. As with start and end date above, we have the same relationship between the registration-close and start dates - that is, it&apos;s possible for all &lt;em&gt;three&lt;/em&gt; dates to be the same day, but, again — not for them to be out of natural time order.&lt;/p&gt;
+&lt;p&gt;So our spec predicate function described above actually specifies the relationship between all three dates.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;:event/details-markdown&lt;/code&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;:event/notes-markdown&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;We have two free text entry sections for each event; one for the public to see (details), and a private one for the organisers (notes). I make it explicit that our system expects Markdown in these strings, by including it in the name.&lt;/p&gt;
+&lt;p&gt;Both are totally optional, but the idea is that the public details will be used to share all the logistics with participants - the event&apos;s agenda, where to park, the secret password to use at the door, where to find the cake, and so on.&lt;/p&gt;
+&lt;p&gt;By using Markdown, we don&apos;t have to worry about structuring this information in the database, which means that any of it is optional, and the format used is up to the author. They could even use images, if they took care of the hosting.&lt;/p&gt;
+&lt;p&gt;This allows me to sidestep a lot of fiddly programming to deal with many fine-grained optional fields, for now. It&apos;s completely possible that we&apos;ll find that some of the things people put in here actually need to become mandatory, in which case we&apos;ll lift it to its own dedicated Datomic attribute, with all its attendant code.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;By the way: those graphs above are rendered from data — view the source! Check out &lt;a href=&quot;https://mermaidjs.github.io/&quot;&gt;mermaid&lt;/a&gt; if you want to easily construct graphs like this yourself.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;The Markdown editor I use, &lt;a href=&quot;https://typora.io/&quot;&gt;Typora&lt;/a&gt;, has built-in support for Mermaid, which made writing those graphs a breeze!&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&quot;event-behaviours&quot;&gt;&lt;a href=&quot;#event-behaviours&quot; id=&quot;event-behaviours&quot;&gt;Event behaviours&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;As with Person and Chapter:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;new-event-tx&lt;/code&gt; - transaction.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;save-new-event!&lt;/code&gt; - commit.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;event-id-by-slug&lt;/code&gt; - query.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I don&apos;t have &lt;code&gt;dev-data&lt;/code&gt; code, yet. I will do this once I move on to the next thing &lt;em&gt;after&lt;/em&gt; events, which is likely to be event registration.&lt;/p&gt;
+&lt;p&gt;And, as with Chapter, authorisation helpers:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;person-is-organiser?&lt;/code&gt; predicate, which verifies a given person as an organiser for a given event — or not.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;check-event-organiser&lt;/code&gt; validation function.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Finally, we have one new function type; a Datomic pull, which simply declares what data will be provided whenever we are asked for an event&apos;s details.&lt;/p&gt;
+&lt;p&gt;This is named &lt;code&gt;event-for-editing&lt;/code&gt;, because I wanted to be clear about the context for use; in this case, the details include the organiser-only notes markdown.&lt;/p&gt;
+&lt;p&gt;Of course, all of this stuff also comes with example tests.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&quot;tldr&quot;&gt;
+&lt;h2 id=&quot;intermission&quot;&gt;&lt;a href=&quot;#intermission&quot; id=&quot;intermission&quot;&gt;&lt;em&gt;Intermission&lt;/em&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Wow - you&apos;re past the 2,500 word mark!&lt;/p&gt;
+&lt;p&gt;If you&apos;re reading this in a single sitting, now&apos;s a great time to rest your eyes for a minute, have a stretch, and maybe even refresh your drink.&lt;/p&gt;
+&lt;p&gt;It&apos;s OK — I&apos;ll wait for you :-)&lt;/p&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;p&gt;Are you back? Do you have a refill? Ok, let&apos;s continue...&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;events-api&quot;&gt;&lt;a href=&quot;#events-api&quot; id=&quot;events-api&quot;&gt;Events API&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The API layer&apos;s job is very similar to the Controller from the MVC world, in that it &lt;em&gt;composes&lt;/em&gt; together the sequence of transformations, queries and transactions that make up our business logic, and to &lt;em&gt;give those compositions names&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;At the beginning of this short novel you&apos;re reading, we spoke of the principle of making changes small and easy to reason about. Here&apos;s where that principle directly applies to how we&apos;re writing the code.&lt;/p&gt;
+&lt;p&gt;I came up with three API calls that our eventual client app will use:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;save-new-event!&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Simply composes functions from the layers further &apos;down&apos; that I&apos;ve described above, with as little extra ceremony as possible:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;check-chapter-organiser&lt;/code&gt;  — the event doesn&apos;t exist yet, so we have delegate authority to the chapter instead.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;save-new-event!&lt;/code&gt; .&lt;/li&gt;
+&lt;li&gt;return &lt;code&gt;event-for-editing&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Through the keys it expects in the context from the client, the following inputs are named: the active person, a chapter id, and the minimum details necessary for creating a new event.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;event-details&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Composes:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;check-event-organiser&lt;/code&gt; — now we have an event, we can check that instead of the chapter.&lt;/li&gt;
+&lt;li&gt;return &lt;code&gt;event-for-editing&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Inputs: the active person, and the event&apos;s id.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;update-field-value!&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Composes:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;check-event-organiser&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;update-field-value!&lt;/code&gt; — a new abstraction, described later on.&lt;/li&gt;
+&lt;li&gt;return &lt;code&gt;event-for-editing&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Inputs: the active person, the event&apos;s id, and the field update.&lt;/p&gt;
+&lt;p&gt;—&lt;/p&gt;
+&lt;p&gt;In all cases above, we end by returning the full pull result, so that we can ensure that the client-side state can be brought into sync with what&apos;s in the database.&lt;/p&gt;
+&lt;p&gt;Given that I haven&apos;t actually written the client yet, this may change, but for now, it&apos;ll do — it tells the story &amp;quot;Ok, I&apos;ve done that, here&apos;s what I have, now.&amp;quot;&lt;/p&gt;
+&lt;p&gt;Before I talk about that new &lt;code&gt;update-field-value&lt;/code&gt; abstraction, let&apos;s cover how the API layer meets the Web.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;api-request-handler&quot;&gt;&lt;a href=&quot;#api-request-handler&quot; id=&quot;api-request-handler&quot;&gt;API request handler&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;This is our current &apos;top&apos; layer.&lt;/p&gt;
+&lt;p&gt;I want to be able to invoke the APIs described above without having to deal with the HTTP abstraction.&lt;/p&gt;
+&lt;p&gt;I want to use namespaced Clojure keywords to name my APIs, rather than HTTP routes. When I&apos;ve used HTTP routing tables to name API endpoints in the past, it&apos;s often turned into a mess, because I&apos;m having to do battle on two fronts: using HTTP semantics correctly, and accurate description of my domain.&lt;/p&gt;
+&lt;p&gt;I prefer to do it with plain Clojure instead, which makes for easier testing — because writing actual tests is easier, and I also stay inside the REPL a lot longer, because I get to avoid the browser for a little longer.&lt;/p&gt;
+&lt;p&gt;To that end, I created a &lt;em&gt;single&lt;/em&gt; &lt;a href=&quot;https://github.com/weavejester/ataraxy&quot;&gt;Ataraxy&lt;/a&gt; route, &lt;code&gt;/client/api&lt;/code&gt;, which will receive all the client&apos;s API calls as HTTP POST requests.&lt;/p&gt;
+&lt;p&gt;It takes care of the following:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Constructs a context for those API calls, by merging all of the below into a single map:
+&lt;ul&gt;
+&lt;li&gt;Datomic connection and database, from the request.&lt;/li&gt;
+&lt;li&gt;User identity, from the request session.&lt;/li&gt;
+&lt;li&gt;The POST body data, read as EDN, which is expected to be a map.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Invokes an &lt;code&gt;api&lt;/code&gt; multimethod, which dispatches on the value of  &lt;code&gt;:action&lt;/code&gt; in the context produced by 1 above. Given that we&apos;re defining an API, we&apos;ll throw an exception if this action doesn&apos;t dispatch.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;api&lt;/code&gt; returns normal Clojure data, which the API request handler will print to EDN and return as the response body.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;By doing it this way, I&apos;ve moved all of this construction, parsing, and printing to a single place, and away from my individual API implementations — just like a good abstraction should.&lt;/p&gt;
+&lt;p&gt;Later, when it&apos;s time to think about performance, I&apos;ll introduce &lt;a href=&quot;http://blog.cognitect.com/blog/2014/7/22/transit&quot;&gt;Transit&lt;/a&gt; here, once I have a production environment to configure for.&lt;/p&gt;
+&lt;h3 id=&quot;authentication-as-middleware&quot;&gt;&lt;a href=&quot;#authentication-as-middleware&quot; id=&quot;authentication-as-middleware&quot;&gt;Authentication as middleware&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I refactored one other thing, too — I moved the &lt;code&gt;buddy/authenticated?&lt;/code&gt; conditional that the client page had, up to an Ataraxy middleware function, which is referenced by the root service.&lt;/p&gt;
+&lt;p&gt;Each handler that requires this behaviour can now be decorated with &lt;code&gt;^:authenticated?&lt;/code&gt; metadata in the Ataraxy route map.&lt;/p&gt;
+&lt;p&gt;In this way, the base client page and the API request handler now use identical basic authentication logic.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;modelling-fine-grained-updates&quot;&gt;&lt;a href=&quot;#modelling-fine-grained-updates&quot; id=&quot;modelling-fine-grained-updates&quot;&gt;Modelling fine-grained updates&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I knew that I wanted to be able to update events one element at a time, with an edit-in-place type experience. To get a sense of what that&apos;d look like at the API layer, I wrote up some notes next to a listing of the schema:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;:event/title ; required
+:event/slug ; unique
+:event/status ; [&amp;lt;next state&amp;gt;] [cancel], both with confirm
+:event/chapter ; can&apos;t edit
+:event/organisers ; add/remove, must be at least one
+:event/start-date ; picker, &amp;lt; end
+:event/end-date ; picker, &amp;gt; start
+:event/registration-close-date ; picker, &amp;lt; start
+:event/details-markdown ; can be blank
+:event/notes-markdown ; can be blank
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Just reading through those notes, I am sure you can see how I arrived at some of the conclusions I&apos;ve already shared above.&lt;/p&gt;
+&lt;h3 id=&quot;building-a-validation-chain&quot;&gt;&lt;a href=&quot;#building-a-validation-chain&quot; id=&quot;building-a-validation-chain&quot;&gt;Building a validation chain&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;That &lt;code&gt;:event/chapter&lt;/code&gt; is unchanging, showed me that I needed to be specific about which attributes are allowed to be changed.&lt;/p&gt;
+&lt;p&gt;But, rather than letting that lead me to conclude that I needed a &apos;set-x&apos; workflow for each attribute, and decided instead to handle that with a simple attribute whitelist instead.&lt;/p&gt;
+&lt;p&gt;To code this, I started with a generic update function, which would use &lt;code&gt;cond&lt;/code&gt; to keep trying validations until either one failed, the first one being that whitelist check.&lt;/p&gt;
+&lt;p&gt;Next, I added a spec-based validation check, where I first test to see if a spec is registered (with &lt;code&gt;s/get-spec&lt;/code&gt;), and if it is, explicitly test with &lt;code&gt;s/valid?&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;After that came the need to deal with uniqueness. Again, rather than copping out to a specially named function for this one attribute, I knew that I can query the database to ask whether uniqueness mattered, and if so, perform a generic validation from there.&lt;/p&gt;
+&lt;p&gt;Then, to validate attributes that use references, I used the same trick to query the database schema, and then used &lt;code&gt;datomic/entid&lt;/code&gt; to check whether the referent exists.&lt;/p&gt;
+&lt;p&gt;What you just read above reads like a neat linear narrative, but it&apos;s true that I jumped around, refining specs, writing tests, and generally fixing small but incorrect assumptions throughout the code, as I wrote these generic validations.&lt;/p&gt;
+&lt;p&gt;Ok, so, so far, we have this:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Whitelist — does the system allow alterations at all?&lt;/li&gt;
+&lt;li&gt;Spec — if we have a spec, is it valid?&lt;/li&gt;
+&lt;li&gt;Uniqueness — if it needs to be unique, is it?&lt;/li&gt;
+&lt;li&gt;Reference — if it needs to exist as an entity, does it?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&quot;reifying-the-update-context&quot;&gt;&lt;a href=&quot;#reifying-the-update-context&quot; id=&quot;reifying-the-update-context&quot;&gt;Reifying the update context&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;At this point, I had the following inputs:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Database&lt;/li&gt;
+&lt;li&gt;The event&apos;s id&lt;/li&gt;
+&lt;li&gt;The attribute&lt;/li&gt;
+&lt;li&gt;The value we&apos;re trying to set&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I had all of these as positional function arguments. Seeing &lt;code&gt;event-id&lt;/code&gt; next to otherwise generic code made me realise that there&apos;s a small context to bring together here. So I put all but the database into a map, and wrote specs for the keys, and how they are to be composed. The client will be able to use those later.&lt;/p&gt;
+&lt;p&gt;This, I think, is what people mean when they say Clojure is &apos;data-oriented&apos;.&lt;/p&gt;
+&lt;h3 id=&quot;custom-validators&quot;&gt;&lt;a href=&quot;#custom-validators&quot; id=&quot;custom-validators&quot;&gt;Custom validators&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Ok - I still had some validations to deal with. I needed a way to ensure that status changes were according to the rules in the diagrams we saw further above, and I also needed a way to ensure that we never remove the last event organiser.&lt;/p&gt;
+&lt;p&gt;These are both pretty specific, and I felt they should have their own distinct implementations, but I didn&apos;t want them to be inside my nicely generic validation function.&lt;/p&gt;
+&lt;p&gt;So, I added another layer of indirection: a &lt;code&gt;check-custom-validation&lt;/code&gt; multimethod, which dispatches on the attribute name, and which is only attempted after all other validations pass. Then, I wrote implementations to ensure that status changes only occur in the agreed ways, and that you can&apos;t remove the last organiser.&lt;/p&gt;
+&lt;p&gt;I later recognised that these custom functions actually compared the incoming data to what was already present in the database for this entity, which is something that a generic system like spec will never be able to do (and nor should it!)&lt;/p&gt;
+&lt;h3 id=&quot;refactoring-for-consistency&quot;&gt;&lt;a href=&quot;#refactoring-for-consistency&quot; id=&quot;refactoring-for-consistency&quot;&gt;Refactoring for consistency&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Given that I was doing this, I recognised the now familiar &lt;code&gt;check-n&lt;/code&gt; pattern in place, and moved all of the generic logic above out to their own named &lt;code&gt;check-n&lt;/code&gt; functions, all nicely named and tested, and composed together with &lt;code&gt;or&lt;/code&gt; into a &apos;master&apos; validation function.&lt;/p&gt;
+&lt;h3 id=&quot;actually-updating-the-heckin-database&quot;&gt;&lt;a href=&quot;#actually-updating-the-heckin-database&quot; id=&quot;actually-updating-the-heckin-database&quot;&gt;Actually updating the heckin&apos; database&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, after all of that, all I ended up with was greater certainty that my intended changes can be committed. I still had to actually transact something.&lt;/p&gt;
+&lt;p&gt;Aside from organisers, all of my updates are assertions. So, expressing that what straightforward. I added a &lt;code&gt;retract?&lt;/code&gt; option to the update context, to allow the client to express retractions for the remove-organiser case.&lt;/p&gt;
+&lt;p&gt;Also, because those markdown fields are optional, it&apos;s possible for an organiser to blank out a previously populated notes area, thereby &apos;retracting&apos; its contents. So, I made sure to catch an incoming blank string assertion, and to instead treat it as a retraction.&lt;/p&gt;
+&lt;p&gt;It&apos;s safe to do this, because our specs in validation step 2 ensure that we don&apos;t let any blank strings through unless they&apos;re allowed.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;various-other-updates&quot;&gt;&lt;a href=&quot;#various-other-updates&quot; id=&quot;various-other-updates&quot;&gt;Various other updates&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&quot;spec-code-organisation&quot;&gt;&lt;a href=&quot;#spec-code-organisation&quot; id=&quot;spec-code-organisation&quot;&gt;Spec code organisation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;All specs now live in &lt;code&gt;spec.cljc&lt;/code&gt; files, so that they can easily be used from ClojureScript later.&lt;/p&gt;
+&lt;p&gt;I decided to standardise on moving all the &lt;code&gt;s/fdef&lt;/code&gt; function specs to directly beneath the function being specified.&lt;/p&gt;
+&lt;p&gt;The folder in which each &lt;code&gt;spec.cljc&lt;/code&gt; file lives denotes its context. For example, the general Datomic specs live in &lt;code&gt;bridge.data.datomic.spec&lt;/code&gt;, whereas Chapter specs live in &lt;code&gt;bridge.chapter.spec&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Given that we include date comparison in that one spec for events, I had to use reader conditionals to provide platform-specific date comparison implementations: Clojure uses &lt;code&gt;clj-time&lt;/code&gt;, and ClojureScript uses &lt;code&gt;goog.date.Date&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Finally, you may notice that I have &lt;code&gt;(require &apos;some.spec)&lt;/code&gt; in several places, rather than including them in the &lt;code&gt;(ns)&lt;/code&gt; form.&lt;/p&gt;
+&lt;p&gt;This is simply because an Emacs package I use, &lt;a href=&quot;https://github.com/clojure-emacs/clj-refactor.el/&quot;&gt;Clj-Refactor&lt;/a&gt;, strips them out of the &lt;code&gt;(ns)&lt;/code&gt; form every time I use &lt;a href=&quot;https://github.com/clojure-emacs/clj-refactor.el/wiki/cljr-clean-ns&quot;&gt;clean-ns&lt;/a&gt;, because it can&apos;t find any references in the rest of the namespace, which causes &apos;undefined spec&apos; errors.&lt;/p&gt;
+&lt;p&gt;So, I use separate &lt;code&gt;require&lt;/code&gt;s to ensure that they are loaded into memory at the right time, and continue to &lt;code&gt;clean-ns&lt;/code&gt; early and often.&lt;/p&gt;
+&lt;p&gt;It&apos;s a small price to pay, all things considered!&lt;/p&gt;
+&lt;h3 id=&quot;tests&quot;&gt;&lt;a href=&quot;#tests&quot; id=&quot;tests&quot;&gt;Tests&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The example tests for Chapter and Event required standard fixtures for People and People+Chapters, respectively. Once I saw these being duplicated a couple times, I moved these to a common fixtures test namespace.&lt;/p&gt;
+&lt;p&gt;It&apos;s very similar to that dev-data namespace, actually!&lt;/p&gt;
+&lt;h3 id=&quot;client&quot;&gt;&lt;a href=&quot;#client&quot; id=&quot;client&quot;&gt;Client&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I stubbed out a sticky top navigation bar, with:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Events: list-events, add-new-event buttons.&lt;/li&gt;
+&lt;li&gt;Session: active person name, logout button.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To support this, I also updated the server template to include the active person&apos;s name in the initial client state.&lt;/p&gt;
+&lt;h3 id=&quot;dependencies&quot;&gt;&lt;a href=&quot;#dependencies&quot; id=&quot;dependencies&quot;&gt;Dependencies&lt;/a&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Added &lt;a href=&quot;https://github.com/Olical/depot&quot;&gt;depot&lt;/a&gt;, a new Clojure CLI library for finding outdated dependencies. I also included a &lt;code&gt;Makefile&lt;/code&gt; command, &lt;code&gt;outdated&lt;/code&gt; to easily invoke it.&lt;/li&gt;
+&lt;li&gt;I updated all the dependencies except for Jetty, which needs to stay where it is to match the Jetty dependencies inside Datomic.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;Phew. This was a pretty big update.&lt;/p&gt;
+&lt;p&gt;As always, I&apos;m looking to learn from others just as much as I am looking to share my experience.&lt;/p&gt;
+&lt;p&gt;I&apos;d &lt;em&gt;really&lt;/em&gt; love to know how any of what I&apos;m writing here is helping you — however small or big.&lt;/p&gt;
+&lt;p&gt;If you have any advice, or questions, or feedback of any kind, please &lt;a href=&quot;http://localhost:3000/&quot;&gt;get in touch&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;As always, thanks for reading!&lt;/p&gt;
+&lt;script src=&quot;https://unpkg.com/mermaid@8.0.0-rc.6/dist/mermaid.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;mermaid.init({startOnLoad:true}, &quot;.language-mermaid&quot;);&lt;/script&gt;
+</content></entry><entry><title>Bridge dev diary: Modelling access</title><link href="http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/" /><updated>2018-03-17T18:56:07Z</updated><id>http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/94cacca10a3e3c06cfef54a81dda9f2e3d0c451e...3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;datomic-peer-and-client-together&quot;&gt;Datomic Peer and Client together&lt;/h2&gt;
+&lt;h2 id=&quot;datomic-peer-and-client-together&quot;&gt;&lt;a href=&quot;#datomic-peer-and-client-together&quot; id=&quot;datomic-peer-and-client-together&quot;&gt;Datomic Peer and Client together&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Ok, so once I actually started using both together, it quickly became apparent that passing the &lt;code&gt;:mode&lt;/code&gt; along with the &lt;code&gt;:conn&lt;/code&gt; / &lt;code&gt;:db&lt;/code&gt; values into the Datomic abstraction was creating all sorts of difficulties.&lt;/p&gt;
 &lt;p&gt;I chose instead to control &lt;code&gt;:mode&lt;/code&gt; with a &lt;a href=&quot;https://clojure.org/reference/vars&quot;&gt;dynamic var&lt;/a&gt;, at:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;bridge.data.datomic/*DATOMIC-MODE*&lt;/code&gt;&lt;/p&gt;
@@ -14,7 +437,7 @@
 &lt;p&gt;It&apos;s still early days, but I must say, given that it&apos;s working just fine at the REPL, from tests, and within all the app code, I&apos;m feeling good about this idea!&lt;/p&gt;
 &lt;p&gt;To see what I&apos;ve touched on so far, you can review the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/data/datomic.clj#L37-L70&quot;&gt;API differences here&lt;/a&gt;.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;modelling-people&quot;&gt;Modelling people&lt;/h2&gt;
+&lt;h2 id=&quot;modelling-people&quot;&gt;&lt;a href=&quot;#modelling-people&quot; id=&quot;modelling-people&quot;&gt;Modelling people&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;To begin modelling people, I chose to implement the standard set of access control gestures that a person will use to self-service-manage their own access:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Sign up, and confirm email.&lt;/li&gt;
@@ -24,7 +447,7 @@
 &lt;p&gt;I felt this was a good place to start, because many of the features of &lt;code&gt;bridge&lt;/code&gt; rely on what we know about the currently signed-in user, and it&apos;d be nice to have this stuff out of the way.&lt;/p&gt;
 &lt;p&gt;It also means that it&apos;s secure from day 1, so deciding when to host on the public Internet won&apos;t be impeded by this.&lt;/p&gt;
 &lt;p&gt;Also, this gives us a nice way to establish some norms, like how we organise the code layers that make up the system, how we&apos;ll name things, and so on.&lt;/p&gt;
-&lt;h3 id=&quot;person-attributes&quot;&gt;Person attributes&lt;/h3&gt;
+&lt;h3 id=&quot;person-attributes&quot;&gt;&lt;a href=&quot;#person-attributes&quot; id=&quot;person-attributes&quot;&gt;Person attributes&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Ultimately, we&apos;ll record a fairly &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/doc/schema.md#user&quot;&gt;large number of values&lt;/a&gt; for a given person, but thanks to Datomic&apos;s design, we don&apos;t need to concern ourselves with all of them at once just to get started with these basics.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Aside&lt;/strong&gt;: to soak yourself in some of the consequences of this sort of thinking, I highly recommend this post on treating your database as a &amp;quot;living, breathing thing&amp;quot;: &lt;a href=&quot;http://blog.datomic.com/2017/01/the-ten-rules-of-schema-growth.html&quot;&gt;The Ten Rules of Schema Growth&lt;/a&gt;, by Stuart Halloway.&lt;/p&gt;
 &lt;p&gt;Ok! We start with six attributes:&lt;/p&gt;
@@ -48,7 +471,7 @@
 &lt;p&gt;A random token that we&apos;ll send via email, for them to provide back to us when they confirm their email, or reset their password, respectively.&lt;/p&gt;
 &lt;p&gt;Buddy comes to the rescue again; this time, we compose &lt;code&gt;buddy.core.nonce/random-nonce&lt;/code&gt;   with &lt;code&gt;buddy.core.codecs/bytes-&amp;gt;hex&lt;/code&gt; to produce secure random tokens for use in email messages.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;code-organisation&quot;&gt;Code organisation&lt;/h2&gt;
+&lt;h2 id=&quot;code-organisation&quot;&gt;&lt;a href=&quot;#code-organisation&quot; id=&quot;code-organisation&quot;&gt;Code organisation&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I&apos;ve found that I prefer to keep all the different technical aspects for a given concern together, rather than grouping code by its behaviour.&lt;/p&gt;
 &lt;p&gt;To say that another way, I&apos;d rather find all the queries, transactions, and web page code for a section of the system together in a folder, rather than keeping all the database code in a folder, and separately keeping all the web page code together in a different folder somewhere else.&lt;/p&gt;
 &lt;p&gt;So, rather than this:&lt;/p&gt;
@@ -76,7 +499,7 @@
 &lt;p&gt;I&apos;m not entirely sure where this idea comes from. It could be Domain Driven Design, or elsewhere, but my preference for this is mostly intuitive; it likely has a name and a whitepaper written by someone far smarter than me!&lt;/p&gt;
 &lt;p&gt;Consequently, This is how I&apos;ve arranged the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/tree/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/person&quot;&gt;code for those six access gestures&lt;/a&gt;.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;access-page-organisation&quot;&gt;Access page organisation&lt;/h2&gt;
+&lt;h2 id=&quot;access-page-organisation&quot;&gt;&lt;a href=&quot;#access-page-organisation&quot; id=&quot;access-page-organisation&quot;&gt;Access page organisation&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;After working through about half of the use-cases, a pattern emerged:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(defn thing-page [&amp;lt;maybe error&amp;gt;] 
   &amp;lt;hiccup, maybe with error&amp;gt;)
@@ -99,31 +522,31 @@
 &lt;p&gt;&lt;em&gt;I&apos;d be particularly interested in hearing feedback, especially from newer Clojure folks, on how approachable this code is for you.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Did it help you to understand the flow, or hinder you? Why?&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;access-page-data-interactions&quot;&gt;Access page data interactions&lt;/h2&gt;
+&lt;h2 id=&quot;access-page-data-interactions&quot;&gt;&lt;a href=&quot;#access-page-data-interactions&quot; id=&quot;access-page-data-interactions&quot;&gt;Access page data interactions&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;The common data namespace brings together several things - the cryptography issues described above, and:&lt;/p&gt;
-&lt;h3 id=&quot;rules-for-data-sanitisation-and-correctness&quot;&gt;Rules for data sanitisation and correctness&lt;/h3&gt;
+&lt;h3 id=&quot;rules-for-data-sanitisation-and-correctness&quot;&gt;&lt;a href=&quot;#rules-for-data-sanitisation-and-correctness&quot; id=&quot;rules-for-data-sanitisation-and-correctness&quot;&gt;Rules for data sanitisation and correctness&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;To prevent issues, we trim and lower-case email addresses whenever a person provides one via HTTP request.&lt;/p&gt;
 &lt;p&gt;We require that passwords be at least 8 characters, and that confirmed passwords match.&lt;/p&gt;
-&lt;h3 id=&quot;naming-the-ways-in-which-people-can-be-found&quot;&gt;Naming the ways in which people can be found&lt;/h3&gt;
+&lt;h3 id=&quot;naming-the-ways-in-which-people-can-be-found&quot;&gt;&lt;a href=&quot;#naming-the-ways-in-which-people-can-be-found&quot; id=&quot;naming-the-ways-in-which-people-can-be-found&quot;&gt;Naming the ways in which people can be found&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Right now, we can find a person in three ways - through their email, and through the confirm and reset tokens.&lt;/p&gt;
 &lt;p&gt;Over time, we may come up with additional ways, or require new rules be included in existing ways.&lt;/p&gt;
 &lt;p&gt;By putting these generic queries in named functions, we hook the rest of our system to these semantics.&lt;/p&gt;
-&lt;h3 id=&quot;defining-how-people-are-created-and-altered&quot;&gt;Defining how people are created and altered&lt;/h3&gt;
+&lt;h3 id=&quot;defining-how-people-are-created-and-altered&quot;&gt;&lt;a href=&quot;#defining-how-people-are-created-and-altered&quot; id=&quot;defining-how-people-are-created-and-altered&quot;&gt;Defining how people are created and altered&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I&apos;ve split the &amp;quot;make-new-person&amp;quot; transaction code from the function that actually transacts it. This allows us to test the rules that govern what it means to be a new person in our system, independently of actually commiting it to the database.&lt;/p&gt;
 &lt;p&gt;To take advantage of this split, I&apos;ve written specs and instrumented this function, and unit-tested this function as well.&lt;/p&gt;
 &lt;p&gt;We also have named functions for the key access control alterations — actually confirming that email address, and resetting that password.&lt;/p&gt;
-&lt;h3 id=&quot;defining-when-messages-are-sent-to-the-person&quot;&gt;Defining when messages are sent to the person&lt;/h3&gt;
+&lt;h3 id=&quot;defining-when-messages-are-sent-to-the-person&quot;&gt;&lt;a href=&quot;#defining-when-messages-are-sent-to-the-person&quot; id=&quot;defining-when-messages-are-sent-to-the-person&quot;&gt;Defining when messages are sent to the person&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;In two cases, we generate a token, and need to inform the person by email.&lt;/p&gt;
 &lt;p&gt;Right now, all we do is log the email, but later, once we have an email sending abstraction in place, this invocation will likely move &apos;up&apos; one layer, out of the data layer, and into the access controller layer, but call back &apos;down&apos; one layer into the email sending abstraction.&lt;/p&gt;
 &lt;p&gt;For now, it&apos;s fine where it is.&lt;/p&gt;
-&lt;h3 id=&quot;the-relevant-datomic-schema&quot;&gt;The relevant Datomic schema&lt;/h3&gt;
+&lt;h3 id=&quot;the-relevant-datomic-schema&quot;&gt;&lt;a href=&quot;#the-relevant-datomic-schema&quot; id=&quot;the-relevant-datomic-schema&quot;&gt;The relevant Datomic schema&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I firmly believe that the database should be the source of truth for its state — schema included — rather than some source code in your app.&lt;/p&gt;
 &lt;p&gt;This becomes especially true when your database has been around for a while, and when you have multiple independent apps interacting with it.&lt;/p&gt;
 &lt;p&gt;In fact, I wrote &lt;a href=&quot;https://github.com/cognician/datomic-doc#rationale&quot;&gt;Datomic Doc&lt;/a&gt; to make inspecting your database idents (schema, enums, functions) easier to do.&lt;/p&gt;
 &lt;p&gt;However, in terms of being able to test the &lt;em&gt;code&lt;/em&gt; that interacts with the database, it&apos;s useful to keep those schema definitions handy. And, as I describe below in about development data, it&apos;s useful to be able to rebuild your database from scratch, if you need to.&lt;/p&gt;
 &lt;p&gt;So, this is why the schema is kept here.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;development-time-data&quot;&gt;Development-time data&lt;/h2&gt;
+&lt;h2 id=&quot;development-time-data&quot;&gt;&lt;a href=&quot;#development-time-data&quot; id=&quot;development-time-data&quot;&gt;Development-time data&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Until I&apos;m ready to commit to a durable storage, I&apos;m using an in-memory database with Datomic. This gives me total freedom if I need to make substantial alterations to the database schema — something that experience has taught me is valuable!&lt;/p&gt;
 &lt;p&gt;The consequence of this is that I&apos;m forced to manually interact with the system to get it into an interesting state for the code I&apos;m working on.&lt;/p&gt;
 &lt;p&gt;Of course, this is something that can be automated, so that&apos;s what I did!&lt;/p&gt;
@@ -131,26 +554,26 @@
 &lt;p&gt;As I go deeper into implementing &lt;code&gt;bridge&lt;/code&gt;, I&apos;ll be able to build up this code, keeping the database in a suitable state for demonstrating features or for preparing testing things interactively.&lt;/p&gt;
 &lt;p&gt;It also serves as nice documentation: the minimum data to make the system go!&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;specs-and-tests&quot;&gt;Specs and tests&lt;/h2&gt;
+&lt;h2 id=&quot;specs-and-tests&quot;&gt;&lt;a href=&quot;#specs-and-tests&quot; id=&quot;specs-and-tests&quot;&gt;Specs and tests&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I used Spec to describe the data layer, which defines rules about the contents and the composition of those Datomic attributes described earlier. Rather than hardcoding meaning into the specs defined at the &amp;quot;person&amp;quot; level, I wrote generic specs - for &apos;non blank string&apos;, &apos;nonce&apos; (a.k.a. token) and email, and had the person specs use those.&lt;/p&gt;
 &lt;p&gt;I added &lt;a href=&quot;https://github.com/bhb/expound&quot;&gt;expound&lt;/a&gt; and &lt;a href=&quot;https://github.com/jeaye/orchestra&quot;&gt;orchestra&lt;/a&gt; as standard Spec conveniences.&lt;/p&gt;
 &lt;p&gt;I use a throwaway in-memory Datomic database, which gets set up and torn down on for each test.&lt;/p&gt;
 &lt;p&gt;I&apos;m only scratching the surface here, as I&apos;ve only got one example-based test written so far, for the &amp;quot;sign up&amp;quot; user gesture. A likely very-next step is to flesh out these tests so that the rest of the named things in &lt;code&gt;bridge.person.data&lt;/code&gt; have exemplars.&lt;/p&gt;
-&lt;h3 id=&quot;dabbling-with-generative-tests&quot;&gt;Dabbling with generative tests&lt;/h3&gt;
+&lt;h3 id=&quot;dabbling-with-generative-tests&quot;&gt;&lt;a href=&quot;#dabbling-with-generative-tests&quot; id=&quot;dabbling-with-generative-tests&quot;&gt;Dabbling with generative tests&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I actually ended up quite far down a small rabbit-hole trying to set up generative tests with these specs. Turns out, doing so for email addresses wasn&apos;t very straightforward.&lt;/p&gt;
 &lt;p&gt;I did try using a couple different email regexes I found on the web with Steve Miner&apos;s frankly awesome &lt;a href=&quot;https://github.com/miner/strgen&quot;&gt;https://github.com/miner/strgen&lt;/a&gt;, but as the Readme describes, it can only support a subset of the regex engine&apos;s language, and for whatever reason, email regexes have a burning need to be &lt;a href=&quot;http://www.perlmonks.org/?node_id=62389&quot;&gt;Perl quines&lt;/a&gt; or something.&lt;/p&gt;
 &lt;p&gt;When I felt the jaws starting to close around me, I decided to park that idea for now, and focus on getting a working UI built. I&apos;d love to come back to this, though, and have generative tests in place for the full &amp;quot;people API&amp;quot;.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;If you know of a way to generate emails using a regex that&apos;s suitably valid, please let me know!&lt;/em&gt;&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;other-code-changes&quot;&gt;Other code changes&lt;/h2&gt;
-&lt;h3 id=&quot;added-repl-conveniences&quot;&gt;Added REPL conveniences&lt;/h3&gt;
+&lt;h2 id=&quot;other-code-changes&quot;&gt;&lt;a href=&quot;#other-code-changes&quot; id=&quot;other-code-changes&quot;&gt;Other code changes&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&quot;added-repl-conveniences&quot;&gt;&lt;a href=&quot;#added-repl-conveniences&quot; id=&quot;added-repl-conveniences&quot;&gt;Added REPL conveniences&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;So that I can quickly poke around in the database from the REPL, I added &lt;code&gt;bridge.dev.repl&lt;/code&gt;, which has zero-arg &lt;code&gt;conn&lt;/code&gt; and &lt;code&gt;db&lt;/code&gt; functions.&lt;/p&gt;
 &lt;p&gt;I usually use these from within &lt;code&gt;(comment ...)&lt;/code&gt; forms in whichever namespace I&apos;m currently working in.&lt;/p&gt;
-&lt;h3 id=&quot;display-stacktraces-via-the-web-server&quot;&gt;Display stacktraces via the web server&lt;/h3&gt;
+&lt;h3 id=&quot;display-stacktraces-via-the-web-server&quot;&gt;&lt;a href=&quot;#display-stacktraces-via-the-web-server&quot; id=&quot;display-stacktraces-via-the-web-server&quot;&gt;Display stacktraces via the web server&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I added the &lt;code&gt;ring.middleware.stacktrace&lt;/code&gt; middleware, as the default Jetty handler shows very little on its own when an exception is thrown.&lt;/p&gt;
-&lt;h3 id=&quot;bumped-cider-and-clj-refactor-to-snapshot&quot;&gt;Bumped CIDER and clj-refactor to SNAPSHOT&lt;/h3&gt;
+&lt;h3 id=&quot;bumped-cider-and-clj-refactor-to-snapshot&quot;&gt;&lt;a href=&quot;#bumped-cider-and-clj-refactor-to-snapshot&quot; id=&quot;bumped-cider-and-clj-refactor-to-snapshot&quot;&gt;Bumped CIDER and clj-refactor to SNAPSHOT&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;So that I can test them out, and also get rid of those deprecation warnings when starting a REPL.&lt;/p&gt;
-&lt;h3 id=&quot;makefile-updates&quot;&gt;Makefile updates&lt;/h3&gt;
+&lt;h3 id=&quot;makefile-updates&quot;&gt;&lt;a href=&quot;#makefile-updates&quot; id=&quot;makefile-updates&quot;&gt;Makefile updates&lt;/a&gt;&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;Run the peer-server easily.&lt;/li&gt;
 &lt;li&gt;Compiling ClojureScript via &lt;code&gt;cljs.main&lt;/code&gt; complains if you don&apos;t provide a &lt;code&gt;:source-map &amp;quot;path&amp;quot;&lt;/code&gt; config when using &lt;code&gt;-O advanced&lt;/code&gt;. I fixed that.&lt;/li&gt;
@@ -163,18 +586,18 @@
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/a7ae33baa9aed47d39882b635b2b0ede4dcac5d9...be515cdcc591b2a5b0123c871f41d7a7e74b880a&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;datomic-peer-vs-datomic-client&quot;&gt;Datomic Peer vs Datomic Client&lt;/h2&gt;
+&lt;h2 id=&quot;datomic-peer-vs-datomic-client&quot;&gt;&lt;a href=&quot;#datomic-peer-vs-datomic-client&quot; id=&quot;datomic-peer-vs-datomic-client&quot;&gt;Datomic Peer vs Datomic Client&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Although I&apos;m planning for the app to use Datomic Peer in production, as a learning exercise, I&apos;ve decided to implement the Datomic layer with both the Peer and the Client at the same time.&lt;/p&gt;
 &lt;p&gt;This&apos;ll serve to highlight the differences between the two (or non-differences), and allow us to explore some ways in which Clojure supports abstractions like this.&lt;/p&gt;
 &lt;p&gt;In practice, you&apos;ll switch between these with a &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn#L2&quot;&gt;single configuration setting&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Of course, this assumes that the respective transactor and peer-server processes are running.&lt;/p&gt;
-&lt;h3 id=&quot;caveat-toolsdepsalpha-and-datomic-pro-peer&quot;&gt;Caveat: tools.deps.alpha and Datomic Pro Peer&lt;/h3&gt;
+&lt;h3 id=&quot;caveat-toolsdepsalpha-and-datomic-pro-peer&quot;&gt;&lt;a href=&quot;#caveat-toolsdepsalpha-and-datomic-pro-peer&quot; id=&quot;caveat-toolsdepsalpha-and-datomic-pro-peer&quot;&gt;Caveat: tools.deps.alpha and Datomic Pro Peer&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;It&apos;s not possible to use the Datomic Pro Peer library with &lt;code&gt;deps.edn&lt;/code&gt;  at the moment, because &lt;a href=&quot;https://github.com/clojure/tools.deps.alpha&quot;&gt;tools.deps.alpha&lt;/a&gt; doesn&apos;t currently support Maven authentication.&lt;/p&gt;
 &lt;p&gt;It&apos;s being worked on; see &lt;a href=&quot;https://dev.clojure.org/jira/browse/TDEPS-9&quot;&gt;the relevant Jira ticket here&lt;/a&gt; — please vote for it :-)&lt;/p&gt;
 &lt;p&gt;Because of this, we can&apos;t use Datomic Pro in Peer mode. This doesn&apos;t matter for the moment, because my initial development will happen with an in-memory database, but when the time comes to use storage, we&apos;ll have to use the &lt;code&gt;datomic:free://&lt;/code&gt; Datomic URI modality.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;code-changes&quot;&gt;Code changes&lt;/h2&gt;
-&lt;h3 id=&quot;datomic-integrant-implementation-update&quot;&gt;Datomic Integrant implementation update&lt;/h3&gt;
+&lt;h2 id=&quot;code-changes&quot;&gt;&lt;a href=&quot;#code-changes&quot; id=&quot;code-changes&quot;&gt;Code changes&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&quot;datomic-integrant-implementation-update&quot;&gt;&lt;a href=&quot;#datomic-integrant-implementation-update&quot; id=&quot;datomic-integrant-implementation-update&quot;&gt;Datomic Integrant implementation update&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;As described earlier, we now support both Peer and Client.&lt;/p&gt;
 &lt;p&gt;Our Integrant &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn&quot;&gt;system map&lt;/a&gt; now includes configuration for both modes.&lt;/p&gt;
 &lt;p&gt;The &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/src/bridge/data/datomic.clj#L6-L22&quot;&gt;Datomic implementation&lt;/a&gt; now returns a map with two or three keys:&lt;/p&gt;
@@ -185,10 +608,10 @@
 &lt;p&gt;Of course, the &lt;code&gt;:datomic/client&lt;/code&gt; is only present if we&apos;re using that mode.&lt;/p&gt;
 &lt;p&gt;Then, the Ring middleware merges this map, plus a Datomic database value at &lt;code&gt;:datomic/db&lt;/code&gt;, into the request map, for our handlers to use as needed.&lt;/p&gt;
 &lt;p&gt;It&apos;s going to be interesting to see how dealing with both APIs at once turns out. Even if it results in code that I wouldn&apos;t be happy with in a &amp;quot;serious&amp;quot; production setting (which may not even happen!), I think it&apos;s worth trying, as a way to directly confront the API differences head on.&lt;/p&gt;
-&lt;h3 id=&quot;explicit-environment-variables&quot;&gt;Explicit environment variables&lt;/h3&gt;
+&lt;h3 id=&quot;explicit-environment-variables&quot;&gt;&lt;a href=&quot;#explicit-environment-variables&quot; id=&quot;explicit-environment-variables&quot;&gt;Explicit environment variables&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I moved the environment defaults from &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/resources/system.edn&quot;&gt;system.edn&lt;/a&gt; to its own file &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/bridge.env&quot;&gt;bridge.env&lt;/a&gt;, so that they can be used outside of Clojure processes (e.g. when running the peer-server).&lt;/p&gt;
 &lt;p&gt;The &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/be515cdcc591b2a5b0123c871f41d7a7e74b880a/Makefile&quot;&gt;makefile&lt;/a&gt; sources this file before running any Clojure processes that require it.&lt;/p&gt;
-&lt;h3 id=&quot;datomic-transactor--peer-server-helper-scripts&quot;&gt;Datomic transactor / peer server helper scripts&lt;/h3&gt;
+&lt;h3 id=&quot;datomic-transactor--peer-server-helper-scripts&quot;&gt;&lt;a href=&quot;#datomic-transactor--peer-server-helper-scripts&quot; id=&quot;datomic-transactor--peer-server-helper-scripts&quot;&gt;Datomic transactor / peer server helper scripts&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;If you&apos;re new to Datomic, I&apos;ve provided some &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/tree/be515cdcc591b2a5b0123c871f41d7a7e74b880a/script&quot;&gt;bash scripts&lt;/a&gt; to ease you into it:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;install-datomic-free.sh&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Does what it says on the tin!&lt;/p&gt;
@@ -198,10 +621,10 @@
 &lt;p&gt;Run your Datomic transactor, which works whether you decide to use Free or Pro.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;datomic-peer-server.sh&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Again, if you decide to use the Datomic Client option, you&apos;ll run the peer-server alongside your transactor.&lt;/p&gt;
-&lt;h3 id=&quot;new-debug-page&quot;&gt;New debug page&lt;/h3&gt;
+&lt;h3 id=&quot;new-debug-page&quot;&gt;&lt;a href=&quot;#new-debug-page&quot; id=&quot;new-debug-page&quot;&gt;New debug page&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I added a &lt;code&gt;/system&lt;/code&gt; page which prints out the fully realised Integrant system configuration, as well as the Ring request.&lt;/p&gt;
 &lt;p&gt;This&apos;ll be useful for debugging both Integrant system issues as well as Ring middleware, particularly as we work on the user authentication and authorisation stuff.&lt;/p&gt;
-&lt;h3 id=&quot;dependency-updates&quot;&gt;Dependency updates&lt;/h3&gt;
+&lt;h3 id=&quot;dependency-updates&quot;&gt;&lt;a href=&quot;#dependency-updates&quot; id=&quot;dependency-updates&quot;&gt;Dependency updates&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;One disadvantage of using &lt;code&gt;:git/url&lt;/code&gt; and &lt;code&gt;:sha&lt;/code&gt; with &lt;code&gt;deps.edn&lt;/code&gt; is that it puts all of the source from these dependencies on your classpath — which means that &lt;code&gt;tools.namespace&lt;/code&gt; includes it in the &lt;code&gt;refresh&lt;/code&gt; cycle. It&apos;s merely an annoyance, that goes away after your first &lt;code&gt;refresh&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Even so, it&apos;s nice that we can now use the freshly minted &lt;a href=&quot;https://github.com/clojure/clojurescript/releases/tag/r1.10.64&quot;&gt;ClojureScript 1.10.64&lt;/a&gt; release. You can watch an awesome livecast about some of the changes in this release here: &lt;a href=&quot;https://www.youtube.com/watch?v=KG9uFtXaqYg&quot;&gt;Apropos Episode 1&lt;/a&gt; — follow &lt;a href=&quot;https://twitter.com/apropos_cast&quot;&gt;Apropos&lt;/a&gt; account on Twitter to learn when the next episode is!&lt;/p&gt;
 &lt;p&gt;I&apos;m really excited about the potential of &lt;code&gt;cljs.main&lt;/code&gt;!&lt;/p&gt;
@@ -214,7 +637,7 @@
 &lt;p&gt;That changes today!&lt;/p&gt;
 &lt;p&gt;I&apos;ve decided to give myself a multi-faceted learning / sharing goal, and this post serves to document what it is, and why I&apos;m doing it.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;what-do-you-need&quot;&gt;What do you need?&lt;/h2&gt;
+&lt;h2 id=&quot;what-do-you-need&quot;&gt;&lt;a href=&quot;#what-do-you-need&quot; id=&quot;what-do-you-need&quot;&gt;What do you need?&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Around 3-4 weeks ago, I wrote to the Internet:&lt;/p&gt;
 &lt;blockquote class=&quot;twitter-tweet&quot; data-lang=&quot;en&quot;&gt;&lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;What would you like to see discussed and dissected about &lt;a href=&quot;https://twitter.com/hashtag/Datomic?src=hash&amp;amp;ref_src=twsrc%5Etfw&quot;&gt;#Datomic&lt;/a&gt;? Please RT :-)&lt;/p&gt;&amp;mdash; Robert Stuttaford (@RobStuttaford) &lt;a href=&quot;https://twitter.com/RobStuttaford/status/956407817245724677?ref_src=twsrc%5Etfw&quot;&gt;January 25, 2018&lt;/a&gt;&lt;/blockquote&gt;
 &lt;script async src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
@@ -244,28 +667,28 @@
 &lt;/ol&gt;
 &lt;p&gt;So that&apos;s what I&apos;m going to do!&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;clojurebridge-registration-system&quot;&gt;ClojureBridge registration system&lt;/h2&gt;
+&lt;h2 id=&quot;clojurebridge-registration-system&quot;&gt;&lt;a href=&quot;#clojurebridge-registration-system&quot; id=&quot;clojurebridge-registration-system&quot;&gt;ClojureBridge registration system&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;This is such a nice project for me, for a number of reasons.&lt;/p&gt;
-&lt;h3 id=&quot;collaboration&quot;&gt;Collaboration&lt;/h3&gt;
+&lt;h3 id=&quot;collaboration&quot;&gt;&lt;a href=&quot;#collaboration&quot; id=&quot;collaboration&quot;&gt;Collaboration&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I have come to learn that I work best when I have someone to work with. This is one of the reasons why I consult — I get to interact with another human being, and learn from them, and provide them with value.&lt;/p&gt;
 &lt;p&gt;Happily, for this project, I have someone I can talk to, to understand requirements, and verify that what I&apos;m building actually solves the problem. Crucially, that person — &lt;a href=&quot;https://twitter.com/plexus&quot;&gt;Arne Brasseur&lt;/a&gt;, of &lt;a href=&quot;https://lambdaisland.com/p/about&quot;&gt;Lambda Island&lt;/a&gt; and &lt;a href=&quot;https://clojureverse.org/&quot;&gt;ClojureVerse&lt;/a&gt; fame — is willing and able. Thanks, Arne! I truly appreciate it.&lt;/p&gt;
-&lt;h3 id=&quot;not-just-a-toy-project&quot;&gt;Not just a toy project&lt;/h3&gt;
+&lt;h3 id=&quot;not-just-a-toy-project&quot;&gt;&lt;a href=&quot;#not-just-a-toy-project&quot; id=&quot;not-just-a-toy-project&quot;&gt;Not just a toy project&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;I haven&apos;t ever attended a ClojureBridge event, mostly due to where I live, which makes me a little sad. So, this gives me my own way to participate somehow.&lt;/p&gt;
 &lt;p&gt;If I succeed, I&apos;ll provide something that&apos;s useful in organising volunteer-driven work that grows our community in a very necessary and healthy way.&lt;/p&gt;
 &lt;p&gt;That feels good!&lt;/p&gt;
-&lt;h3 id=&quot;clear-goal&quot;&gt;Clear goal&lt;/h3&gt;
+&lt;h3 id=&quot;clear-goal&quot;&gt;&lt;a href=&quot;#clear-goal&quot; id=&quot;clear-goal&quot;&gt;Clear goal&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Because of the first two points above, I have clarity on what to build, and why it&apos;ll work. This is thanks largely to the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/master/doc/requirements.md&quot;&gt;excellent write-up that Arne provided&lt;/a&gt;, which describes what they need, and why.&lt;/p&gt;
-&lt;h3 id=&quot;its-full-featured&quot;&gt;It&apos;s full-featured&lt;/h3&gt;
+&lt;h3 id=&quot;its-full-featured&quot;&gt;&lt;a href=&quot;#its-full-featured&quot; id=&quot;its-full-featured&quot;&gt;It&apos;s full-featured&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;In hammock mode, I wrote up a &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/master/doc/system.md#views-and-verbs-by-capability-and-role&quot;&gt;list of capabilities, roles, verbs and views&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Here are some highlights:&lt;/p&gt;
-&lt;h4 id=&quot;user-management&quot;&gt;User management&lt;/h4&gt;
+&lt;h4 id=&quot;user-management&quot;&gt;&lt;a href=&quot;#user-management&quot; id=&quot;user-management&quot;&gt;User management&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;There&apos;s no avoiding it. Systems that matter need to interact with human beings. We have to model them in our system, and provide safe ways for them to do their part to move things forward.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Authentication and authorisation (role-based and content-based).&lt;/li&gt;
 &lt;li&gt;Profile management: self-service registration and account recovery, data protection and privacy concerns.&lt;/li&gt;
 &lt;li&gt;Audit trail: who did what? Who altered this thing?&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h4 id=&quot;event-management&quot;&gt;Event management&lt;/h4&gt;
+&lt;h4 id=&quot;event-management&quot;&gt;&lt;a href=&quot;#event-management&quot; id=&quot;event-management&quot;&gt;Event management&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;The heart of the application.&lt;/p&gt;
 &lt;p&gt;Interesting, because events are anchored in time, which means that time is a first class aspect of the system&apos;s behaviour:&lt;/p&gt;
 &lt;ul&gt;
@@ -273,41 +696,41 @@
 &lt;li&gt;Some things need to happen automatically at a predetermined time.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;There are a handful of interesting event manangement features to build:&lt;/p&gt;
-&lt;h5 id=&quot;content-management&quot;&gt;Content management&lt;/h5&gt;
+&lt;h5 id=&quot;content-management&quot;&gt;&lt;a href=&quot;#content-management&quot; id=&quot;content-management&quot;&gt;Content management&lt;/a&gt;&lt;/h5&gt;
 &lt;p&gt;There are two content management pieces here:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;The events themselves — scheduling, detailing, and managing the status of events and the individuals involved.&lt;/li&gt;
 &lt;li&gt;Email templates. Much of the work of organising such an event is clear communication, and, given the fact that this whole effort is focused on helping to establish a new narrative for women in tech — the words &lt;strong&gt;really&lt;/strong&gt; matter. So, removing the friction around sending the right words at the right time is important.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h5 id=&quot;invite-process&quot;&gt;Invite process&lt;/h5&gt;
+&lt;h5 id=&quot;invite-process&quot;&gt;&lt;a href=&quot;#invite-process&quot; id=&quot;invite-process&quot;&gt;Invite process&lt;/a&gt;&lt;/h5&gt;
 &lt;p&gt;There&apos;s a cyclical, multi-person interaction when handling the invite process. Arne would like the app to make it &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/blob/master/doc/requirements.md#self-service-acceptdecline&quot;&gt;totally self-service&lt;/a&gt;.&lt;/p&gt;
-&lt;h5 id=&quot;reporting&quot;&gt;Reporting&lt;/h5&gt;
+&lt;h5 id=&quot;reporting&quot;&gt;&lt;a href=&quot;#reporting&quot; id=&quot;reporting&quot;&gt;Reporting&lt;/a&gt;&lt;/h5&gt;
 &lt;p&gt;Ah, good old reporting. Organisers need to be able to quickly determine head-counts for things like t-shirt sizes, catering choices, child-care, and so on.&lt;/p&gt;
 &lt;p&gt;More friction to remove!&lt;/p&gt;
-&lt;h5 id=&quot;learning-groups&quot;&gt;Learning groups&lt;/h5&gt;
+&lt;h5 id=&quot;learning-groups&quot;&gt;&lt;a href=&quot;#learning-groups&quot; id=&quot;learning-groups&quot;&gt;Learning groups&lt;/a&gt;&lt;/h5&gt;
 &lt;p&gt;Another interesting bit is how participants are grouped during a live ClojureBridge event. Several factors play a part: who&apos;s actually available, language preference, prior experience, coaching preference — all of this matters.&lt;/p&gt;
 &lt;p&gt;It&apos;ll be interesting to see how we might solve this algorithmically.&lt;/p&gt;
 &lt;p&gt;Perhaps it&apos;ll give me a strong enough impetus to understand &lt;a href=&quot;https://github.com/clojure/core.logic&quot;&gt;core.logic&lt;/a&gt; enough to solve an actual challenge?&lt;/p&gt;
 &lt;p&gt;This does feel a bit like planning who sits next to whom at a wedding :-)&lt;/p&gt;
-&lt;h4 id=&quot;chapter-management&quot;&gt;Chapter management&lt;/h4&gt;
+&lt;h4 id=&quot;chapter-management&quot;&gt;&lt;a href=&quot;#chapter-management&quot; id=&quot;chapter-management&quot;&gt;Chapter management&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;If things go as well as I hope, I&apos;d like to see this system used by ClojureBridge around the world, not just the chapter in Berlin. That means that there&apos;ll be an additional layer beyond users and events, where we control who organises which chapter, adding new chapters, and so forth.&lt;/p&gt;
 &lt;p&gt;A personal goal (one I acknowledge may not be possible, because it&apos;s not actually up to me) is that this system lives on the main &lt;a href=&quot;http://www.clojurebridge.org&quot;&gt;ClojureBridge&lt;/a&gt; site somehow.&lt;/p&gt;
 &lt;p&gt;I suppose am in control of one thing; I can ensure that I make this as useful as possible!&lt;/p&gt;
 &lt;p&gt;Perhaps when the time is right, I&apos;ll be able to make a strong case for having this system facilitate all the ClojureBridge events around the world.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h3 id=&quot;its-full-stack&quot;&gt;It&apos;s full stack&lt;/h3&gt;
+&lt;h3 id=&quot;its-full-stack&quot;&gt;&lt;a href=&quot;#its-full-stack&quot; id=&quot;its-full-stack&quot;&gt;It&apos;s full stack&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;That I&apos;ll be using Clojure 1.9, ClojureScript, and Datomic are &lt;em&gt;quite&lt;/em&gt; obvious :-)&lt;/p&gt;
-&lt;h4 id=&quot;rich-user-experience&quot;&gt;Rich user experience&lt;/h4&gt;
+&lt;h4 id=&quot;rich-user-experience&quot;&gt;&lt;a href=&quot;#rich-user-experience&quot; id=&quot;rich-user-experience&quot;&gt;Rich user experience&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;There&apos;s loads of things to build into a single-page app backed by an EDN API, but also a fair amount of simple server-rendered pages. We&apos;ll be able to see both approaches working in unison.&lt;/p&gt;
-&lt;h4 id=&quot;no-leiningen&quot;&gt;No Leiningen&lt;/h4&gt;
+&lt;h4 id=&quot;no-leiningen&quot;&gt;&lt;a href=&quot;#no-leiningen&quot; id=&quot;no-leiningen&quot;&gt;No Leiningen&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;Since the release of Clojure 1.9, &lt;a href=&quot;https://clojure.org/guides/deps_and_cli&quot;&gt;Clojure ships with its own cli tool&lt;/a&gt;. As I&apos;ve been happily ensconced in my fortress of &lt;code&gt;project.clj&lt;/code&gt; files these past six years, I&apos;ve had no reason to get to grips with this tool, or any of its implications.&lt;/p&gt;
 &lt;p&gt;I&apos;ve decided to apply a simple forcing function for this project: do it with &lt;code&gt;clojure&lt;/code&gt; and &lt;a href=&quot;https://clojure.org/reference/deps_and_cli&quot;&gt;tools.deps.alpha&lt;/a&gt; / &lt;code&gt;deps.edn&lt;/code&gt; alone — no Leiningen!&lt;/p&gt;
-&lt;h4 id=&quot;libraries-ive-had-an-itch-to-try-out&quot;&gt;Libraries I&apos;ve had an itch to try out&lt;/h4&gt;
+&lt;h4 id=&quot;libraries-ive-had-an-itch-to-try-out&quot;&gt;&lt;a href=&quot;#libraries-ive-had-an-itch-to-try-out&quot; id=&quot;libraries-ive-had-an-itch-to-try-out&quot;&gt;Libraries I&apos;ve had an itch to try out&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;I&apos;ve long been a fan of &lt;a href=&quot;https://twitter.com/stuartsierra&quot;&gt;Stuart Sierra&lt;/a&gt;&apos;s &lt;a href=&quot;http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded&quot;&gt;Reloaded workflow&lt;/a&gt;, as I am sure many Clojurians (Clojurists? Clojurologists? Clojuronimoes?) are.&lt;/p&gt;
 &lt;p&gt;Having used &lt;a href=&quot;http://github.com/stuartsierra/component&quot;&gt;Component&lt;/a&gt; and &lt;a href=&quot;https://github.com/puppetlabs/trapperkeeper&quot;&gt;TrapperKeeper&lt;/a&gt; thus far, I&apos;ve been aware of several other takes on this, such as &lt;a href=&quot;https://twitter.com/danielszmu&quot;&gt;Daniel Szmulewicz&lt;/a&gt;&apos; &lt;a href=&quot;https://github.com/danielsz/system&quot;&gt;System&lt;/a&gt; and &lt;a href=&quot;https://twitter.com/weavejester&quot;&gt;James Reeves&lt;/a&gt;&apos; &lt;a href=&quot;https://github.com/weavejester/integrant&quot;&gt;Integrant&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;I decided to give Integrant and &lt;a href=&quot;https://github.com/weavejester/ataraxy&quot;&gt;Ataraxy&lt;/a&gt; (also by James) a try. I like their design, and I just love saying their names.&lt;/p&gt;
 &lt;p&gt;Makes me feel a little like I&apos;m living in a &lt;a href=&quot;https://en.wikipedia.org/wiki/Culture_series&quot;&gt;Culture novel&lt;/a&gt; :-)&lt;/p&gt;
-&lt;h4 id=&quot;datomic-on-prem-vs-datomic-cloud&quot;&gt;Datomic On-Prem vs Datomic Cloud&lt;/h4&gt;
+&lt;h4 id=&quot;datomic-on-prem-vs-datomic-cloud&quot;&gt;&lt;a href=&quot;#datomic-on-prem-vs-datomic-cloud&quot; id=&quot;datomic-on-prem-vs-datomic-cloud&quot;&gt;Datomic On-Prem vs Datomic Cloud&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;I did intend on using &lt;a href=&quot;https://www.datomic.com/&quot;&gt;Datomic Cloud&lt;/a&gt; for this, as this is something I wish to experience, but it&apos;s not quite ready yet.&lt;/p&gt;
 &lt;p&gt;Critically, it has no support for &lt;a href=&quot;https://docs.datomic.com/on-prem/excision.html&quot;&gt;excision&lt;/a&gt;, which is a key requirement for this app — we&apos;d be honour (and legally) bound to lose people&apos;s &lt;abbr title=&quot;Personally Identifiable Information&quot;&gt;PII&lt;/abbr&gt; when they request it. Given that Datomic doesn&apos;t actually delete anything, this is a problem which only excision can solve.&lt;/p&gt;
 &lt;img src=&quot;https://memegenerator.net/img/instances/78164808/say-gdpr-one-more-time.jpg&quot;&gt;
@@ -318,14 +741,14 @@
 &lt;p&gt;The other thing, though, is that someone has to pay to host this once it&apos;s built, and a USD40/month VPS running Datomic Free and our Clojure app is likely to be all we need. Using Datomic Cloud will cost at least 2-3x that, due to the need for multiple AWS resources.&lt;/p&gt;
 &lt;p&gt;All is not lost, though! I will use this opportunity to build with the &lt;a href=&quot;https://docs.datomic.com/client-api/index.html&quot;&gt;Datomic Client&lt;/a&gt; library instead of the &lt;a href=&quot;https://docs.datomic.com/on-prem/clojure/index.html&quot;&gt;Datomic Peer&lt;/a&gt; library, as it is a substantially simpler (and therefore different) API. This&apos;ll also teach me about running a &lt;a href=&quot;https://docs.datomic.com/on-prem/peer-server.html&quot;&gt;Peer Server&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;That way, one day, I&apos;ll be able to convert the project to use Cloud when it&apos;s ready. I expect that conversion to be a quick one.&lt;/p&gt;
-&lt;h4 id=&quot;im-not-a-designer&quot;&gt;I&apos;m not a designer&lt;/h4&gt;
+&lt;h4 id=&quot;im-not-a-designer&quot;&gt;&lt;a href=&quot;#im-not-a-designer&quot; id=&quot;im-not-a-designer&quot;&gt;I&apos;m not a designer&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;… so I&apos;ll be using &lt;a href=&quot;https://bulma.io&quot;&gt;Bulma&lt;/a&gt; to style all of the pages. Not only does it look great, it doesn&apos;t force any JavaScript on you.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;progress-so-far&quot;&gt;Progress so far&lt;/h2&gt;
+&lt;h2 id=&quot;progress-so-far&quot;&gt;&lt;a href=&quot;#progress-so-far&quot; id=&quot;progress-so-far&quot;&gt;Progress so far&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I&apos;ve waited to write about all of this, because I wanted to have some progress to show. So, here&apos;s the code!&lt;/p&gt;
 &lt;p&gt;​    &lt;a href=&quot;https://github.com/robert-stuttaford/bridge&quot;&gt;https://github.com/robert-stuttaford/bridge&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;So far, it has:&lt;/p&gt;
-&lt;h4 id=&quot;development-and-build-tools-without-leiningen&quot;&gt;Development and build tools without Leiningen&lt;/h4&gt;
+&lt;h4 id=&quot;development-and-build-tools-without-leiningen&quot;&gt;&lt;a href=&quot;#development-and-build-tools-without-leiningen&quot; id=&quot;development-and-build-tools-without-leiningen&quot;&gt;Development and build tools without Leiningen&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;All using the &lt;code&gt;clojure&lt;/code&gt; CLI, and a &lt;code&gt;Makefile&lt;/code&gt; to save the repetitive typing:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;REPL + Figwheel, with CIDER/clj-refactor middleware.&lt;/li&gt;
@@ -337,7 +760,7 @@
 &lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;clojure -Sdeps &apos;{:deps {org.clojure/clojurescript {:git/url &amp;quot;https://github.com/clojure/clojurescript&amp;quot; :sha &amp;quot;4df0542339e533b2d1e1dd7f6ffa8824eab64893&amp;quot;}}}&apos; -m cljs.main -h
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;With all of these in place, I&apos;m happy that I can provision CI and run this in a production setting.&lt;/p&gt;
-&lt;h4 id=&quot;web-service&quot;&gt;Web service&lt;/h4&gt;
+&lt;h4 id=&quot;web-service&quot;&gt;&lt;a href=&quot;#web-service&quot; id=&quot;web-service&quot;&gt;Web service&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;An Integrant system, connecting a Jetty web server, a Datomic connection, and a &lt;em&gt;say-it-with-me&lt;/em&gt; Ataraxy  Ring handler.&lt;/p&gt;
 &lt;p&gt;It was fun to compose Integrant with &lt;a href=&quot;https://github.com/hlship/dyn-edn&quot;&gt;dyn-edn&lt;/a&gt;, released just a couple days ago. By providing its capability as data readers, it was trivial to use with Integrant&apos;s own &lt;code&gt;read-string&lt;/code&gt;. Thanks again, &lt;a href=&quot;https://twitter.com/hlship&quot;&gt;@hlship&lt;/a&gt;!&lt;/p&gt;
 &lt;p&gt;It also has:&lt;/p&gt;
@@ -357,13 +780,13 @@
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;next-steps-from-here&quot;&gt;Next steps from here&lt;/h2&gt;
+&lt;h2 id=&quot;next-steps-from-here&quot;&gt;&lt;a href=&quot;#next-steps-from-here&quot; id=&quot;next-steps-from-here&quot;&gt;Next steps from here&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;So, there we have it!&lt;/p&gt;
 &lt;p&gt;I&apos;m all set to begin building the actual application, now. That means starting with that most-requested Datomic feature: modelling data.&lt;/p&gt;
 &lt;p&gt;Taking inspiration from my colleague &lt;a href=&quot;https://twitter.com/nikitonsky&quot;&gt;tonsky&lt;/a&gt;, who &lt;a href=&quot;https://www.youtube.com/watch?v=Oy3IImX-nSU&quot;&gt;live-streams Clojure programming&lt;/a&gt; (in Russian),  I&apos;d like to experiment with doing this in a live-stream, too. Failing that, I may simply record a couple programming sessions, and share it that way.&lt;/p&gt;
 &lt;p&gt;No matter what else, I&apos;ll be sharing the code and writing developer diaries along the way, just as I have done today.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;in-closing&quot;&gt;In closing&lt;/h2&gt;
+&lt;h2 id=&quot;in-closing&quot;&gt;&lt;a href=&quot;#in-closing&quot; id=&quot;in-closing&quot;&gt;In closing&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I have no idea where I&apos;ll end up with this project. I recognise that many projects that start this way, never get finished, which I guess is a risk I&apos;ll just have to take.&lt;/p&gt;
 &lt;p&gt;Of course, I have a selfish reason for doing this, that goes beyond the pure and simple &lt;em&gt;fun&lt;/em&gt; of building something — and that&apos;s to promote my &lt;a href=&quot;/consulting/&quot;&gt;consulting&lt;/a&gt; practice. My hope is that I can demonstrate my value, rather than writing short novels about it — &amp;quot;show, don&apos;t tell,&amp;quot; if you will.&lt;/p&gt;
 &lt;p&gt;Regardless of whether my consulting interests you, if you&apos;re at all interested in this adventure, I&apos;d love to hear from you.&lt;/p&gt;
@@ -392,7 +815,7 @@
 &lt;/ul&gt;
 &lt;p&gt;Onwards!&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;introvert--extrovert-spectrum&quot;&gt;Introvert / extrovert spectrum&lt;/h2&gt;
+&lt;h2 id=&quot;introvert--extrovert-spectrum&quot;&gt;&lt;a href=&quot;#introvert--extrovert-spectrum&quot; id=&quot;introvert--extrovert-spectrum&quot;&gt;Introvert / extrovert spectrum&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I’m a 10/10 introvert.&lt;/p&gt;
 &lt;p&gt;That’s according to &lt;a href=&quot;https://www.quietrev.com/the-introvert-test/&quot;&gt;Susan Cain’s Quiet Introvert/Extrovert test&lt;/a&gt;. It wasn’t surprising that I’m on this side of this continuum, but the degree to which I am actually so surprised me.&lt;/p&gt;
 &lt;p&gt;When I shared this news with a colleague, he was surprised - because he had only ever encountered my “pseudo-extrovert” persona, that I put on like a suit of clothing whenever it was time to be social.&lt;/p&gt;
@@ -404,7 +827,7 @@
 &lt;li&gt;&lt;em&gt;What about your working environment or team setup can you change to better support your nature, or the nature of those in your team?&lt;/em&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;intrinsic--extrinsic-motivators&quot;&gt;Intrinsic / extrinsic motivators&lt;/h2&gt;
+&lt;h2 id=&quot;intrinsic--extrinsic-motivators&quot;&gt;&lt;a href=&quot;#intrinsic--extrinsic-motivators&quot; id=&quot;intrinsic--extrinsic-motivators&quot;&gt;Intrinsic / extrinsic motivators&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;This one’s golden. I’ve had so many productive coaching conversations thanks to this. And, I’ve become a lot more conscious of my own needs, and been able to meet them with far less fuss.&lt;/p&gt;
 &lt;p&gt;Dan Pink wrote a book called Drive, in which he unpacks what we currently understand about motivating human beings.&lt;/p&gt;
 &lt;p&gt;Here&apos;s a great 10 min video overview:&lt;/p&gt;
@@ -422,7 +845,7 @@
 &lt;li&gt;&lt;em&gt;If you’re struggling with something in your work life, see if you can map it to one of these motivators. Note that just as you may have too little of something, you may also have too much!&lt;/em&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;growth--fixed-mindset&quot;&gt;Growth / Fixed Mindset&lt;/h2&gt;
+&lt;h2 id=&quot;growth--fixed-mindset&quot;&gt;&lt;a href=&quot;#growth--fixed-mindset&quot; id=&quot;growth--fixed-mindset&quot;&gt;Growth / Fixed Mindset&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;This is the one that underpins it all, for me. One of the intrinsic motivators above is Mastery - which I summarise as “learning and the application of that learning” - and it is a major theme of my personality.&lt;/p&gt;
 &lt;p&gt;Carol Dweck wrote a small book with a huge idea in it about &lt;a href=&quot;https://www.brainpickings.org/2014/01/29/carol-dweck-mindset/&quot;&gt;Mindsets&lt;/a&gt;, which has unlocked an endless supply of Mastery for me: the Growth Mindset.&lt;/p&gt;
 &lt;p&gt;Fundamentally, it’s the idea that the story is never finished. Change is always possible. Improvement is always possible. The Japanese embody it with &amp;quot;Kaizen&amp;quot;. Having told so many people about this already, I’ve come to summarise it with the pithy phrase “&lt;strong&gt;curiosity over identity&lt;/strong&gt;,” which describes the way I use it in daily life.&lt;/p&gt;
@@ -436,7 +859,7 @@
 &lt;li&gt;&lt;em&gt;What could you begin improving in your life today if you decided to get curious about it, instead of re-telling yourself the same tired story about it?&lt;/em&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;all-models-are-wrong&quot;&gt;All models are &apos;wrong&apos;&lt;/h2&gt;
+&lt;h2 id=&quot;all-models-are-wrong&quot;&gt;&lt;a href=&quot;#all-models-are-wrong&quot; id=&quot;all-models-are-wrong&quot;&gt;All models are &apos;wrong&apos;&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;What’s crucial to note about all of these frameworks is that there’s no ‘right’ or ‘wrong’ - there is only appropriate/inappropriate, suitable/unsuitable, skilful/unskilful (thanks, Buddhism!). If it’s not helping (and you’re pretty sure you’ve not misapplied it), find another way.&lt;/p&gt;
 &lt;p&gt;The truth is, like all models, they are approximations. They’re not truly describing you or the people around you, or their behaviours or attitudes. I don’t think we can ever truly do that. But, they are useful. And using them turns getting to know yourself, and the people around you, into a fascinating experience.&lt;/p&gt;
 &lt;p&gt;If you’re aware that something isn’t working in your team, or in your role, I encourage you to assess your preferences within each of these frameworks, and find where the mismatches are with the environment you’re in.&lt;/p&gt;
@@ -444,7 +867,7 @@
 &lt;p&gt;As I’ve found over and over, it’s often just the act of expressing things in terms of one or another of these models that brings enough fresh energy and perspective to the situation. As Carl Jung says, &amp;quot;To ask the right question is already half the solution of a problem.”&lt;/p&gt;
 &lt;p&gt;After all, we’re all creative problem-solvers - often, all we need is the right perspective, and our natural inclinations tend to take care of the rest!&lt;/p&gt;
 &lt;hr&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;&lt;a href=&quot;#conclusion&quot; id=&quot;conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;A fixed mindset I know that I have is an &lt;em&gt;intense&lt;/em&gt; dislike of advertising.&lt;/p&gt;
 &lt;p&gt;However, I’ve recently decided to share all my learning with the community as a consultant, and so, I’m having to advertise myself. This is proving to be quite a challenge!&lt;/p&gt;
 &lt;p&gt;I’m accepting that I have to make folks aware of what I’m offering. So, the fun is in finding a way to do this that doesn’t trigger my own highly developed advertising filter!&lt;/p&gt;
@@ -469,7 +892,7 @@
 &lt;li&gt;Declaring and integrating computations in Onyx.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;We have been using Clojure, ClojureScript and Datomic for several years. The most recent addition is Onyx, which we put into production in September 2015. We had some bumps along the way, but now that we’ve learned the requisite skills to run this powerful system suitably well, I’m incredibly happy with it.&lt;/p&gt;
-&lt;h2 id=&quot;a-need-for-scalable-continuous-event-stream-processing&quot;&gt;A need for scalable, continuous event-stream processing&lt;/h2&gt;
+&lt;h2 id=&quot;a-need-for-scalable-continuous-event-stream-processing&quot;&gt;&lt;a href=&quot;#a-need-for-scalable-continuous-event-stream-processing&quot; id=&quot;a-need-for-scalable-continuous-event-stream-processing&quot;&gt;A need for scalable, continuous event-stream processing&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Around September 2014 we were planning the next version of our platform, and had a need for a horizontally scalable computation system; one which wouldn’t need a total rewrite in a couple years as we scaled up. It could not be batch-based, as we wanted to process events coming in from our users as we received them on a continuous basis - a facility known as ‘event stream processing’.&lt;/p&gt;
 &lt;p&gt;The only real option we had back then as a Clojure team, was Twitter’s Storm (now an Apache project). Storm is great in many ways, but one of them is not ease of development and debugging. The deployment story was quite complex, considering that until that time, all we had to do was put &lt;code&gt;.jar&lt;/code&gt; files on servers behind AWS’ ELB. And, it used an old version of Clojure, which made it impossible to take advantage of new features in the language.&lt;/p&gt;
 &lt;p&gt;Despite all that, we were going to go ahead with it and spike a solution, to see how things go. Happily, before we made any significant headway, I saw Michael Drogalis’s first Onyx talk, which he gave at StrangeLoop 2014 (&lt;a href=&quot;https://www.youtube.com/watch?v=vG47Gui3hYE&quot;&gt;video&lt;/a&gt;).&lt;/p&gt;
@@ -477,7 +900,7 @@
 &lt;p&gt;We’ve already learned that this is the best possible way to build an API. We’d been living this dream with Ring and Datomic for a while, and seeing how Onyx used the same great approach made it a natural fit for our context.&lt;/p&gt;
 &lt;p&gt;We decided to go ahead with it, and over the course of 12 months, along with the rest of our new platform, we built an event-stream processing system with Onyx.&lt;/p&gt;
 &lt;p&gt;Before I can describe how we use Onyx, I’m going to go over some of its key concepts.&lt;/p&gt;
-&lt;h2 id=&quot;onyxs-api-is-mostly-data&quot;&gt;Onyx’s API is mostly data&lt;/h2&gt;
+&lt;h2 id=&quot;onyxs-api-is-mostly-data&quot;&gt;&lt;a href=&quot;#onyxs-api-is-mostly-data&quot; id=&quot;onyxs-api-is-mostly-data&quot;&gt;Onyx’s API is mostly data&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;The Onyx data API is broken into several cleverly designed pieces (see the &lt;a href=&quot;https://onyx-platform.gitbooks.io/onyx/content/&quot;&gt;documentation site&lt;/a&gt; or the &lt;a href=&quot;http://www.onyxplatform.org/docs/cheat-sheet/&quot;&gt;cheat-sheet&lt;/a&gt; for the full picture):&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -506,7 +929,7 @@
 &lt;/ul&gt;
 &lt;p&gt;We use both of these to great effect. Since we built our system, even more goodies have become available, which we’ve not yet had a chance to take advantage of: &lt;a href=&quot;http://michaeldrogalis.github.io/jekyll/update/2015/11/12/Onyx-0.8.0-Automatic-State-Management.html&quot;&gt;Windows and Triggers, which Michael describes far better than I can here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;In summary, they allow you to gather up segments into buckets (Windows) and do something of consequence with them (Triggers). One use we have for this in the future is to “debounce” events for a single user; that is, prevent processing events for that user more often than, say, every 5 seconds. This is a great way to reduce overall workload when processing at scale.&lt;/p&gt;
-&lt;h2 id=&quot;how-cognician-uses-onyx&quot;&gt;How Cognician uses Onyx&lt;/h2&gt;
+&lt;h2 id=&quot;how-cognician-uses-onyx&quot;&gt;&lt;a href=&quot;#how-cognician-uses-onyx&quot; id=&quot;how-cognician-uses-onyx&quot;&gt;How Cognician uses Onyx&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Our Onyx system, named Highstorm (which I lifted from Brandon Sanderson’s seriously &lt;em&gt;fantastic&lt;/em&gt; &lt;a href=&quot;https://en.wikipedia.org/wiki/The_Stormlight_Archive&quot;&gt;The Stormlight Archive fantasy novel series&lt;/a&gt;), has several duties:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Calculate and store statistics and aggregates&lt;/strong&gt;, so that web pages and offline analysis can be faster. As all of our data lives in Datomic, these values are 100% inferred; all the raw source data is in the database before Highstorm begins its work.&lt;/li&gt;
@@ -515,7 +938,7 @@
 &lt;/ul&gt;
 &lt;p&gt;Aside from the last of these, you could think of Highstorm as a sort of &lt;em&gt;scalable, eventually-consistent database function system&lt;/em&gt;. Of course, it’s different to actual &lt;a href=&quot;http://docs.datomic.com/database-functions.html&quot;&gt;Datomic database functions&lt;/a&gt; in several very important ways, and should not be mistaken for those! But, even so, it’s a handy analogy.&lt;/p&gt;
 &lt;p&gt;Before we dive into the details of how we did this, I think it’s important to understand how we were able to fit Onyx into the overall infrastructure.&lt;/p&gt;
-&lt;h1 id=&quot;how-onyx-fits-into-cognicians-infrastructure&quot;&gt;How Onyx fits into Cognician’s infrastructure&lt;/h1&gt;
+&lt;h1 id=&quot;how-onyx-fits-into-cognicians-infrastructure&quot;&gt;&lt;a href=&quot;#how-onyx-fits-into-cognicians-infrastructure&quot; id=&quot;how-onyx-fits-into-cognicians-infrastructure&quot;&gt;How Onyx fits into Cognician’s infrastructure&lt;/a&gt;&lt;/h1&gt;
 &lt;p&gt;Typically, when integrating a new system, you’d decouple it from the rest of your infrastructure with a queue, and so that’s what we did. But we didn’t use a separate queue technology like Apache Kafka or RabbitMQ.&lt;/p&gt;
 &lt;p&gt;This is thanks to a great feature of Datomic’s, which is that every connected peer is aware of changes to the database &lt;strong&gt;in real time&lt;/strong&gt;. They have to be, thanks to the way query works - see the green ’Live Index’ pictured in &lt;a href=&quot;http://docs.datomic.com/architecture.html&quot;&gt;this Datomic architecture diagram&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Highstorm’s primary input task simply watches the Datomic transaction log, and puts each transaction log entry into the system to be processed as they become available. Then, whatever changes to be stored ultimately reach Highstorm’s output task as transaction data, ready to be transacted.&lt;/p&gt;
@@ -529,7 +952,7 @@
 &lt;p&gt;Onyx only connects to Datomic the same places that the web peers do in the original diagram. That is, they’re also just Datomic peers. There is no separate queue or coordination mechanism between the web and worker tiers.&lt;/p&gt;
 &lt;p&gt;This is a crucial point: we’re applying the same lesson to architecture that we learned at the programming layer: make data your interface. Our web tier communicates with our worker tier only through data in the database!&lt;/p&gt;
 &lt;p&gt;To dive into the details a bit, we’ll look at how we send email with Highstorm, as it’s a great example of this data-as-interface pattern.&lt;/p&gt;
-&lt;h1 id=&quot;data-as-interface-between-systems&quot;&gt;Data as interface between systems&lt;/h1&gt;
+&lt;h1 id=&quot;data-as-interface-between-systems&quot;&gt;&lt;a href=&quot;#data-as-interface-between-systems&quot; id=&quot;data-as-interface-between-systems&quot;&gt;Data as interface between systems&lt;/a&gt;&lt;/h1&gt;
 &lt;p&gt;When our system has to send email, such as when providing a user with a reset-your-password token, all the web server does is write a new ‘pending message’ entity to Datomic:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(ns your.app.messaging
   (:require [datomic.api :as d]
@@ -613,7 +1036,7 @@
 &lt;li&gt;⟶ &lt;code&gt;commit-tx&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;This is quite awesome, I think!&lt;/p&gt;
-&lt;h1 id=&quot;thats-it-for-now&quot;&gt;That’s it for now&lt;/h1&gt;
+&lt;h1 id=&quot;thats-it-for-now&quot;&gt;&lt;a href=&quot;#thats-it-for-now&quot; id=&quot;thats-it-for-now&quot;&gt;That’s it for now&lt;/a&gt;&lt;/h1&gt;
 &lt;p&gt;I could go on and on :-)&lt;/p&gt;
 &lt;p&gt;Given how core this system is to our platform, I have plenty of other topics that I can talk about on it, which I plan to do in a follow up post or two:&lt;/p&gt;
 &lt;ul&gt;
@@ -623,7 +1046,7 @@
 &lt;li&gt;Working with metrics.&lt;/li&gt;
 &lt;li&gt;Tuning Onyx performance, including some hard-won lessons on back-pressure and throughput.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h1 id=&quot;a-huge-huge-thank-you&quot;&gt;A huge, &lt;em&gt;huge&lt;/em&gt; thank you&lt;/h1&gt;
+&lt;h1 id=&quot;a-huge-huge-thank-you&quot;&gt;&lt;a href=&quot;#a-huge-huge-thank-you&quot; id=&quot;a-huge-huge-thank-you&quot;&gt;A huge, &lt;em&gt;huge&lt;/em&gt; thank you&lt;/a&gt;&lt;/h1&gt;
 &lt;p&gt;I want to thank the two (yes, just two!) guys in the Onyx team – &lt;a href=&quot;https://twitter.com/michaeldrogalis&quot;&gt;Michael Drogalis&lt;/a&gt;, who first conceived of Onyx, and &lt;a href=&quot;https://twitter.com/ghaz&quot;&gt;Lucas Bradstreet&lt;/a&gt;, who joined the cause about a year later – for their incredible patience and support during our learning curve with Onyx.&lt;/p&gt;
 &lt;p&gt;I know that although we were able to contribute by sharing bug reports, or feedback on this API or the utility of that feature, we at Cognician by far got the better deal. Thank you, guys. You’re both menschen!&lt;/p&gt;
 &lt;p&gt;I wouldn’t hesitate for a second to recommend them to anyone who wants to use Onyx in anger - they’ve just recently started a consultancy to offer commercial support, training, development and so on; you can hit them up at &lt;a href=&quot;http://www.onyxplatform.org/support&quot;&gt;http://www.onyxplatform.org/support&lt;/a&gt;. I can’t think of a better way to get started.&lt;/p&gt;
@@ -684,7 +1107,7 @@ two systems - two for production and two for development:&lt;/p&gt;
 &lt;/ul&gt;
 &lt;p&gt;Here&apos;s the code so you can follow along:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/robert-stuttaford/tk-app-dev&quot;&gt;https://github.com/robert-stuttaford/tk-app-dev&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;app-services&quot;&gt;App services&lt;/h2&gt;
+&lt;h2 id=&quot;app-services&quot;&gt;&lt;a href=&quot;#app-services&quot; id=&quot;app-services&quot;&gt;App services&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;These run in both development and production contexts. Only the app
 services run when you issue &lt;code&gt;lein tk&lt;/code&gt; at the command line, which makes
 use of the &lt;code&gt;bootstrap.cfg&lt;/code&gt; file to determine how to satisfy
@@ -692,7 +1115,7 @@ dependencies at startup. You can learn more in the
 &lt;a href=&quot;https://github.com/puppetlabs/trapperkeeper/wiki/Bootstrapping&quot;&gt;Trapperkeeper bootstrapping&lt;/a&gt;
 documentation. In fact, I heartily recommend reading
 &lt;a href=&quot;https://github.com/puppetlabs/trapperkeeper/wiki&quot;&gt;all their documentation&lt;/a&gt;!&lt;/p&gt;
-&lt;h3 id=&quot;datomic-service&quot;&gt;Datomic service&lt;/h3&gt;
+&lt;h3 id=&quot;datomic-service&quot;&gt;&lt;a href=&quot;#datomic-service&quot; id=&quot;datomic-service&quot;&gt;Datomic service&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Code: &lt;a href=&quot;https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/services/datomic.clj&quot;&gt;src/tkad/services/datomic.clj&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This service manages our Datomic database connection, and ensures that
 we have a database, and that all the schema we have defined is
@@ -705,7 +1128,7 @@ to discover all the configured Datomic database uris.&lt;/p&gt;
 will only affect the database if there are actually changes to make.&lt;/p&gt;
 &lt;p&gt;Once initialised, this service provides access to Datomic database
 connections and to database values.&lt;/p&gt;
-&lt;h3 id=&quot;pedestal-service&quot;&gt;Pedestal service&lt;/h3&gt;
+&lt;h3 id=&quot;pedestal-service&quot;&gt;&lt;a href=&quot;#pedestal-service&quot; id=&quot;pedestal-service&quot;&gt;Pedestal service&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Code: &lt;a href=&quot;https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/services/pedestal.clj&quot;&gt;src/tkad/services/pedestal.clj&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This service manages the lifecycle of the Pedestal web server. Here we
 configure all the interceptors, notably injecting config and Datomic
@@ -716,7 +1139,7 @@ web requests, and ensures that - by default - our database queries use
 a common time basis.&lt;/p&gt;
 &lt;p&gt;Of course, we have the connection as well, which means we can easily
 create new database values, submit transactions, and so on.&lt;/p&gt;
-&lt;h2 id=&quot;dev-services&quot;&gt;Dev services&lt;/h2&gt;
+&lt;h2 id=&quot;dev-services&quot;&gt;&lt;a href=&quot;#dev-services&quot; id=&quot;dev-services&quot;&gt;Dev services&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;These services only ever run on a developer machine. When started,
 both of these services watch the file-system for changes and recompile
 their output as needed. As this automated reloading is in place once
@@ -726,14 +1149,14 @@ source tree; instead they are in &lt;code&gt;/dev&lt;/code&gt; which is only add
 source path for the &lt;code&gt;dev&lt;/code&gt; Leiningen profile. This prevents any of this
 code from loading into memory in production, where all this output
 would already have been compiled.&lt;/p&gt;
-&lt;h3 id=&quot;cljx-service&quot;&gt;Cljx service&lt;/h3&gt;
+&lt;h3 id=&quot;cljx-service&quot;&gt;&lt;a href=&quot;#cljx-service&quot; id=&quot;cljx-service&quot;&gt;Cljx service&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Code: &lt;a href=&quot;https://github.com/robert-stuttaford/tk-app-dev/tree/master/dev/services/cljx.clj&quot;&gt;dev/services/cljx.clj&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Pretty simple - compiles all .cljx files to both .clj and .cljs files
 as they change. We make use of Juxt&apos;s
 &lt;a href=&quot;https://github.com/juxt/dirwatch&quot;&gt;dirwatch&lt;/a&gt; library to watch the
 file-system recursively, and only invoke &lt;code&gt;cljx/cljx-compile&lt;/code&gt; when
 we know a &lt;code&gt;.cljx&lt;/code&gt; file changed.&lt;/p&gt;
-&lt;h3 id=&quot;shadow-service&quot;&gt;Shadow service&lt;/h3&gt;
+&lt;h3 id=&quot;shadow-service&quot;&gt;&lt;a href=&quot;#shadow-service&quot; id=&quot;shadow-service&quot;&gt;Shadow service&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Code: &lt;a href=&quot;https://github.com/robert-stuttaford/tk-app-dev/tree/master/dev/services/shadow.clj&quot;&gt;dev/services/shadow.clj&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This one is interesting. Shadow-build is quite low-level to use (which
 is great), so we added a thin layer over the top to support our own
@@ -743,13 +1166,13 @@ it&apos;s hardcoded as a preamble to all output, and its externs are used
 for advanced compilation.&lt;/p&gt;
 &lt;p&gt;Then, we have created two output modes (both of which produce
 Javascript source maps):&lt;/p&gt;
-&lt;h4 id=&quot;debug&quot;&gt;&lt;code&gt;:debug&lt;/code&gt;&lt;/h4&gt;
+&lt;h4 id=&quot;debug&quot;&gt;&lt;a href=&quot;#debug&quot; id=&quot;debug&quot;&gt;&lt;code&gt;:debug&lt;/code&gt;&lt;/a&gt;&lt;/h4&gt;
 &lt;ul&gt;
 &lt;li&gt;Writes to &lt;code&gt;(MODULE-NAME)-debug.js&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;Uses unminifed React.&lt;/li&gt;
 &lt;li&gt;Output is not optimised and is pretty printed.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h4 id=&quot;production&quot;&gt;&lt;code&gt;:production&lt;/code&gt;&lt;/h4&gt;
+&lt;h4 id=&quot;production&quot;&gt;&lt;a href=&quot;#production&quot; id=&quot;production&quot;&gt;&lt;code&gt;:production&lt;/code&gt;&lt;/a&gt;&lt;/h4&gt;
 &lt;ul&gt;
 &lt;li&gt;Writes to &lt;code&gt;(MODULE-NAME).js&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;Uses minifed React.&lt;/li&gt;
@@ -782,7 +1205,7 @@ in the only web view we have set up here:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/robert-stuttaford/tk-app-dev/tree/master/src/tkad/web/routes.clj#L20-L21&quot;&gt;src/tkad/web/routes.clj&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;It&apos;s important to recognise that even with advanced optimisations,
 these two Javascript files can interoperate!&lt;/p&gt;
-&lt;h2 id=&quot;composing-services-as-systems&quot;&gt;Composing services as systems&lt;/h2&gt;
+&lt;h2 id=&quot;composing-services-as-systems&quot;&gt;&lt;a href=&quot;#composing-services-as-systems&quot; id=&quot;composing-services-as-systems&quot;&gt;Composing services as systems&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Ok! So now that we understand what these services do, we can finally
 see how to compose them into two systems. It&apos;s actually rather
 simple - it&apos;s all explained in the comments:&lt;/p&gt;
@@ -808,7 +1231,7 @@ and ensures that any new schema is present in your database)!&lt;/p&gt;
 be automatically recompiled - usually quickly enough for it to be
 ready by the time you refresh your browser.&lt;/p&gt;
 &lt;p&gt;Awesome!&lt;/p&gt;
-&lt;h3 id=&quot;caveat-an-escape-hatch-for-cljx&quot;&gt;Caveat: an escape hatch for cljx&lt;/h3&gt;
+&lt;h3 id=&quot;caveat-an-escape-hatch-for-cljx&quot;&gt;&lt;a href=&quot;#caveat-an-escape-hatch-for-cljx&quot; id=&quot;caveat-an-escape-hatch-for-cljx&quot;&gt;Caveat: an escape hatch for cljx&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Sometimes you might end up with a code-path from &lt;code&gt;dev/user&lt;/code&gt; that
 depends on forms present in the &lt;code&gt;.clj&lt;/code&gt; output of the code in &lt;code&gt;.cljx&lt;/code&gt;
 files, which, when missing, prevents the REPL from starting up.&lt;/p&gt;
@@ -818,7 +1241,7 @@ via Leiningen:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;That&apos;ll invoke cljx in its own Leiningen profile which doesn&apos;t load
 the &lt;code&gt;dev/&lt;/code&gt; code at all.&lt;/p&gt;
-&lt;h2 id=&quot;emacs-shortcuts&quot;&gt;Emacs shortcuts&lt;/h2&gt;
+&lt;h2 id=&quot;emacs-shortcuts&quot;&gt;&lt;a href=&quot;#emacs-shortcuts&quot; id=&quot;emacs-shortcuts&quot;&gt;Emacs shortcuts&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;No Clojure how-to is complete without a snippet of Emacs lisp to add
 to your dotfiles. Here are two simple keybinds for resetting the app
 and dev systems respectively. The second one uses &lt;code&gt;shift+r&lt;/code&gt; instead of
@@ -856,7 +1279,7 @@ starting point would have run into several issues. This post attempts
 to make up for those, by sharing how it works and providing usable code!&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;tl;dr&lt;/strong&gt;: Here&apos;s the full source:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/robert-stuttaford/om-ace-demo/blob/master/src/om_ace_demo.cljs#L1&quot;&gt;https://github.com/robert-stuttaford/om-ace-demo&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;the-basic-idea&quot;&gt;The basic idea&lt;/h2&gt;
+&lt;h2 id=&quot;the-basic-idea&quot;&gt;&lt;a href=&quot;#the-basic-idea&quot; id=&quot;the-basic-idea&quot;&gt;The basic idea&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;So, as you likely already know,
 &lt;a href=&quot;http://facebook.github.io/react/&quot;&gt;React&lt;/a&gt; (for which
 &lt;a href=&quot;https://github.com/swannodette/om&quot;&gt;Om&lt;/a&gt; is a ClojureScript wrapper)
@@ -872,7 +1295,7 @@ that nothing about the view changes from state change to state change.&lt;/p&gt;
 &lt;p&gt;This causes the diff to yield no changes for this particular part of
 the virtual DOM, which of course means no mutations will occur to the
 live DOM nodes.&lt;/p&gt;
-&lt;h2 id=&quot;getting-ace-on-the-page&quot;&gt;Getting Ace on the page&lt;/h2&gt;
+&lt;h2 id=&quot;getting-ace-on-the-page&quot;&gt;&lt;a href=&quot;#getting-ace-on-the-page&quot; id=&quot;getting-ace-on-the-page&quot;&gt;Getting Ace on the page&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We&apos;re going to go through a working example with Ace. We&apos;ll look at:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;How to instantiate an Ace instance&lt;/li&gt;
@@ -895,7 +1318,7 @@ render HTML rather than the &lt;code&gt;om.dom&lt;/code&gt; namespace provided b
 personally find it a lot easier to read and write.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Let&apos;s jump in!&lt;/p&gt;
-&lt;h3 id=&quot;1-instantiate-an-ace-instance&quot;&gt;1. Instantiate an Ace instance&lt;/h3&gt;
+&lt;h3 id=&quot;1-instantiate-an-ace-instance&quot;&gt;&lt;a href=&quot;#1-instantiate-an-ace-instance&quot; id=&quot;1-instantiate-an-ace-instance&quot;&gt;1. Instantiate an Ace instance&lt;/a&gt;&lt;/h3&gt;
 &lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(def *ace* (atom nil))                              ;; 1
 
 (defcomponent editor-area [data owner]
@@ -920,7 +1343,7 @@ that we get by...&lt;/li&gt;
 the backing React component provided by Om.&lt;/li&gt;
 &lt;li&gt;We store the Ace reference in the atom.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&quot;2-populate-the-text-editor-from-the-om-global-app-state&quot;&gt;2. Populate the text editor from the Om global app state&lt;/h3&gt;
+&lt;h3 id=&quot;2-populate-the-text-editor-from-the-om-global-app-state&quot;&gt;&lt;a href=&quot;#2-populate-the-text-editor-from-the-om-global-app-state&quot; id=&quot;2-populate-the-text-editor-from-the-om-global-app-state&quot;&gt;2. Populate the text editor from the Om global app state&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;We&apos;ll do this in two places; once on starting Ace up, and with a
 separate life cycle protocol function. First, a helper function:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(defn set-value! [value]
@@ -953,7 +1376,7 @@ key of &lt;code&gt;:value&lt;/code&gt; for this particular state map:&lt;/p&gt;
 protocol) to set the data from the incoming state transition cursor.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Great! We have an editor on the page!&lt;/p&gt;
-&lt;h2 id=&quot;3-track-the-changes-in-ace&quot;&gt;3. Track the changes in Ace&lt;/h2&gt;
+&lt;h2 id=&quot;3-track-the-changes-in-ace&quot;&gt;&lt;a href=&quot;#3-track-the-changes-in-ace&quot; id=&quot;3-track-the-changes-in-ace&quot;&gt;3. Track the changes in Ace&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Now we&apos;ll use Ace&apos;s on change callback to catch changes as they
 happen.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(defn change-handler []                             ;; 1
@@ -979,7 +1402,7 @@ for that.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Ok, but what do we put into that change handler?&lt;/p&gt;
 &lt;hr /&gt;
-&lt;h4 id=&quot;interlude&quot;&gt;Interlude&lt;/h4&gt;
+&lt;h4 id=&quot;interlude&quot;&gt;&lt;a href=&quot;#interlude&quot; id=&quot;interlude&quot;&gt;Interlude&lt;/a&gt;&lt;/h4&gt;
 &lt;p&gt;At this point, we &lt;em&gt;could&lt;/em&gt; simply write the changes right back into the
 global app state, but there&apos;s a problem with this approach.&lt;/p&gt;
 &lt;p&gt;Doing so will cause that &lt;code&gt;will-update&lt;/code&gt; function to run, which will
@@ -1002,7 +1425,7 @@ editor components when the user clicks Save, so that the editor can
 transfer the editor value from local to global state.&lt;/p&gt;
 &lt;p&gt;That&apos;s where the core.async comes in.&lt;/p&gt;
 &lt;hr /&gt;
-&lt;h2 id=&quot;3-track-the-changes-in-ace---round-two&quot;&gt;3. Track the changes in Ace - round two&lt;/h2&gt;
+&lt;h2 id=&quot;3-track-the-changes-in-ace---round-two&quot;&gt;&lt;a href=&quot;#3-track-the-changes-in-ace---round-two&quot; id=&quot;3-track-the-changes-in-ace---round-two&quot;&gt;3. Track the changes in Ace - round two&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Right. Let&apos;s get the value from Ace into local state:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(defn change-handler [owner]
   (om/set-state-nr! owner :edited-value             ;; 1
@@ -1088,7 +1511,7 @@ value is &lt;code&gt;:save!&lt;/code&gt;...&lt;/li&gt;
 &lt;li&gt;And if it&apos;s there, use &lt;code&gt;om/update!&lt;/code&gt; to place it in the global state map.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Phew! Now we have everything wired up.&lt;/p&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;&lt;a href=&quot;#conclusion&quot; id=&quot;conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Here&apos;s the full source, again:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/robert-stuttaford/om-ace-demo/blob/master/src/om_ace_demo.cljs#L1&quot;&gt;https://github.com/robert-stuttaford/om-ace-demo&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;We have covered quite a lot ground in just ±50 lines of code:&lt;/p&gt;
@@ -1101,7 +1524,7 @@ callbacks between them.&lt;/li&gt;
 &lt;li&gt;We saw how om-tools and Ŝablono look when used with Om, which is
 mostly a feel-good thing, I believe it helps a lot in the long run.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&quot;special-thanks&quot;&gt;Special thanks&lt;/h2&gt;
+&lt;h2 id=&quot;special-thanks&quot;&gt;&lt;a href=&quot;#special-thanks&quot; id=&quot;special-thanks&quot;&gt;Special thanks&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;To &lt;a href=&quot;https://twitter.com/levanderhart&quot;&gt;Luke VanderHart&lt;/a&gt; for the
 conversation that led me to this insight.&lt;/p&gt;
 </content></entry><entry><title>Configuration in Om apps</title><link href="http://www.stuttaford.me/2014/08/07/configuration-in-om-apps/" /><updated>2018-01-11T15:57:15Z</updated><id>http://www.stuttaford.me/2014/08/07/configuration-in-om-apps/</id><content type="html">&lt;p&gt;I&apos;ve found a nice and simple way for making configuration available to

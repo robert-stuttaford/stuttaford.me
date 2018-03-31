@@ -3,7 +3,7 @@
 <p><a href="/2018/02/18/a-clojure-learning-journey/">A Clojure learning journey</a></p>
 <p>This diary entry covers the <a href="https://github.com/robert-stuttaford/bridge/compare/94cacca10a3e3c06cfef54a81dda9f2e3d0c451e...3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c">changes in this diff</a>.</p>
 <hr>
-<h2 id="datomic-peer-and-client-together">Datomic Peer and Client together</h2>
+<h2 id="datomic-peer-and-client-together"><a href="#datomic-peer-and-client-together" id="datomic-peer-and-client-together">Datomic Peer and Client together</a></h2>
 <p>Ok, so once I actually started using both together, it quickly became apparent that passing the <code>:mode</code> along with the <code>:conn</code> / <code>:db</code> values into the Datomic abstraction was creating all sorts of difficulties.</p>
 <p>I chose instead to control <code>:mode</code> with a <a href="https://clojure.org/reference/vars">dynamic var</a>, at:</p>
 <p><code>bridge.data.datomic/*DATOMIC-MODE*</code></p>
@@ -14,7 +14,7 @@
 <p>It's still early days, but I must say, given that it's working just fine at the REPL, from tests, and within all the app code, I'm feeling good about this idea!</p>
 <p>To see what I've touched on so far, you can review the <a href="https://github.com/robert-stuttaford/bridge/blob/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/data/datomic.clj#L37-L70">API differences here</a>.</p>
 <hr>
-<h2 id="modelling-people">Modelling people</h2>
+<h2 id="modelling-people"><a href="#modelling-people" id="modelling-people">Modelling people</a></h2>
 <p>To begin modelling people, I chose to implement the standard set of access control gestures that a person will use to self-service-manage their own access:</p>
 <ul>
 <li>Sign up, and confirm email.</li>
@@ -24,7 +24,7 @@
 <p>I felt this was a good place to start, because many of the features of <code>bridge</code> rely on what we know about the currently signed-in user, and it'd be nice to have this stuff out of the way.</p>
 <p>It also means that it's secure from day 1, so deciding when to host on the public Internet won't be impeded by this.</p>
 <p>Also, this gives us a nice way to establish some norms, like how we organise the code layers that make up the system, how we'll name things, and so on.</p>
-<h3 id="person-attributes">Person attributes</h3>
+<h3 id="person-attributes"><a href="#person-attributes" id="person-attributes">Person attributes</a></h3>
 <p>Ultimately, we'll record a fairly <a href="https://github.com/robert-stuttaford/bridge/blob/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/doc/schema.md#user">large number of values</a> for a given person, but thanks to Datomic's design, we don't need to concern ourselves with all of them at once just to get started with these basics.</p>
 <p><strong>Aside</strong>: to soak yourself in some of the consequences of this sort of thinking, I highly recommend this post on treating your database as a &quot;living, breathing thing&quot;: <a href="http://blog.datomic.com/2017/01/the-ten-rules-of-schema-growth.html">The Ten Rules of Schema Growth</a>, by Stuart Halloway.</p>
 <p>Ok! We start with six attributes:</p>
@@ -48,7 +48,7 @@
 <p>A random token that we'll send via email, for them to provide back to us when they confirm their email, or reset their password, respectively.</p>
 <p>Buddy comes to the rescue again; this time, we compose <code>buddy.core.nonce/random-nonce</code>   with <code>buddy.core.codecs/bytes-&gt;hex</code> to produce secure random tokens for use in email messages.</p>
 <hr>
-<h2 id="code-organisation">Code organisation</h2>
+<h2 id="code-organisation"><a href="#code-organisation" id="code-organisation">Code organisation</a></h2>
 <p>I've found that I prefer to keep all the different technical aspects for a given concern together, rather than grouping code by its behaviour.</p>
 <p>To say that another way, I'd rather find all the queries, transactions, and web page code for a section of the system together in a folder, rather than keeping all the database code in a folder, and separately keeping all the web page code together in a different folder somewhere else.</p>
 <p>So, rather than this:</p>
@@ -76,7 +76,7 @@
 <p>I'm not entirely sure where this idea comes from. It could be Domain Driven Design, or elsewhere, but my preference for this is mostly intuitive; it likely has a name and a whitepaper written by someone far smarter than me!</p>
 <p>Consequently, This is how I've arranged the <a href="https://github.com/robert-stuttaford/bridge/tree/3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c/src/bridge/person">code for those six access gestures</a>.</p>
 <hr>
-<h2 id="access-page-organisation">Access page organisation</h2>
+<h2 id="access-page-organisation"><a href="#access-page-organisation" id="access-page-organisation">Access page organisation</a></h2>
 <p>After working through about half of the use-cases, a pattern emerged:</p>
 <pre><code class="language-clojure">(defn thing-page [&lt;maybe error&gt;] 
   &lt;hiccup, maybe with error&gt;)
@@ -99,31 +99,31 @@
 <p><em>I'd be particularly interested in hearing feedback, especially from newer Clojure folks, on how approachable this code is for you.</em></p>
 <p><em>Did it help you to understand the flow, or hinder you? Why?</em></p>
 <hr>
-<h2 id="access-page-data-interactions">Access page data interactions</h2>
+<h2 id="access-page-data-interactions"><a href="#access-page-data-interactions" id="access-page-data-interactions">Access page data interactions</a></h2>
 <p>The common data namespace brings together several things - the cryptography issues described above, and:</p>
-<h3 id="rules-for-data-sanitisation-and-correctness">Rules for data sanitisation and correctness</h3>
+<h3 id="rules-for-data-sanitisation-and-correctness"><a href="#rules-for-data-sanitisation-and-correctness" id="rules-for-data-sanitisation-and-correctness">Rules for data sanitisation and correctness</a></h3>
 <p>To prevent issues, we trim and lower-case email addresses whenever a person provides one via HTTP request.</p>
 <p>We require that passwords be at least 8 characters, and that confirmed passwords match.</p>
-<h3 id="naming-the-ways-in-which-people-can-be-found">Naming the ways in which people can be found</h3>
+<h3 id="naming-the-ways-in-which-people-can-be-found"><a href="#naming-the-ways-in-which-people-can-be-found" id="naming-the-ways-in-which-people-can-be-found">Naming the ways in which people can be found</a></h3>
 <p>Right now, we can find a person in three ways - through their email, and through the confirm and reset tokens.</p>
 <p>Over time, we may come up with additional ways, or require new rules be included in existing ways.</p>
 <p>By putting these generic queries in named functions, we hook the rest of our system to these semantics.</p>
-<h3 id="defining-how-people-are-created-and-altered">Defining how people are created and altered</h3>
+<h3 id="defining-how-people-are-created-and-altered"><a href="#defining-how-people-are-created-and-altered" id="defining-how-people-are-created-and-altered">Defining how people are created and altered</a></h3>
 <p>I've split the &quot;make-new-person&quot; transaction code from the function that actually transacts it. This allows us to test the rules that govern what it means to be a new person in our system, independently of actually commiting it to the database.</p>
 <p>To take advantage of this split, I've written specs and instrumented this function, and unit-tested this function as well.</p>
 <p>We also have named functions for the key access control alterations — actually confirming that email address, and resetting that password.</p>
-<h3 id="defining-when-messages-are-sent-to-the-person">Defining when messages are sent to the person</h3>
+<h3 id="defining-when-messages-are-sent-to-the-person"><a href="#defining-when-messages-are-sent-to-the-person" id="defining-when-messages-are-sent-to-the-person">Defining when messages are sent to the person</a></h3>
 <p>In two cases, we generate a token, and need to inform the person by email.</p>
 <p>Right now, all we do is log the email, but later, once we have an email sending abstraction in place, this invocation will likely move 'up' one layer, out of the data layer, and into the access controller layer, but call back 'down' one layer into the email sending abstraction.</p>
 <p>For now, it's fine where it is.</p>
-<h3 id="the-relevant-datomic-schema">The relevant Datomic schema</h3>
+<h3 id="the-relevant-datomic-schema"><a href="#the-relevant-datomic-schema" id="the-relevant-datomic-schema">The relevant Datomic schema</a></h3>
 <p>I firmly believe that the database should be the source of truth for its state — schema included — rather than some source code in your app.</p>
 <p>This becomes especially true when your database has been around for a while, and when you have multiple independent apps interacting with it.</p>
 <p>In fact, I wrote <a href="https://github.com/cognician/datomic-doc#rationale">Datomic Doc</a> to make inspecting your database idents (schema, enums, functions) easier to do.</p>
 <p>However, in terms of being able to test the <em>code</em> that interacts with the database, it's useful to keep those schema definitions handy. And, as I describe below in about development data, it's useful to be able to rebuild your database from scratch, if you need to.</p>
 <p>So, this is why the schema is kept here.</p>
 <hr>
-<h2 id="development-time-data">Development-time data</h2>
+<h2 id="development-time-data"><a href="#development-time-data" id="development-time-data">Development-time data</a></h2>
 <p>Until I'm ready to commit to a durable storage, I'm using an in-memory database with Datomic. This gives me total freedom if I need to make substantial alterations to the database schema — something that experience has taught me is valuable!</p>
 <p>The consequence of this is that I'm forced to manually interact with the system to get it into an interesting state for the code I'm working on.</p>
 <p>Of course, this is something that can be automated, so that's what I did!</p>
@@ -131,26 +131,26 @@
 <p>As I go deeper into implementing <code>bridge</code>, I'll be able to build up this code, keeping the database in a suitable state for demonstrating features or for preparing testing things interactively.</p>
 <p>It also serves as nice documentation: the minimum data to make the system go!</p>
 <hr>
-<h2 id="specs-and-tests">Specs and tests</h2>
+<h2 id="specs-and-tests"><a href="#specs-and-tests" id="specs-and-tests">Specs and tests</a></h2>
 <p>I used Spec to describe the data layer, which defines rules about the contents and the composition of those Datomic attributes described earlier. Rather than hardcoding meaning into the specs defined at the &quot;person&quot; level, I wrote generic specs - for 'non blank string', 'nonce' (a.k.a. token) and email, and had the person specs use those.</p>
 <p>I added <a href="https://github.com/bhb/expound">expound</a> and <a href="https://github.com/jeaye/orchestra">orchestra</a> as standard Spec conveniences.</p>
 <p>I use a throwaway in-memory Datomic database, which gets set up and torn down on for each test.</p>
 <p>I'm only scratching the surface here, as I've only got one example-based test written so far, for the &quot;sign up&quot; user gesture. A likely very-next step is to flesh out these tests so that the rest of the named things in <code>bridge.person.data</code> have exemplars.</p>
-<h3 id="dabbling-with-generative-tests">Dabbling with generative tests</h3>
+<h3 id="dabbling-with-generative-tests"><a href="#dabbling-with-generative-tests" id="dabbling-with-generative-tests">Dabbling with generative tests</a></h3>
 <p>I actually ended up quite far down a small rabbit-hole trying to set up generative tests with these specs. Turns out, doing so for email addresses wasn't very straightforward.</p>
 <p>I did try using a couple different email regexes I found on the web with Steve Miner's frankly awesome <a href="https://github.com/miner/strgen">https://github.com/miner/strgen</a>, but as the Readme describes, it can only support a subset of the regex engine's language, and for whatever reason, email regexes have a burning need to be <a href="http://www.perlmonks.org/?node_id=62389">Perl quines</a> or something.</p>
 <p>When I felt the jaws starting to close around me, I decided to park that idea for now, and focus on getting a working UI built. I'd love to come back to this, though, and have generative tests in place for the full &quot;people API&quot;.</p>
 <p><em>If you know of a way to generate emails using a regex that's suitably valid, please let me know!</em></p>
 <hr>
-<h2 id="other-code-changes">Other code changes</h2>
-<h3 id="added-repl-conveniences">Added REPL conveniences</h3>
+<h2 id="other-code-changes"><a href="#other-code-changes" id="other-code-changes">Other code changes</a></h2>
+<h3 id="added-repl-conveniences"><a href="#added-repl-conveniences" id="added-repl-conveniences">Added REPL conveniences</a></h3>
 <p>So that I can quickly poke around in the database from the REPL, I added <code>bridge.dev.repl</code>, which has zero-arg <code>conn</code> and <code>db</code> functions.</p>
 <p>I usually use these from within <code>(comment ...)</code> forms in whichever namespace I'm currently working in.</p>
-<h3 id="display-stacktraces-via-the-web-server">Display stacktraces via the web server</h3>
+<h3 id="display-stacktraces-via-the-web-server"><a href="#display-stacktraces-via-the-web-server" id="display-stacktraces-via-the-web-server">Display stacktraces via the web server</a></h3>
 <p>I added the <code>ring.middleware.stacktrace</code> middleware, as the default Jetty handler shows very little on its own when an exception is thrown.</p>
-<h3 id="bumped-cider-and-clj-refactor-to-snapshot">Bumped CIDER and clj-refactor to SNAPSHOT</h3>
+<h3 id="bumped-cider-and-clj-refactor-to-snapshot"><a href="#bumped-cider-and-clj-refactor-to-snapshot" id="bumped-cider-and-clj-refactor-to-snapshot">Bumped CIDER and clj-refactor to SNAPSHOT</a></h3>
 <p>So that I can test them out, and also get rid of those deprecation warnings when starting a REPL.</p>
-<h3 id="makefile-updates">Makefile updates</h3>
+<h3 id="makefile-updates"><a href="#makefile-updates" id="makefile-updates">Makefile updates</a></h3>
 <ul>
 <li>Run the peer-server easily.</li>
 <li>Compiling ClojureScript via <code>cljs.main</code> complains if you don't provide a <code>:source-map &quot;path&quot;</code> config when using <code>-O advanced</code>. I fixed that.</li>

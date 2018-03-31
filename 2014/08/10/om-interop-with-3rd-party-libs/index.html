@@ -11,7 +11,7 @@ starting point would have run into several issues. This post attempts
 to make up for those, by sharing how it works and providing usable code!</p>
 <p><strong>tl;dr</strong>: Here's the full source:</p>
 <p><a href="https://github.com/robert-stuttaford/om-ace-demo/blob/master/src/om_ace_demo.cljs#L1">https://github.com/robert-stuttaford/om-ace-demo</a></p>
-<h2 id="the-basic-idea">The basic idea</h2>
+<h2 id="the-basic-idea"><a href="#the-basic-idea" id="the-basic-idea">The basic idea</a></h2>
 <p>So, as you likely already know,
 <a href="http://facebook.github.io/react/">React</a> (for which
 <a href="https://github.com/swannodette/om">Om</a> is a ClojureScript wrapper)
@@ -27,7 +27,7 @@ that nothing about the view changes from state change to state change.</p>
 <p>This causes the diff to yield no changes for this particular part of
 the virtual DOM, which of course means no mutations will occur to the
 live DOM nodes.</p>
-<h2 id="getting-ace-on-the-page">Getting Ace on the page</h2>
+<h2 id="getting-ace-on-the-page"><a href="#getting-ace-on-the-page" id="getting-ace-on-the-page">Getting Ace on the page</a></h2>
 <p>We're going to go through a working example with Ace. We'll look at:</p>
 <ol>
 <li>How to instantiate an Ace instance</li>
@@ -50,7 +50,7 @@ render HTML rather than the <code>om.dom</code> namespace provided by Om. I
 personally find it a lot easier to read and write.</li>
 </ul>
 <p>Let's jump in!</p>
-<h3 id="1-instantiate-an-ace-instance">1. Instantiate an Ace instance</h3>
+<h3 id="1-instantiate-an-ace-instance"><a href="#1-instantiate-an-ace-instance" id="1-instantiate-an-ace-instance">1. Instantiate an Ace instance</a></h3>
 <pre><code class="language-clojure">(def *ace* (atom nil))                              ;; 1
 
 (defcomponent editor-area [data owner]
@@ -75,7 +75,7 @@ that we get by...</li>
 the backing React component provided by Om.</li>
 <li>We store the Ace reference in the atom.</li>
 </ol>
-<h3 id="2-populate-the-text-editor-from-the-om-global-app-state">2. Populate the text editor from the Om global app state</h3>
+<h3 id="2-populate-the-text-editor-from-the-om-global-app-state"><a href="#2-populate-the-text-editor-from-the-om-global-app-state" id="2-populate-the-text-editor-from-the-om-global-app-state">2. Populate the text editor from the Om global app state</a></h3>
 <p>We'll do this in two places; once on starting Ace up, and with a
 separate life cycle protocol function. First, a helper function:</p>
 <pre><code class="language-clojure">(defn set-value! [value]
@@ -108,7 +108,7 @@ key of <code>:value</code> for this particular state map:</p>
 protocol) to set the data from the incoming state transition cursor.</li>
 </ol>
 <p>Great! We have an editor on the page!</p>
-<h2 id="3-track-the-changes-in-ace">3. Track the changes in Ace</h2>
+<h2 id="3-track-the-changes-in-ace"><a href="#3-track-the-changes-in-ace" id="3-track-the-changes-in-ace">3. Track the changes in Ace</a></h2>
 <p>Now we'll use Ace's on change callback to catch changes as they
 happen.</p>
 <pre><code class="language-clojure">(defn change-handler []                             ;; 1
@@ -134,7 +134,7 @@ for that.</li>
 </ol>
 <p>Ok, but what do we put into that change handler?</p>
 <hr />
-<h4 id="interlude">Interlude</h4>
+<h4 id="interlude"><a href="#interlude" id="interlude">Interlude</a></h4>
 <p>At this point, we <em>could</em> simply write the changes right back into the
 global app state, but there's a problem with this approach.</p>
 <p>Doing so will cause that <code>will-update</code> function to run, which will
@@ -157,7 +157,7 @@ editor components when the user clicks Save, so that the editor can
 transfer the editor value from local to global state.</p>
 <p>That's where the core.async comes in.</p>
 <hr />
-<h2 id="3-track-the-changes-in-ace---round-two">3. Track the changes in Ace - round two</h2>
+<h2 id="3-track-the-changes-in-ace---round-two"><a href="#3-track-the-changes-in-ace---round-two" id="3-track-the-changes-in-ace---round-two">3. Track the changes in Ace - round two</a></h2>
 <p>Right. Let's get the value from Ace into local state:</p>
 <pre><code class="language-clojure">(defn change-handler [owner]
   (om/set-state-nr! owner :edited-value             ;; 1
@@ -243,7 +243,7 @@ value is <code>:save!</code>...</li>
 <li>And if it's there, use <code>om/update!</code> to place it in the global state map.</li>
 </ol>
 <p>Phew! Now we have everything wired up.</p>
-<h2 id="conclusion">Conclusion</h2>
+<h2 id="conclusion"><a href="#conclusion" id="conclusion">Conclusion</a></h2>
 <p>Here's the full source, again:</p>
 <p><a href="https://github.com/robert-stuttaford/om-ace-demo/blob/master/src/om_ace_demo.cljs#L1">https://github.com/robert-stuttaford/om-ace-demo</a></p>
 <p>We have covered quite a lot ground in just ±50 lines of code:</p>
@@ -256,7 +256,7 @@ callbacks between them.</li>
 <li>We saw how om-tools and Ŝablono look when used with Om, which is
 mostly a feel-good thing, I believe it helps a lot in the long run.</li>
 </ul>
-<h2 id="special-thanks">Special thanks</h2>
+<h2 id="special-thanks"><a href="#special-thanks" id="special-thanks">Special thanks</a></h2>
 <p>To <a href="https://twitter.com/levanderhart">Luke VanderHart</a> for the
 conversation that led me to this insight.</p>
 </div><div id="mc_embed_signup"><form action="https://stuttaford.us17.list-manage.com/subscribe/post?u=fb5cca3ecb94dac76560e8fd8&amp;id=4aa6be7af7" class="validate" id="mc-embedded-subscribe-form" method="post" name="mc-embedded-subscribe-form" target="_blank"><div id="mc_embed_signup_scroll"><input class="email" id="mce-EMAIL" name="EMAIL" placeholder="Subscribe for updates" type="email" value=""><div aria-hidden="true" style="position: absolute; left: -5000px;"><input name="b_fb5cca3ecb94dac76560e8fd8_4aa6be7af7" tabindex="-1" type="text" value=""></div><div class="clear"><input class="button" id="mc-embedded-subscribe" name="subscribe" style="margin-left: 0.5rem" type="submit" value="Subscribe"></div></div></form></div><div class="footer"><p>&copy; Robert Stuttaford 2018. All rights reserved. Some lefts, too.</p></div><script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
