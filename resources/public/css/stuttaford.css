@@ -133,3 +133,11 @@ a.anchor {
 .footer p {
     font-size 0.9em;
 }
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    color: #313131;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+    color: #268bd2;
+}

@@ -6,6 +6,7 @@
            [com.vladsch.flexmark.ext.yaml.front.matter
             AbstractYamlFrontMatterVisitor
             YamlFrontMatterExtension]
+           com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension
            com.vladsch.flexmark.html.HtmlRenderer
            com.vladsch.flexmark.parser.Parser
            com.vladsch.flexmark.util.options.MutableDataSet
@@ -14,7 +15,8 @@
 (def options ^MutableDataSet
   (doto (MutableDataSet.)
     (.set Parser/EXTENSIONS
-          (ArrayList. [(TocExtension/create)
+          (ArrayList. [(AnchorLinkExtension/create)
+                       (TocExtension/create)
                        (YamlFrontMatterExtension/create)]))))
 
 (def parser ^Parser$Builder
