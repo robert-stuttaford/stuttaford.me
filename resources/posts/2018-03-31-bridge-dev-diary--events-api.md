@@ -568,7 +568,7 @@ As always, I'm looking to learn from others just as much as I am looking to shar
 
 I'd _really_ love to know how any of what I'm writing here is helping you — however small or big.
 
-If you have any advice, or questions, or feedback of any kind, please [get in touch](http://localhost:3000/)!
+If you have any advice, or questions, or feedback of any kind, please [get in touch](/)!
 
 As always, thanks for reading!
 
