@@ -418,7 +418,7 @@ IP-.-&amp;gt;CA
 &lt;p&gt;Phew. This was a pretty big update.&lt;/p&gt;
 &lt;p&gt;As always, I&apos;m looking to learn from others just as much as I am looking to share my experience.&lt;/p&gt;
 &lt;p&gt;I&apos;d &lt;em&gt;really&lt;/em&gt; love to know how any of what I&apos;m writing here is helping you — however small or big.&lt;/p&gt;
-&lt;p&gt;If you have any advice, or questions, or feedback of any kind, please &lt;a href=&quot;http://localhost:3000/&quot;&gt;get in touch&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;If you have any advice, or questions, or feedback of any kind, please &lt;a href=&quot;/&quot;&gt;get in touch&lt;/a&gt;!&lt;/p&gt;
 &lt;p&gt;As always, thanks for reading!&lt;/p&gt;
 &lt;script src=&quot;https://unpkg.com/mermaid@8.0.0-rc.6/dist/mermaid.min.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;mermaid.init({startOnLoad:true}, &quot;.language-mermaid&quot;);&lt;/script&gt;
