@@ -36,7 +36,7 @@ Today's diary entry covers the [changes in this diff](https://github.com/robert-
 
 ## Dealing with events
 
-My current programming goal here is for an organser to be able to:
+My current programming goal here is for an organiser to be able to:
 
 1. Create a new event
 2. Alter an event's details
