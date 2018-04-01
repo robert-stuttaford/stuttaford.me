@@ -512,11 +512,11 @@ Given that I was doing this, I recognised the now familiar `check-n` pattern in 
 
 So, after all of that, all I ended up with was greater certainty that my intended changes can be committed. I still had to actually transact something.
 
-Aside from organisers, all of my updates are assertions. So, expressing that what straightforward. I added a `retract?` option to the update context, to allow the client to express retractions for the remove-organiser case.
+Aside from retracting organisers, all of my updates are assertions. So, expressing that was straightforward. I added a `retract?` option to the update context, to allow the client to express retractions for the remove-organiser case.
 
 Also, because those markdown fields are optional, it's possible for an organiser to blank out a previously populated notes area, thereby 'retracting' its contents. So, I made sure to catch an incoming blank string assertion, and to instead treat it as a retraction.
 
-It's safe to do this, because our specs in validation step 2 ensure that we don't let any blank strings through unless they're allowed.
+It's safe to do this automated retraction because our specs in validation step 2 ensure that we don't let any blank strings through, unless they're allowed.
 
 <hr>
 
