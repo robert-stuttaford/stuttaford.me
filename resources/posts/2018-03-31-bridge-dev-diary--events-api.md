@@ -571,8 +571,3 @@ I'd _really_ love to know how any of what I'm writing here is helping you — ho
 If you have any advice, or questions, or feedback of any kind, please [get in touch](/)!
 
 As always, thanks for reading!
-
-
-<script src="https://unpkg.com/mermaid@8.0.0-rc.6/dist/mermaid.min.js"></script>
-
-<script>mermaid.init({startOnLoad:true}, ".language-mermaid");</script>

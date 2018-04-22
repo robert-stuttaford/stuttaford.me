@@ -1,5 +1,6 @@
 (ns stuttaford.web.content
   (:require [clj-time.format :as time-format]
+            [clojure.string :as str]
             [hiccup.page :as page]
             [stuttaford.db :as db]
             [stuttaford.web.posts :as posts]))
@@ -50,6 +51,9 @@
        title)]
     [:span.post-date (format-date date)]
     content]
+   (when (str/includes? content "language-mermaid")
+     (list [:script {:src "https://unpkg.com/mermaid@8.0.0-rc.6/dist/mermaid.min.js"}]
+           [:script "mermaid.init({startOnLoad:true}, \".language-mermaid\");"]))
    (when-let [related (seq (posts/recent recent-posts date false))]
      [:div.related
       [:h2 "Related Posts"]
