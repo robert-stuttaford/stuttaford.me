@@ -1,5 +1,340 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-04-01T15:21:47Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Events API</title><link href="http://www.stuttaford.me/2018/03/31/bridge-dev-diary--events-api/" /><updated>2018-04-01T15:21:47Z</updated><id>http://www.stuttaford.me/2018/03/31/bridge-dev-diary--events-api/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-04-28T13:58:14Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Events UI</title><link href="http://www.stuttaford.me/2018/04/22/bridge-dev-diary--events-ui/" /><updated>2018-04-28T13:58:14Z</updated><id>http://www.stuttaford.me/2018/04/22/bridge-dev-diary--events-ui/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Since then, I&apos;ve written other dev diary entries:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/03/bridge-dev-diary--datomic-mode/&quot;&gt;Bridge dev diary: Datomic mode&lt;/a&gt; — 3 March, 2018&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/17/bridge-dev-diary--modelling-access/&quot;&gt;Bridge dev diary: Modelling access&lt;/a&gt; — 17 March, 2018&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/31/bridge-dev-diary--events-api/&quot;&gt;Bridge dev diary: Events API&lt;/a&gt; — 31 March, 2018&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Today&apos;s diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/c21851f...b599627&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#choosing-re-frame&quot;&gt;Choosing re-frame&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#that-speedbump-re-frame-10x&quot;&gt;That speedbump: re-frame-10x&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#bootstrapping-the-clojurescript-app&quot;&gt;Bootstrapping the ClojureScript app&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#developer-tools&quot;&gt;Developer tools&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#state-initialisation&quot;&gt;State initialisation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#client-side-specs&quot;&gt;Client-side specs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#top-level-view&quot;&gt;Top-level view&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#intermission&quot;&gt;&lt;em&gt;Intermission&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#events-ui&quot;&gt;Events UI&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#how-this-code-is-organised&quot;&gt;How this code is organised&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#listing-events&quot;&gt;Listing events&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#creating-events&quot;&gt;Creating events&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#editing-events&quot;&gt;Editing events&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#where-to-from-here&quot;&gt;Where to from here?&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#technical-debt&quot;&gt;Technical debt&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#next-steps&quot;&gt;Next steps&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#closing&quot;&gt;Closing&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;Today&apos;s entry covers our first adventure on the frontend!&lt;/p&gt;
+&lt;p&gt;I set out to produce the essential UI for creating, listing, and editing events. I wanted to see all three working in unison, so that I had a &apos;closed&apos; interaction loop.&lt;/p&gt;
+&lt;h2 id=&quot;choosing-re-frame&quot;&gt;&lt;a href=&quot;#choosing-re-frame&quot; id=&quot;choosing-re-frame&quot;&gt;Choosing re-frame&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I decided to use a library I had never used before: &lt;a href=&quot;https://github.com/Day8/re-frame&quot;&gt;re-frame&lt;/a&gt;. Over the years, as I&apos;ve looked at various open-source ClojureScript projects, Reagent has often been in the mix. I&apos;ve often wanted to use components from these Reagent-backed projects (&lt;a href=&quot;https://github.com/Odinodin/data-frisk-reagent&quot;&gt;data-frisk-reagent&lt;/a&gt; comes to mind), but couldn&apos;t easily do so, because I was either using Om-not-Next, or later, Rum.&lt;/p&gt;
+&lt;p&gt;After seeing how much fun &lt;a href=&quot;http://twitter.com/wazound&quot;&gt;Mike&lt;/a&gt; and &lt;a href=&quot;https://twitter.com/danielwithmusic&quot;&gt;Daniel&lt;/a&gt; (and many other contributors) are having with re-frame and neat-o developer tooling like &lt;a href=&quot;https://github.com/Day8/re-frame-10x&quot;&gt;re-frame-10x&lt;/a&gt;, I figured that this bridge project would be a great place to try these things out.&lt;/p&gt;
+&lt;p&gt;It turns out that it was a great choice!&lt;/p&gt;
+&lt;p&gt;I&apos;ve really enjoyed it so far (despite a small speedbump along the way with 10x), and I&apos;m quite confident that its design is going to scale well as bridge grows.&lt;/p&gt;
+&lt;p&gt;That design is very similar to something we use at Cognician, named Radiant (I&apos;m a &lt;em&gt;huge&lt;/em&gt; &lt;a href=&quot;https://brandonsanderson.com/books/the-stormlight-archive/&quot;&gt;Stormlight Archive&lt;/a&gt; fan-boy, can you tell?). There&apos;s a trimmed-down version of Radiant powering the Clojure Codex (see &lt;a href=&quot;https://github.com/robert-stuttaford/stuttaford.me/tree/master/src/stuttaford&quot;&gt;client* here&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;It&apos;s a very common pattern in the ClojureScript world, which (I have it on good authority, the Javascript folks go through great ritual to reproduce):&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;One top-level state &lt;code&gt;atom&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;One &lt;code&gt;core.async&lt;/code&gt; channel which serialises all inputs, whether from the user or the network.&lt;/li&gt;
+&lt;li&gt;A function which reads from that channel, using a keyword to dispatch some registered handler, which returns a new state to &lt;code&gt;swap!&lt;/code&gt; into the atom.&lt;/li&gt;
+&lt;li&gt;Some mechanism for running side-effects in a controlled manner. Radiant allows the &lt;code&gt;state-&amp;gt;new-state&lt;/code&gt; functions from 3 to accrue effects as data in a vector, which then get invoked after the state update via &lt;code&gt;doseq&lt;/code&gt;. If needed, it&apos;s expected that effects will place more inputs into the &lt;code&gt;chan&lt;/code&gt; at 2, typically via callbacks.&lt;/li&gt;
+&lt;li&gt;A React wrapper subscribed to the atom, turning Hiccup + data into React components.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here&apos;s a flowchart:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-mermaid&quot;&gt;graph TD;
+A[2. User/Network event];
+B[2. Core.async channel];
+C[3. State transformation function];
+D[&amp;quot;4. Side-effect(s)&amp;quot;];
+E[1. State atom];
+F[5. Render UI];
+A--&amp;gt;B;
+B--&amp;gt;C;
+C--&amp;gt;E;
+C-.-&amp;gt;D;
+D-.-&amp;gt;A;
+E--&amp;gt;F;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The whole point of all of that being: state changes happen in serial, and the state change mechanism is totally decoupled from the UI rendering mechanism. This is often referred to as &apos;uni-directional data-flow&apos;, which is proof that nerds can&apos;t help themselves some time.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;*polishes Nerd badge*&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Re-frame does pretty much this; what&apos;s interesting about it is how it handles 2, 3 and 4 - it brings the full power of &lt;a href=&quot;https://en.wikipedia.org/wiki/Finite-state_machine&quot;&gt;finite-state machines&lt;/a&gt; and &lt;a href=&quot;http://pedestal.io/reference/interceptors&quot;&gt;interceptors&lt;/a&gt; to bear on the problem, making it capable of modelling substantial complexity.&lt;/p&gt;
+&lt;p&gt;I&apos;m not going to cover how re-frame does its thing here - there are plenty of resources out there:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/Day8/re-frame/tree/master/docs/README.md&quot;&gt;re-frame itself has extensive documentation&lt;/a&gt;. The &amp;quot;6-domino&amp;quot; cascade described in its README maps very closely to the flowchart above.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/plexus&quot;&gt;Arne Brausser&lt;/a&gt; has &lt;a href=&quot;https://lambdaisland.com/episodes/re-frame&quot;&gt;LambdaIsland screencasts and articles about re-frame&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://twitter.com/ericnormand&quot;&gt;Eric Normand&lt;/a&gt; has a regularly maintained guide here: &lt;a href=&quot;https://purelyfunctional.tv/guide/re-frame-building-blocks&quot;&gt;The Re-frame Building Blocks Guide&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There are no doubt plenty more out there to find!&lt;/p&gt;
+&lt;h3 id=&quot;that-speedbump-re-frame-10x&quot;&gt;&lt;a href=&quot;#that-speedbump-re-frame-10x&quot; id=&quot;that-speedbump-re-frame-10x&quot;&gt;That speedbump: re-frame-10x&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I did bring this fantastic tool into my project, but for some reason, there&apos;s a &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/pull/3&quot;&gt;dodgy interaction&lt;/a&gt; between it and the &lt;code&gt;tools.namespace&lt;/code&gt; refresh process.&lt;/p&gt;
+&lt;p&gt;Daniel is aware of it, but he&apos;s a busy chap, and so rather than allow this weird, non-obvious bug to derail my efforts, I&apos;ve decided not to use 10x for now.&lt;/p&gt;
+&lt;p&gt;I&apos;m happy to park it and circle back in a couple months!&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;bootstrapping-the-clojurescript-app&quot;&gt;&lt;a href=&quot;#bootstrapping-the-clojurescript-app&quot; id=&quot;bootstrapping-the-clojurescript-app&quot;&gt;Bootstrapping the ClojureScript app&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;This section covers all the stuff that sits between the browser and Actual Features in our client app. The section that follows after that will talk about how the Events UI sits on top.&lt;/p&gt;
+&lt;p&gt;The base application is an integration layer, which brings together the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Some developer tooling&lt;/li&gt;
+&lt;li&gt;State initialisation&lt;/li&gt;
+&lt;li&gt;Routing&lt;/li&gt;
+&lt;li&gt;The top-level view&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;developer-tools&quot;&gt;&lt;a href=&quot;#developer-tools&quot; id=&quot;developer-tools&quot;&gt;Developer tools&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;First, a couple developer conveniences.&lt;/p&gt;
+&lt;p&gt;I added &lt;a href=&quot;https://github.com/binaryage/cljs-devtools&quot;&gt;binaryage/cljs-devtools&lt;/a&gt;. This makes logging Clojure data structures as nice as logging JavaScript ones.&lt;/p&gt;
+&lt;p&gt;Just as with server-side development, I also switch on Spec asserts and Expound error printing. This pays its rent in spades, as we&apos;ll see below.&lt;/p&gt;
+&lt;h3 id=&quot;state-initialisation&quot;&gt;&lt;a href=&quot;#state-initialisation&quot; id=&quot;state-initialisation&quot;&gt;State initialisation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The server-side view dumps some basic data for the client to work with, which is currently just some session data. We read it from the DOM as EDN, and hand it to re-frame to start the client database with.&lt;/p&gt;
+&lt;p&gt;I also set up some re-frame subscriptions to get at this session data.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&quot;client-side-specs&quot;&gt;&lt;a href=&quot;#client-side-specs&quot; id=&quot;client-side-specs&quot;&gt;Client-side specs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;As I mentioned earlier, re-frame has a full interceptor chain built in. This allows us to set up middleware functions and declaratively compose them with our event handlers.&lt;/p&gt;
+&lt;p&gt;In reading through re-frame&apos;s docs, I came across an excellent application of this feature: automated client-database spec validation.&lt;/p&gt;
+&lt;p&gt;I started using namespaced keys for this initial data, and wrotes specs for it. Then I cribbed the &lt;a href=&quot;https://github.com/Day8/re-frame/blob/master/examples/todomvc/src/todomvc/events.cljs#L49&quot;&gt;check-spec&lt;/a&gt; interceptor from the todomvc example, and, as I developed the UI, I made sure that I had specs for all the data going into the client state.&lt;/p&gt;
+&lt;p&gt;Given that expound prints such nice, readable errors in the console when this happens, this ended up saving me &lt;strong&gt;substantial&lt;/strong&gt; head-scratching time.&lt;/p&gt;
+&lt;p&gt;Of course, I had already invested in specs for most all the data when writing the APIs, so I was able to simply reuse those when doing this, which felt pretty damn good. Thanks, &lt;code&gt;cljc&lt;/code&gt;!&lt;/p&gt;
+&lt;p&gt;So, this means that I have &lt;strong&gt;one&lt;/strong&gt; specification for my data, and both the server and the client use it to &apos;fail fast&apos; when data doesn&apos;t conform.&lt;/p&gt;
+&lt;p&gt;I hope the power of this is evident to you!&lt;/p&gt;
+&lt;p&gt;Just in-case it is not, let me state it clearly:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Every client-side state &lt;strong&gt;mutation only succeeds&lt;/strong&gt; if the resultant change &lt;strong&gt;conforms to the spec&lt;/strong&gt; for the client-side database.&lt;/li&gt;
+&lt;li&gt;This spec composes the &lt;strong&gt;same specs the server uses&lt;/strong&gt; with additional specs to describe how the data is structured for the client to use.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;How many times have you written &lt;code&gt;prn&lt;/code&gt; and hit refresh because of bugs caused by the lack of this sort of assistance? I know I have done so far too many times!&lt;/p&gt;
+&lt;p&gt;So, if you take &lt;u&gt;one&lt;/u&gt; thing away from this post, let it be this:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;Write specs for your client-side data and use them&lt;br&gt; to validate data on every state transition!&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h4 id=&quot;routing&quot;&gt;&lt;a href=&quot;#routing&quot; id=&quot;routing&quot;&gt;Routing&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;As with any integration layer, client-side routing is the composition of several concerns:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Wildcard server-side route, so that all &lt;code&gt;/app*&lt;/code&gt; requests reach the same server-side handler, which then serves the client HTML and assets. The client app is responsible for dealing with &lt;code&gt;&amp;quot;*&amp;quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Declaring our client-side routes. &lt;a href=&quot;https://github.com/juxt/bidi&quot;&gt;bidi&lt;/a&gt; handles this nicely; it allows me to compose the client&apos;s routing table together in the same way that it happens on the server side: by simply merging maps. This is important, because I want each app module to maintains its own routes, rather than having a large, central monolithic routes file.&lt;/p&gt;
+&lt;p&gt;Because I&apos;ve never written several of those. No &lt;em&gt;sir&lt;/em&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A re-frame &lt;a href=&quot;https://github.com/Day8/re-frame#1st-domino---event-dispatch&quot;&gt;event dispatch&lt;/a&gt; to transform the routing stimulus into data (more on this below).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Interacting with the browser&apos;s mutable history API. We use  &lt;a href=&quot;https://github.com/kibu-australia/pushy&quot;&gt;pushy&lt;/a&gt;, which connects browser events to the re-frame dispatch, after transforming them with bidi.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Most of this came from an excellent article by J. Pablo Fernández: &lt;a href=&quot;https://pupeno.com/2015/08/26/no-hashes-bidirectional-routing-in-re-frame-with-bidi-and-pushy&quot;&gt;No-hashes bidirectional routing in re-frame with bidi and pushy&lt;/a&gt;. I really just massaged it into place!&lt;/p&gt;
+&lt;h4 id=&quot;turbolinks&quot;&gt;&lt;a href=&quot;#turbolinks&quot; id=&quot;turbolinks&quot;&gt;Turbolinks&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;I added a &lt;a href=&quot;https://github.com/turbolinks/turbolinks&quot;&gt;turbolinks&lt;/a&gt;-esque helper, which allows me to use routing names like &lt;code&gt;:create-event&lt;/code&gt; to produce the right Hiccup attribute map data to make a normal &lt;code&gt;&amp;lt;a href=&amp;quot;/app/events/create&amp;quot;&amp;gt;&lt;/code&gt; link, but also provide it with an &lt;code&gt;:on-click&lt;/code&gt; handler that directly invokes the routing machinery for that view.&lt;/p&gt;
+&lt;p&gt;This allows users to right-click links and Open in New Tab, but prevents a full page reload if simply clicked in the browser. It makes the app feel really fast, without losing the things that make it feel like a normal web page.&lt;/p&gt;
+&lt;h4 id=&quot;trigger-routing-manually&quot;&gt;&lt;a href=&quot;#trigger-routing-manually&quot; id=&quot;trigger-routing-manually&quot;&gt;Trigger routing manually&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;I also added a re-frame side-effect &lt;a href=&quot;https://github.com/Day8/re-frame/blob/master/docs/Effects.md#extensible-side-effects&quot;&gt;Effect Handler&lt;/a&gt; which invokes the routing mechanism as though the user altered the address on the address bar.&lt;/p&gt;
+&lt;p&gt;This allows us to automate moving the user to a new view as part of a broader process. Currently, I use this to move the user to editing a new draft event immediately after creating it.&lt;/p&gt;
+&lt;h4 id=&quot;route--state--ui&quot;&gt;&lt;a href=&quot;#route--state--ui&quot; id=&quot;route--state--ui&quot;&gt;Route ⟶ State ⟶ UI&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Once pushy has shared the routing stimulus with re-frame, we need it to affect the view.&lt;/p&gt;
+&lt;p&gt;First, we store the data in the state. This data has two parts: the route&apos;s name (as a keyword at &lt;code&gt;:view&lt;/code&gt;), and any dynamic data from the url (as a map at &lt;code&gt;:params&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;We need to use this data to do two things: to update the view, and to load any data needed for that view. Because we&apos;ll be doing this for many different views, we need a dispatch mechanism, so that we don&apos;t end up exhaustively listing out all the views here.&lt;/p&gt;
+&lt;p&gt;Happily, we can use our old friend the multimethod for both of these, using the same &lt;code&gt;:view&lt;/code&gt; value to dispatch on:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(defmulti load-on-view :view)
+(defmethod load-on-view :default [_] nil)
+
+(defmulti view :view)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Any view that needs to load data can implement a &lt;code&gt;load-on-view&lt;/code&gt; method, which must return a re-frame dispatchable event. The default is to return &lt;code&gt;nil&lt;/code&gt;, which is how we make it optional.&lt;/p&gt;
+&lt;p&gt;And, view entry points are implemented as &lt;code&gt;view&lt;/code&gt; methods, which must return valid React components.&lt;/p&gt;
+&lt;p&gt;By example, here&apos;s &apos;edit event&apos; — see how they both use &lt;code&gt;event-slug&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(defmethod ui.base/load-on-view :edit-event
+  [{{:keys [event-slug]} :params}]
+  [::event-for-editing [:event/slug event-slug]])
+
+(defmethod ui.base/view :edit-event
+  [{{:keys [event-slug]} :params}]
+  [bridge.event.ui.edit/edit-event event-slug])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;view&lt;/code&gt; method here defers to a separate namespace for the actual view code, defined as a Reagent component &lt;code&gt;bridge.event.ui.edit/edit-event&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;load-on-view&lt;/code&gt; method is used by the same the event handler that the routing invokes.&lt;/p&gt;
+&lt;p&gt;Here&apos;s how all of that comes together, in the event that the routing invokes:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(rf/reg-event-fx ::set-view
+  [ui.spec/check-spec-interceptor]
+  (fn [{:keys [db]} [_ view]]
+    (let [load-on-view (ui.base/load-on-view view)]
+      (cond-&amp;gt; {:db (assoc db ::current-view view)}
+        (some? load-on-view)
+        (assoc :dispatch load-on-view)))))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By returning a map with a &lt;code&gt;:db&lt;/code&gt; and a &lt;code&gt;:dispatch&lt;/code&gt; key, we give re-frame the instruction to both immediately update the client database, and trigger another event.&lt;/p&gt;
+&lt;p&gt;And here&apos;s all of that as a flowchart (because who doesn&apos;t love those!)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-mermaid&quot;&gt;graph TD;
+
+A[1. DOM history changes]
+B[2. URI -&amp;gt; route lookup]
+C[3. Dispatch set-view]
+D[4.a. Dispatch load-on-view]
+E[4.b. Set current-view state]
+F[&amp;quot;5+. Render current-view&amp;quot;]
+
+A--&amp;gt;B;
+B--&amp;gt;C;
+C-.-&amp;gt;D;
+C--&amp;gt;E;
+D-.-&amp;gt;F;
+E--&amp;gt;F;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this diagram, normal link visit starts at 1, and turbolinks and manual routing changes both start at 3.&lt;/p&gt;
+&lt;p&gt;Elegant!&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&quot;top-level-view&quot;&gt;&lt;a href=&quot;#top-level-view&quot; id=&quot;top-level-view&quot;&gt;Top-level view&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The outermost view code is really quite straightforward.&lt;/p&gt;
+&lt;p&gt;It composes a navigation bar (which use turbolinks, of course) and a call to our &lt;code&gt;view&lt;/code&gt; multimethod call into a cohesive layout.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&quot;tldr&quot;&gt;
+&lt;h2 id=&quot;intermission&quot;&gt;&lt;a href=&quot;#intermission&quot; id=&quot;intermission&quot;&gt;&lt;em&gt;Intermission&lt;/em&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Wow - you&apos;re past the 2,000 word mark!&lt;/p&gt;
+&lt;p&gt;If you&apos;re reading this in a single sitting, now&apos;s a great time to rest your eyes for a minute, have a stretch, and maybe even refresh your drink.&lt;/p&gt;
+&lt;p&gt;It&apos;s OK — I&apos;ll wait for you :-)&lt;/p&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;p&gt;Are you back? Do you have a refill? Ok, let&apos;s continue...&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;events-ui&quot;&gt;&lt;a href=&quot;#events-ui&quot; id=&quot;events-ui&quot;&gt;Events UI&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&quot;how-this-code-is-organised&quot;&gt;&lt;a href=&quot;#how-this-code-is-organised&quot; id=&quot;how-this-code-is-organised&quot;&gt;How this code is organised&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;All of the following are in a single &apos;root controller&apos; namespace &lt;code&gt;bridge.event.ui&lt;/code&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Route definitions&lt;/li&gt;
+&lt;li&gt;re-frame subscriptions&lt;/li&gt;
+&lt;li&gt;re-frame effects, covering all the interaction data flows&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;load-on-view&lt;/code&gt; and &lt;code&gt;view&lt;/code&gt; multimethod implementations&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This one namespace has all of these for all three main event views. I may eventually split these out into individual namespaces per view.&lt;/p&gt;
+&lt;p&gt;The actual view implementation React components each live in their own namespace, e.g.  &lt;code&gt;bridge.event.ui.list&lt;/code&gt; or &lt;code&gt;bridge.event.ui.create&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Right now, it&apos;s nice to be able to see all of the &apos;glue&apos; in one place, to see data access/update and data-flow patterns that can be extracted.&lt;/p&gt;
+&lt;p&gt;It&apos;s also nice to be able to put the controller code side-by-side with the rendering code I&apos;m working on - which gives me another way to see the whole story for that view.&lt;/p&gt;
+&lt;p&gt;Regarding network interactions, I use the nifty &lt;a href=&quot;https://github.com/Day8/re-frame-http-fx&quot;&gt;re-frame http-fx&lt;/a&gt; effect handler to issue and respond to Ajax calls. I plan to add generic network error message handling in my wrapper code here.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&quot;listing-events&quot;&gt;&lt;a href=&quot;#listing-events&quot; id=&quot;listing-events&quot;&gt;Listing events&lt;/a&gt;&lt;/h3&gt;
+&lt;figure&gt;&lt;img src=&quot;/images/posts/bridge/list-events.png&quot; alt=&quot;Listing an event&quot;&gt;&lt;figcaption&gt;Listing events&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;p&gt;When there are no events, invite the organiser to create one.&lt;/p&gt;
+&lt;p&gt;Show the event&apos;s title, its status, and the three dates that constitute its timeline — registration-close, start, and end. Click to edit.&lt;/p&gt;
+&lt;h4 id=&quot;implementation-notes&quot;&gt;&lt;a href=&quot;#implementation-notes&quot; id=&quot;implementation-notes&quot;&gt;Implementation notes&lt;/a&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Added new Events API &lt;code&gt;list-events-for-chapter&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;goog.i18n.DateTimeFormat&lt;/code&gt; to format dates.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&quot;creating-events&quot;&gt;&lt;a href=&quot;#creating-events&quot; id=&quot;creating-events&quot;&gt;Creating events&lt;/a&gt;&lt;/h3&gt;
+&lt;figure&gt;&lt;img src=&quot;/images/posts/bridge/create-event.png&quot; alt=&quot;Creating an event&quot;&gt;&lt;figcaption&gt;Creating an event&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;p&gt;According to our &apos;make small decisions&apos; principle, we ask the organiser to enter the absolute minimum — event title, and start and end dates — and infer sensible defaults for the other mandatory event data.&lt;/p&gt;
+&lt;p&gt;To handle the remainder, we take the organiser to the edit-event view for the newly created event.&lt;/p&gt;
+&lt;h4 id=&quot;implementation-notes-1&quot;&gt;&lt;a href=&quot;#implementation-notes-1&quot; id=&quot;implementation-notes-1&quot;&gt;Implementation notes&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Since the organiser has to provide all of these details at once, we use a single reagent &lt;a href=&quot;http://reagent-project.github.io/docs/master/reagent.ratom.html#var-atom&quot;&gt;ratom&lt;/a&gt; (a.k.a. reactive atom) to store the three form field values.&lt;/p&gt;
+&lt;p&gt;Each field updates the ratom on every change.&lt;/p&gt;
+&lt;p&gt;The submit button is disabled until the map inside the atom &lt;em&gt;conforms to the &lt;code&gt;new-event&lt;/code&gt; spec&lt;/em&gt;. As this spec composes the specs for the fields, this means that we allow only &lt;strong&gt;complete&lt;/strong&gt; and &lt;strong&gt;correct&lt;/strong&gt; data through.&lt;/p&gt;
+&lt;p&gt;We use Airbnb&apos;s &lt;em&gt;excellent&lt;/em&gt; &lt;a href=&quot;http://airbnb.io/react-dates/&quot;&gt;react-dates&lt;/a&gt; component to get the start and end date values. To do this, I used the &lt;a href=&quot;http://cljsjs.github.io/&quot;&gt;cljsjs&lt;/a&gt; wrapper &lt;a href=&quot;https://github.com/cljsjs/packages/tree/master/react-dates&quot;&gt;cljsjs/react-dates&lt;/a&gt; to bring in the JavaScript, and the &lt;a href=&quot;https://github.com/deraen/ring-cljsjs&quot;&gt;ring-cljsjs&lt;/a&gt; middleware to make serving the related CSS easy.&lt;/p&gt;
+&lt;p&gt;It&apos;s thanks to &lt;a href=&quot;https://twitter.com/dubitable?lang=en&quot;&gt;Dave Della Costa&lt;/a&gt;&apos;s &lt;a href=&quot;https://github.com/ddellacosta/react-dates-reagent-example&quot;&gt;react-dates-reagent-example&lt;/a&gt; that I was able to integrate this easily.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&quot;editing-events&quot;&gt;&lt;a href=&quot;#editing-events&quot; id=&quot;editing-events&quot;&gt;Editing events&lt;/a&gt;&lt;/h3&gt;
+&lt;figure&gt;&lt;img src=&quot;/images/posts/bridge/edit-event.png&quot; alt=&quot;Editing an event&quot;&gt;&lt;figcaption&gt;Editing an event&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;p&gt;This UI, which then provides UI to manage all aspects of the event:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Title, slug, start and end dates, and registration date&lt;/li&gt;
+&lt;li&gt;Public details and private notes&lt;/li&gt;
+&lt;li&gt;Event status. Here we can see the event status rules we covered last time nicely visualised.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;implementation-notes-2&quot;&gt;&lt;a href=&quot;#implementation-notes-2&quot; id=&quot;implementation-notes-2&quot;&gt;Implementation notes&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Wow. There&apos;s a lot going on here!&lt;/p&gt;
+&lt;p&gt;Editing events falls into two basic gestures - altering the event&apos;s status, or editing a detail field.&lt;/p&gt;
+&lt;h5 id=&quot;event-status&quot;&gt;&lt;a href=&quot;#event-status&quot; id=&quot;event-status&quot;&gt;Event status&lt;/a&gt;&lt;/h5&gt;
+&lt;p&gt;As described in &lt;a href=&quot;/2018/03/31/bridge-dev-diary--events-api/#event-schema&quot;&gt;the previous post&lt;/a&gt;, event status follows a strict set of rules for how the value can change.&lt;/p&gt;
+&lt;p&gt;Here&apos;s how UI handles this. First of all, the full continuum (sans &apos;cancelled&apos;) is displayed as a progress view at the top of the page:&lt;/p&gt;
+&lt;img src=&quot;/images/posts/bridge/event-status-progress.png&quot; alt=&quot;Event status progress bar&quot;&gt;
+&lt;p&gt;A helpful message is displayed beneath this bar, which describes the key thing that&apos;s happening with this event right now:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;(def status-&amp;gt;description
+  {:status/draft
+   &amp;quot;This event is not yet public.&amp;quot;
+   :status/registering
+   &amp;quot;Participants may register.&amp;quot;
+   :status/inviting
+   &amp;quot;Registration is closed; awaiting confirmed invitations.&amp;quot;
+   :status/in-progress
+   &amp;quot;This event is happening right now!&amp;quot;
+   :status/complete
+   &amp;quot;This event is all done!&amp;quot;
+   :status/cancelled
+   &amp;quot;This event is cancelled.&amp;quot;})
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And, if the event isn&apos;t complete or cancelled, there are two buttons at the top right of the page, which progress the event to the next status, or cancel it, respectively.&lt;/p&gt;
+&lt;p&gt;Either way, when the organiser chooses to do one of these, the organiser must confirm this action, as it can&apos;t be undone:&lt;/p&gt;
+&lt;figure&gt;&lt;img src=&quot;/images/posts/bridge/edit-status.png&quot; alt=&quot;Confirming event status changes&quot;&gt;&lt;figcaption&gt;Confirming event status changes&lt;/figcaption&gt;&lt;/figure&gt;
+&lt;h5 id=&quot;edit-in-place-text-field&quot;&gt;&lt;a href=&quot;#edit-in-place-text-field&quot; id=&quot;edit-in-place-text-field&quot;&gt;Edit in place text field&lt;/a&gt;&lt;/h5&gt;
+&lt;p&gt;Most of the event&apos;s fields are text entry:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Title&lt;/li&gt;
+&lt;li&gt;Slug&lt;/li&gt;
+&lt;li&gt;Public Details&lt;/li&gt;
+&lt;li&gt;Private Notes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;They all use the same edit-in-place component, which handles everything about the edit experience: making, cancelling and committing changes, displaying &apos;dirty&apos; and &apos;invalid&apos; states, and connecting all of this to the re-frame data-flow machinery.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Editing vs display state&lt;/strong&gt;: the Markdown variant renders normal Markdown when you&apos;re not editing, and switches to a textarea when you are. The single-line textfield always displays the input.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&apos;Dirty&apos; state&lt;/strong&gt;: show when there&apos;s a new value to commit or discard. Provides &amp;quot;Save&amp;quot; and &amp;quot;Cancel&amp;quot; buttons, and wires up the Enter and Escape  keys respectively to do handle those gestures.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Invalid state&lt;/strong&gt;: disables the Save gesture, renders a red border and warning icon, and updates the placeholder with a description of the issue.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When the organiser commits an edit, we update the local state immediately, and send the network update in the background.&lt;/p&gt;
+&lt;p&gt;The edit-in-place field uses a set of configuration values, all collected together in a map under the &lt;code&gt;:field/*&lt;/code&gt; namespace. Of course, these have specs, and the component will throw if the provided config does not conform.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;where-to-from-here&quot;&gt;&lt;a href=&quot;#where-to-from-here&quot; id=&quot;where-to-from-here&quot;&gt;Where to from here?&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;At this point, a fair amount of technical debt has built up.&lt;/p&gt;
+&lt;h3 id=&quot;technical-debt&quot;&gt;&lt;a href=&quot;#technical-debt&quot; id=&quot;technical-debt&quot;&gt;Technical debt&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;There&apos;s plenty of gaps in the unit tests. Happily, all the tests that we have right now do pass!&lt;/p&gt;
+&lt;p&gt;There are plenty of places where there&apos;s insufficient error-handling:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;There&apos;s no network error handling.&lt;/li&gt;
+&lt;li&gt;None of the form interactions respond to server-side error messages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A number of issues exist due to the fact that we use a user-managed unique attribute - the url slug:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The create event form doesn&apos;t check for uniqueness conflicts yet.&lt;/li&gt;
+&lt;li&gt;When editing an event, if you change a slug, the UI doesn&apos;t update its state, or the web url yet.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Editing events has some gaps, too:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Extra logic needs to be written to ensure that the relationship between the registration-closes and start dates remains intact.&lt;/li&gt;
+&lt;li&gt;It&apos;s not possible to manage the event&apos;s organisers yet.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And the usual culprit: all of the UI needs a responsive CSS polishing.&lt;/p&gt;
+&lt;h3 id=&quot;next-steps&quot;&gt;&lt;a href=&quot;#next-steps&quot; id=&quot;next-steps&quot;&gt;Next steps&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So, probably the next arc of work will be to pay most (or all) of this all of this tech debt down, so that the next set of features is built on top of firm foundations.&lt;/p&gt;
+&lt;p&gt;After that, we can begin work on the next key activity: event participant registration!&lt;/p&gt;
+&lt;p&gt;This will likely entail building the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Public event pages&lt;/li&gt;
+&lt;li&gt;Registration forms (for both participant and coach)&lt;/li&gt;
+&lt;li&gt;Updating the backend to show registrants&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;closing&quot;&gt;&lt;a href=&quot;#closing&quot; id=&quot;closing&quot;&gt;Closing&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;As always, I&apos;m looking to learn from others just as much as I am looking to share my experience.&lt;/p&gt;
+&lt;p&gt;I&apos;d &lt;em&gt;really&lt;/em&gt; love to know how any of what I&apos;m writing here is helping you — however small or big.&lt;/p&gt;
+&lt;p&gt;If you have any advice, or questions, or feedback of any kind, please &lt;a href=&quot;http://localhost:3000/&quot;&gt;get in touch&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;As always, thanks for reading!&lt;/p&gt;
+</content></entry><entry><title>Bridge dev diary: Events API</title><link href="http://www.stuttaford.me/2018/03/31/bridge-dev-diary--events-api/" /><updated>2018-04-22T16:39:22Z</updated><id>http://www.stuttaford.me/2018/03/31/bridge-dev-diary--events-api/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Since then, I&apos;ve written other dev diary entries:&lt;/p&gt;
 &lt;ul&gt;
@@ -420,8 +755,6 @@ IP-.-&amp;gt;CA
 &lt;p&gt;I&apos;d &lt;em&gt;really&lt;/em&gt; love to know how any of what I&apos;m writing here is helping you — however small or big.&lt;/p&gt;
 &lt;p&gt;If you have any advice, or questions, or feedback of any kind, please &lt;a href=&quot;/&quot;&gt;get in touch&lt;/a&gt;!&lt;/p&gt;
 &lt;p&gt;As always, thanks for reading!&lt;/p&gt;
-&lt;script src=&quot;https://unpkg.com/mermaid@8.0.0-rc.6/dist/mermaid.min.js&quot;&gt;&lt;/script&gt;
-&lt;script&gt;mermaid.init({startOnLoad:true}, &quot;.language-mermaid&quot;);&lt;/script&gt;
 </content></entry><entry><title>Bridge dev diary: Modelling access</title><link href="http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/" /><updated>2018-03-17T18:56:07Z</updated><id>http://www.stuttaford.me/2018/03/17/bridge-dev-diary--modelling-access/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;This diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/94cacca10a3e3c06cfef54a81dda9f2e3d0c451e...3d9ce59b58eeed4d7ee2b86217c1746b1b6a424c&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
