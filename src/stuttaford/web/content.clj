@@ -115,7 +115,7 @@
     [:link {:href (str base-url "atom.xml") :rel   "alternate"
             :type "application/rss+xml"     :title "RSS"}]
     (when (str/includes? content "language-clojure")
-      (page/include-css "https://unpkg.com/highlightjs@9.10.0/styles/tomorrow.css"))]
+      (page/include-css "https://unpkg.com/highlightjs@9.10.0/styles/solarized-light.css"))]
    [:body (when (some? page-name) {:class page-name})
     [:a {:name "top"}]
     [:div.container.content
