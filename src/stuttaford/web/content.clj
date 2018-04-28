@@ -54,6 +54,9 @@
    (when (str/includes? content "language-mermaid")
      (list [:script {:src "https://unpkg.com/mermaid@8.0.0-rc.6/dist/mermaid.min.js"}]
            [:script "mermaid.init({startOnLoad:true}, \".language-mermaid\");"]))
+   (when (str/includes? content "language-clojure")
+     (list [:script {:src "https://unpkg.com/highlightjs@9.10.0/highlight.pack.js"}]
+           [:script " document.querySelectorAll(\".language-clojure\").forEach(hljs.highlightBlock);"]))
    (when-let [related (seq (posts/recent recent-posts date false))]
      [:div.related
       [:h2 "Related Posts"]
@@ -84,7 +87,7 @@
        [:h3
         [:a {:href permalink} title " " [:small (format-date date)]]]])]])
 
-(defn html-layout [{{:keys [page-name title description]} :page
+(defn html-layout [{{:keys [page-name title description content]} :page
                     {:keys [site-title site-description]} :meta
                     {:keys [name]} :author
                     :keys [base-url nav google-analytics-id domain year]
@@ -110,7 +113,9 @@
             :rel  "apple-touch-icon-precomposed"}]
     [:link {:href (str base-url "favicon.ico") :rel "shortcut icon"}]
     [:link {:href (str base-url "atom.xml") :rel   "alternate"
-            :type "application/rss+xml"     :title "RSS"}]]
+            :type "application/rss+xml"     :title "RSS"}]
+    (when (str/includes? content "language-clojure")
+      (page/include-css "https://unpkg.com/highlightjs@9.10.0/styles/tomorrow.css"))]
    [:body (when (some? page-name) {:class page-name})
     [:div.container.content
      [:div.masthead
