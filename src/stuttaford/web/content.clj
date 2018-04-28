@@ -117,6 +117,7 @@
     (when (str/includes? content "language-clojure")
       (page/include-css "https://unpkg.com/highlightjs@9.10.0/styles/tomorrow.css"))]
    [:body (when (some? page-name) {:class page-name})
+    [:a {:name "top"}]
     [:div.container.content
      [:div.masthead
       [:h3.masthead-title
@@ -126,6 +127,7 @@
              [:small [:a {:href path} title]])
            (interpose " &middot; "))]
      (template config)
+     [:div.back-to-top [:a {:href "#top"} "Back to top"]]
      [:div#mc_embed_signup
       [:form#mc-embedded-subscribe-form.validate
        {:action "https://stuttaford.us17.list-manage.com/subscribe/post?u=fb5cca3ecb94dac76560e8fd8&id=4aa6be7af7"
@@ -152,6 +154,17 @@
            :style "margin-left: 0.5rem"}]]]]]
      [:div.footer
       [:p "&copy; " name " " year ". All rights reserved. Some lefts, too."]]
+     [:script {:src         "https://code.jquery.com/jquery-3.3.0.slim.min.js"
+               :integrity   "sha256-AMg3I7ya76OLPD9M+Mk7kqrA29HUn/FuGBfT/9Uf9ls="
+               :crossorigin "anonymous"}]
+     [:script "function backToTop() {
+  if ($(window).scrollTop() <= 500 ) {
+    $('.back-to-top').css('visibility','hidden');
+  } else {
+    $('.back-to-top').css('visibility','visible');
+  }
+}
+scrollIntervalID = setInterval(backToTop, 10);"]
      [:script {:type "text/javascript"}
       "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
