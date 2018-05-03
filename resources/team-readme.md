@@ -48,7 +48,6 @@ I’ve built websites, web applications, downloadable apps, mobile games, touch 
 I’ve used the following technologies:
 
 - Databases: MySQL, SQL Server, MongoDB
-
 - Server-side: .NET, Rails, Java, PHP, Node
 - Client-side: Actionscript, AIR, Javascript, HTML/CSS
 
