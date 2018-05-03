@@ -19,11 +19,13 @@
   "open-source"
   "speaking"
   "testimonials"
-  "the-clojure-way"]
+  "the-clojure-way"
+  "team-readme"]
  :nav
  [{:title "Blog" :path "/blog/"}
   {:title "Clojure Codex" :path "/codex/"}
   {:title "Consulting" :path "/consulting/"}
   {:title "Speaking" :path "/speaking/"}
   {:title "Open Source" :path "/open-source/"}
-  {:title "Twitter" :path "https://twitter.com/RobStuttaford"}]}
+  {:title "Twitter" :path "https://twitter.com/RobStuttaford"}
+  {:title "Team Readme" :path "/team-readme/"}]}
