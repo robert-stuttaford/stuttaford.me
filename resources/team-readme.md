@@ -29,7 +29,7 @@ As always, feedback and questions are most welcome :-)
 
 Hi, I’m Robert!
 
-I have a wife, Nadine, and we two daughters -- Summer, and Elizabeth -- who are just starting their school careers.
+I have a wife, Nadine, and we have two daughters -- Summer, and Elizabeth -- who are just starting their school careers.
 
 I lived in the Western Cape, South Africa almost all my life, with parts of my childhood in Joburg.
 
