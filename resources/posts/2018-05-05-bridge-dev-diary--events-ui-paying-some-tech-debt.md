@@ -62,7 +62,7 @@ I also added some specs to the event API, and applied the same check-spec-and-th
 
 I used the usual trick of defining a separate multimethod to decide on the spec to use, using the same dispatch values as the API methods themselves. I may yet also define a [multi-spec](https://clojure.org/guides/spec#_multi_spec) around this, but as things stand right now, I don't need one!
 
-These API specs compose existing specs from the data layer — such as ``:bridge/new-event`, with specs for the API, such as `:bridge.api/chapter-id`.
+These API specs compose existing specs from the data layer — such as `:bridge/new-event`, with specs for the API, such as `:bridge.api/chapter-id`.
 
 <hr>
 
