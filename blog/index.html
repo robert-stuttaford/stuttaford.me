@@ -58,7 +58,7 @@
 <h3 id="api-specs"><a href="#api-specs" id="api-specs">API Specs</a></h3>
 <p>I also added some specs to the event API, and applied the same check-spec-and-throw trick we saw last time with the re-frame client db. Now, if the API request args aren't spec-valid, we return a 400 error, with a nicely formatted expound spec error message.</p>
 <p>I used the usual trick of defining a separate multimethod to decide on the spec to use, using the same dispatch values as the API methods themselves. I may yet also define a <a href="https://clojure.org/guides/spec#_multi_spec">multi-spec</a> around this, but as things stand right now, I don't need one!</p>
-<p>These API specs compose existing specs from the data layer — such as ``:bridge/new-event<code>, with specs for the API, such as</code>:bridge.api/chapter-id`.</p>
+<p>These API specs compose existing specs from the data layer — such as <code>:bridge/new-event</code>, with specs for the API, such as <code>:bridge.api/chapter-id</code>.</p>
 <hr>
 <h2 id="error-handling"><a href="#error-handling" id="error-handling">Error handling</a></h2>
 <p>There were a couple different situations where errors are detected, but not raised to the organiser who's using the UI.</p>
