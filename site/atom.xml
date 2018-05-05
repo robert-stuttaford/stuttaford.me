@@ -1,5 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-04-28T14:00:39Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Events UI</title><link href="http://www.stuttaford.me/2018/04/28/bridge-dev-diary--events-ui/" /><updated>2018-04-28T14:00:39Z</updated><id>http://www.stuttaford.me/2018/04/28/bridge-dev-diary--events-ui/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Robert Stuttaford</title><link href="http://www.stuttaford.me/atom.xml" rel="self" /><link href="http://www.stuttaford.me/" /><updated>2018-05-05T13:34:04Z</updated><id>http://www.stuttaford.me</id><author><name>Robert Stuttaford</name><email>robert@stuttaford.me</email></author><entry><title>Bridge dev diary: Events UI — Paying some tech debt</title><link href="http://www.stuttaford.me/2018/05/05/bridge-dev-diary--events-ui-paying-some-tech-debt/" /><updated>2018-05-05T13:34:04Z</updated><id>http://www.stuttaford.me/2018/05/05/bridge-dev-diary--events-ui-paying-some-tech-debt/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Since then, I&apos;ve written other dev diary entries:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/03/bridge-dev-diary--datomic-mode/&quot;&gt;Bridge dev diary: Datomic mode&lt;/a&gt; — 3 March, 2018&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/17/bridge-dev-diary--modelling-access/&quot;&gt;Bridge dev diary: Modelling access&lt;/a&gt; — 17 March, 2018&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/03/31/bridge-dev-diary--events-api/&quot;&gt;Bridge dev diary: Events API&lt;/a&gt; — 31 March, 2018&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;/2018/04/28/bridge-dev-diary—events-ui/&quot;&gt;Bridge dev diary: Events UI&lt;/a&gt; — 28 April, 2018&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Today&apos;s diary entry covers the &lt;a href=&quot;https://github.com/robert-stuttaford/bridge/compare/b599627...2cf89d2&quot;&gt;changes in this diff&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#tests-and-specs&quot;&gt;Tests and Specs&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#api-specs&quot;&gt;API Specs&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#error-handling&quot;&gt;Error handling&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#general-network-errors&quot;&gt;General network errors&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#creating-events&quot;&gt;Creating events&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#edit-in-place-errors&quot;&gt;Edit-in-place errors&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#slugs&quot;&gt;Slugs&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#responsive-styling&quot;&gt;Responsive styling&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#next-steps&quot;&gt;Next steps&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;This is a small update to cover how I&apos;ve dealt with some technical debt that I listed, at the end of the previous post.&lt;/p&gt;
+&lt;p&gt;For quick reference, here are the items I have since dealt with, and will be covering today (&lt;em&gt;italicised items&lt;/em&gt; haven&apos;t been dealt with, yet):&lt;/p&gt;
+&lt;div class=&quot;tldr&quot; style=&quot;padding-top:1rem&quot;&gt;
+&lt;p&gt;There&apos;s plenty of gaps in the unit tests. Happily, all the tests that we have right now do pass!&lt;/p&gt;
+&lt;p&gt;There are plenty of places where there&apos;s insufficient error-handling:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;There&apos;s no network error handling.&lt;/li&gt;
+&lt;li&gt;None of the form interactions respond to server-side error messages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A number of issues exist due to the fact that we use a user-managed unique attribute - the url slug:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The create event form doesn&apos;t check for uniqueness conflicts yet.&lt;/li&gt;
+&lt;li&gt;When editing an event, if you change a slug, the UI doesn&apos;t update its state, or the web url yet.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Editing events has some gaps, too:&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Extra logic needs to be written to ensure that the relationship between the registration-closes and start dates remains intact.&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;It&apos;s not possible to manage the event&apos;s organisers yet.&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And the usual culprit: all of the UI needs a responsive CSS polishing.&lt;/p&gt;
+&lt;/div&gt;
+&lt;h2 id=&quot;tests-and-specs&quot;&gt;&lt;a href=&quot;#tests-and-specs&quot; id=&quot;tests-and-specs&quot;&gt;Tests and Specs&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I added some example tests, mostly for the sake of completeness.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The data and API layer functions for listing events.&lt;/li&gt;
+&lt;li&gt;The custom validators for &lt;code&gt;:event/status&lt;/code&gt; and &lt;code&gt;:event/organisers&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;api-specs&quot;&gt;&lt;a href=&quot;#api-specs&quot; id=&quot;api-specs&quot;&gt;API Specs&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;I also added some specs to the event API, and applied the same check-spec-and-throw trick we saw last time with the re-frame client db. Now, if the API request args aren&apos;t spec-valid, we return a 400 error, with a nicely formatted expound spec error message.&lt;/p&gt;
+&lt;p&gt;I used the usual trick of defining a separate multimethod to decide on the spec to use, using the same dispatch values as the API methods themselves. I may yet also define a &lt;a href=&quot;https://clojure.org/guides/spec#_multi_spec&quot;&gt;multi-spec&lt;/a&gt; around this, but as things stand right now, I don&apos;t need one!&lt;/p&gt;
+&lt;p&gt;These API specs compose existing specs from the data layer — such as ``:bridge/new-event&lt;code&gt;, with specs for the API, such as&lt;/code&gt;:bridge.api/chapter-id`.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;error-handling&quot;&gt;&lt;a href=&quot;#error-handling&quot; id=&quot;error-handling&quot;&gt;Error handling&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;There were a couple different situations where errors are detected, but not raised to the organiser who&apos;s using the UI.&lt;/p&gt;
+&lt;h3 id=&quot;general-network-errors&quot;&gt;&lt;a href=&quot;#general-network-errors&quot; id=&quot;general-network-errors&quot;&gt;General network errors&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The Ajax effect has a timeout of 5 seconds at the moment. If that timeout occurs, or if the backend returns anything other than a HTTP 200 status, I now display a generic error modal, with the body of the response included.&lt;/p&gt;
+&lt;p&gt;Eventually I may remove this detail, but for now, it&apos;ll help me build out the app.&lt;/p&gt;
+&lt;p&gt;The modal reuses the one I made for the event status change, so I reorganised the code to make it reusable for this new case.&lt;/p&gt;
+&lt;h3 id=&quot;creating-events&quot;&gt;&lt;a href=&quot;#creating-events&quot; id=&quot;creating-events&quot;&gt;Creating events&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It was possible for an organiser to create a new event that would cause a slug to be generated that already exists. Rather than fuss with error modes in the form, I detect this situation and automatically append a randomised suffix.&lt;/p&gt;
+&lt;p&gt;I figure that the organiser either won&apos;t care, or will notice it, and use the edit-in-place system to alter it to something more suitable.&lt;/p&gt;
+&lt;h3 id=&quot;edit-in-place-errors&quot;&gt;&lt;a href=&quot;#edit-in-place-errors&quot; id=&quot;edit-in-place-errors&quot;&gt;Edit-in-place errors&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;This is where most of my time was spent — not specifically in presenting the error to the user to deal with, but in reworking the edit-in-place code to use global state, rather than a component-local ratom.&lt;/p&gt;
+&lt;p&gt;Before, I stored the original field value in the global atom, and then stored extra state in the local ratom. I also used the same global store location for the event list, and the event edit form.&lt;/p&gt;
+&lt;p&gt;Now, I specifically load the edit-event data into a separate top-level place in the global atom, and for the fields that use the edit-in-place mechanism, I expand the value at the attribute key to a map with all the state necessary for the edit-in-place field to work.&lt;/p&gt;
+&lt;p&gt;Let&apos;s cover that ground again, by example. The following states both show how things look with the event edit form open, while editing the title field.&lt;/p&gt;
+&lt;h4 id=&quot;before&quot;&gt;&lt;a href=&quot;#before&quot; id=&quot;before&quot;&gt;Before&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Global state&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;{:bridge.event.ui/events
+ {[:event/slug &amp;quot;clojurebridge-april&amp;quot;]
+  {:event/title &amp;quot;ClojureBridge April&amp;quot;}}}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Local ratom state&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;{:edit-value &amp;quot;ClojureBridge April!&amp;quot;
+ :editing?   true
+ :dirty?     true
+ :invalid?   false}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With this setup, there&apos;s no clean way to get error information from the server response into that local ratom, because the opportunity for doing so has passed: when first rendering the form.&lt;/p&gt;
+&lt;h4 id=&quot;after&quot;&gt;&lt;a href=&quot;#after&quot; id=&quot;after&quot;&gt;After&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Global state&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-clojure&quot;&gt;{:bridge.event.ui/events
+ {[:event/slug &amp;quot;clojurebridge-april&amp;quot;]
+  {:event/title &amp;quot;ClojureBridge April&amp;quot;}}
+ :bridge.event.ui/event-for-editing
+ {:event/title
+  {:orig-value &amp;quot;ClojureBridge April&amp;quot;
+   :edit-value &amp;quot;ClojureBridge April!&amp;quot;
+   :editing?   true
+   :dirty?     true
+   :invalid?   false}}}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, when error information comes in from the server, I simply add the error to this edit-in-place map at that field, and render it accordingly.&lt;/p&gt;
+&lt;p&gt;And, because I have explicitly decoupled this UI from the state shared with the event-list, I can move the original value down to &lt;code&gt;:orig-value&lt;/code&gt; and use it as appropriate when handling that error, or cancelling the edit entirely.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;slugs&quot;&gt;&lt;a href=&quot;#slugs&quot; id=&quot;slugs&quot;&gt;Slugs&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Using a user-managed value as an internal identifier inside the client-side state, also as an ID over the network, proved to be too cumbersome. Rather than writing more and more code to cover all the cracks, I decided to add a little state instead.&lt;/p&gt;
+&lt;p&gt;Events now have a &lt;code&gt;:event/id&lt;/code&gt; UUID, which is unique, and immutable. I use &lt;code&gt;java.util.UUID/randomUUID&lt;/code&gt; to generate these, as it&apos;s no longer necessary to use Datomic&apos;s &lt;code&gt;datomic.api/squuid&lt;/code&gt; to ensure indexing performance.&lt;/p&gt;
+&lt;p&gt;I still continue to allow slug on the address bar; this is passed over the network when loading the event for editing, and from the point that response comes back, I use the UUID internally.&lt;/p&gt;
+&lt;p&gt;Naturally, I had to update a couple specs, but overall, there was very little change to bring this new attribute in.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;responsive-styling&quot;&gt;&lt;a href=&quot;#responsive-styling&quot; id=&quot;responsive-styling&quot;&gt;Responsive styling&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I added the necessary logic to power the &lt;a href=&quot;https://bulma.io/documentation/components/navbar/#navbar-menu&quot;&gt;Bulma navbar burger&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This ended up being a bit more code than I expected, because in the mobile view, the menu expands over the top of the page content, and because this is a stateful single-page app, clicking any of those menu items won&apos;t automatically close the menu back down.&lt;/p&gt;
+&lt;p&gt;I have yet to test everything while using a narrow viewport, so I haven&apos;t specifically fixed any other responsive styling issues.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&quot;next-steps&quot;&gt;&lt;a href=&quot;#next-steps&quot; id=&quot;next-steps&quot;&gt;Next steps&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Although there are a couple more things to do from that technical debt list, I feel comfortable that I can move on to building new features again!&lt;/p&gt;
+&lt;p&gt;As mentioned last time, that&apos;ll be event participant registration:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Public event pages&lt;/li&gt;
+&lt;li&gt;Registration forms (for both participant and coach)&lt;/li&gt;
+&lt;li&gt;Updating the backend to show registrants&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See you next time!&lt;/p&gt;
+</content></entry><entry><title>Bridge dev diary: Events UI</title><link href="http://www.stuttaford.me/2018/04/28/bridge-dev-diary--events-ui/" /><updated>2018-04-28T14:00:39Z</updated><id>http://www.stuttaford.me/2018/04/28/bridge-dev-diary--events-ui/</id><content type="html">&lt;p&gt;This is a development diary for the &lt;code&gt;bridge&lt;/code&gt; project I&apos;m working on, described in detail in my post:&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;/2018/02/18/a-clojure-learning-journey/&quot;&gt;A Clojure learning journey&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Since then, I&apos;ve written other dev diary entries:&lt;/p&gt;
 &lt;ul&gt;
