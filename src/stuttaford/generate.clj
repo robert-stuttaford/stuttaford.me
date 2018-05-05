@@ -69,6 +69,8 @@
     (generate-html-path session "/codex/")
     (doseq [page (:markdown-pages (routes/site-config))]
       (generate-html-path session (str "/" page "/")))
+    (generate-path session "/blog/index/"
+                   "/blog/index/index.html")
     (generate-path session "/blog/archived/"
                    "/blog/archived/index.html")
     (doseq [permalink (map :permalink (posts/list-posts))]

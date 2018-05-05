@@ -68,15 +68,23 @@
 
 (defmethod template :blog [{:keys [latest-posts] :as config}]
   [:div.posts
-   (if-some [latest (seq (posts/latest latest-posts))]
-     (for [post latest]
-       (template (update config :page merge post)))
-     (list
-      [:h1.post-title "Blog"]
-      [:p "A new year, a new approach - coming soon!"]))
+   [:p {:style "text-align: center"} [:a {:href "/blog/index/"} "All blog posts"]]
+   [:hr]
+   (for [post (posts/latest latest-posts)]
+     (template (update config :page merge post)))
    [:div.related
     [:a {:href "/blog/archived/"}
      "Archived posts"]]])
+
+(defmethod template :blog-index [config]
+  [:div.posts
+   [:h1.post-title "All blog posts"]
+   [:ul.related-posts
+    (for [{:keys [title date permalink]} (posts/all-posts)]
+      [:li
+       [:h3
+        [:a {:href permalink} title " " [:small (format-date date)]]]])]
+   (template {:page {:layout "archived-blog"}})])
 
 (defmethod template :archived-blog [_]
   [:div.posts

@@ -12,9 +12,12 @@
                  markdown/parse-markdown-post))
        (sort-by :date (comp - compare))))
 
-(defn latest [count]
+(defn all-posts []
   (->> (list-posts)
-       (remove :archive)
+       (remove :archive)))
+
+(defn latest [count]
+  (->> (all-posts)
        (take count)))
 
 (defn recent [count date archived?]

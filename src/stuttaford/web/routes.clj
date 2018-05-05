@@ -44,6 +44,11 @@
                                                 :content ""
                                                 :layout  "blog"})))
 
+     (compojure/GET "/blog/index/" []
+       (render content/html-layout (constantly {:title   "Blog Index"
+                                                :content ""
+                                                :layout  "blog-index"})))
+
      (compojure/GET "/blog/archived/" []
        (render content/html-layout (constantly {:title   "Older Blog Posts"
                                                 :content ""
