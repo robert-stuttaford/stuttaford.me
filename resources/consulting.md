@@ -57,7 +57,7 @@ I take great interest in the social side of software, and would love to share my
 
 Evenings and weekends in UTC+2 (I live in South Africa). [Compare timezones](https://www.worldtimebuddy.com/?pl=1&lid=3369157,8,5128581,2643743&h=3369157).
 
-<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
+<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/robstuttaford).
 
 Questions? [Direct Message me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:consulting@stuttaford.me).
 
@@ -187,7 +187,7 @@ I have 6 hours a week available, which can happen in 60-90 minute blocks in the 
 
 I bill at <u>USD 250/hour</u>. I also offer a <u>5 hour package for USD 1000</u> (20% discount).
 
-<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/RobertStuttaford).
+<a href="https://calendly.com/robert-stuttaford/60min" onclick="Calendly.showPopupWidget('https://calendly.com/robert-stuttaford/60min');return false;">Schedule time with me (on Calendly)</a>, or [pay for a session (PayPal)](https://www.paypal.me/robstuttaford).
 
 If you have any questions, you can [DM me on Twitter](https://twitter.com/RobStuttaford), or [email me](mailto:consulting@stuttaford.me). I'd love to chat!
 
